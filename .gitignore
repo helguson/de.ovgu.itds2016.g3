@@ -1,0 +1,33 @@
+### whitelist or don't ignore list
+#
+# this file enables defining file types that are probably desired to be tracked
+# instead of defining file types that are probably desired to be ignored by git.
+#
+# table of contents:
+# 0 ignore every file
+# 0.0 so ignore everything
+# 0.1 but not every directory
+# 1 but ...
+# 1.0 certain git files
+# 1.3 markdown files
+# 2 nevertheless ignore ...
+# 2.0 the following directories
+
+
+### 0 ignore every file
+### 0.0 so ignore everything
+*
+### 0.1 but not every directory
+!**/
+
+### 1 but ...
+### 1.0 certain git files
+!.gitignore
+
+### 1.1 markdown files
+!*.md
+
+
+# 2 nevertheless ignore ...
+# 2.0 the following directories
+/example/
