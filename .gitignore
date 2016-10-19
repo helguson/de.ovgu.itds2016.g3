@@ -10,8 +10,10 @@
 # 1 but ...
 # 1.0 certain git files
 # 1.1 markdown files
+# 1.2 c++ files
 # 2 nevertheless ignore ...
-# 2.0 the following directories
+# 2.0 all directories
+# 2.1 except the following directories
 
 
 ### 0 ignore every file
@@ -27,7 +29,13 @@
 ### 1.1 markdown files
 !*.md
 
+### 1.2 c++ files
+!*.h
+!*.cpp
 
 # 2 nevertheless ignore ...
-# 2.0 the following directories
-/example/
+# 2.0 all directories
+**/
+
+# 2.1 except the following directories
+!source files/
