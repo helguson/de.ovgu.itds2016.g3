@@ -91,5 +91,7 @@ void GlfwWindowView::_pollInteractionsWithWindow() {
 
 void GlfwWindowView::setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback) {
 
-	this->_callbackAdapter.setOnDemandClosingWindowCallbackTo(callback);
+	this->_callbackAdapter.setOnDemandClosingWindowCallbackTo(
+		[callback](GLFWwindow* windowPtr)->void { callback();  }
+	);
 }
