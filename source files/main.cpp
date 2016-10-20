@@ -21,12 +21,10 @@ int main() {
 
 	std::function<void()> onDemandClosingOfWindow = [&shouldCloseWindow]()->void {
 		shouldCloseWindow = true;
-		log("called callback");
+		log("called callback to stop main loop");
 	};
-	log("created callback");
 
 	view.setOnDemandClosingOfWindowCallbackTo(onDemandClosingOfWindow);
-	log("set callback");
 
 	log("starting main loop");
 	while (!shouldCloseWindow) {
@@ -34,7 +32,7 @@ int main() {
 		view.render();
 	}
 
-	log("stopped looping");
+	log("stoped main loop");
 
 	return 0;
 }
