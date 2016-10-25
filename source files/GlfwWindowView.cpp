@@ -50,11 +50,11 @@ void GlfwWindowView::_initializeCallbackAdapter() {
 	}
 }
 
-void GlfwWindowView::render() {
+void GlfwWindowView::render(PointCloud3d pointCloud) {
 
 	if (this->isCorrectlyInitialized()) {
 		this->_initializeImage();
-		this->_renderImage();
+		this->_renderImage(pointCloud);
 		this->_showImage();
 		this->_pollInteractionsWithWindow();
 	}
@@ -72,9 +72,14 @@ void GlfwWindowView::_initializeImage() {
 	glClear(GL_COLOR_BUFFER_BIT); // clear image buffer
 }
 
-void GlfwWindowView::_renderImage() {
+void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
 
 	// TODO
+	// setTransformationsFor(camera)
+
+
+	// render point cloud
+
 }
 
 void GlfwWindowView::_showImage() {

@@ -3,6 +3,8 @@
 #include <GLFW\glfw3.h>
 #include <functional>
 
+#include "PointCloud3d.h"
+
 #include "GlfwWindowCallbackAdapter.h"
 
 class GlfwWindowView {
@@ -11,7 +13,7 @@ public:
 	GlfwWindowView();
 	~GlfwWindowView();
 
-	void render();
+	void render(PointCloud3d pointCloud);
 	bool isCorrectlyInitialized();
 
 	void setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback);
@@ -25,7 +27,7 @@ private:
 	void _initializeGlfwWindow();
 	void _initializeCallbackAdapter();
 	void _initializeImage();
-	void _renderImage();
+	void _renderImage(PointCloud3d pointCloud);
 	void _showImage();
 	void _pollInteractionsWithWindow();
 };
