@@ -13,11 +13,7 @@ public:
 	void setPointCloudTo(PointCloud3d pointCloud);
 	PointCloud3d getPointCloud();
 
-	void setShouldContinueMainLoopTo(bool value);
-	bool getShouldContiniueMainLoop();
-
 private:
 	PointCloud3d _pointCloud;
-	bool _shouldContinueMainLoop;
 };
 

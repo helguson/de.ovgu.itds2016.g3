@@ -7,7 +7,8 @@ Controller::Controller()
 	:
 	_view(),
 	_model(),
-	_fileLoader()
+	_fileLoader(),
+	_shouldContiniueLooping(false)
 {
 	PointCloud3d pointCloud;
 
@@ -24,16 +25,15 @@ void Controller::startMainLoop() {
 
 	Model& model = this->_model;
 
-	model.setShouldContinueMainLoopTo(true);
-
 	std::function<void()> onDemandClosingOfWindow = [this]()->void {
 		this->stopMainLoop();
 	};
 
 	this->_view.setOnDemandClosingOfWindowCallbackTo(onDemandClosingOfWindow);
 
+	this->_shouldContiniueLooping = true;
 
-	while (this->shouldContinueLooping()) {
+	while (this->shouldDoNextLoop()) {
 
 		this->_view.render(this->_model.getPointCloud());
 	}
@@ -41,10 +41,10 @@ void Controller::startMainLoop() {
 
 void Controller::stopMainLoop() {
 
-	this->_model.setShouldContinueMainLoopTo(false);
+	this->_shouldContiniueLooping = false;
 }
 
-bool Controller::shouldContinueLooping() {
+bool Controller::shouldDoNextLoop() {
 
-	return this->_model.getShouldContiniueMainLoop();
+	return this->_shouldContiniueLooping;
 }

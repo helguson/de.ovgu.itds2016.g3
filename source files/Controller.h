@@ -14,10 +14,11 @@ public:
 	// for internal use only
 	// TODO: search for better solution
 	void stopMainLoop();
-	bool shouldContinueLooping();
+	bool shouldDoNextLoop();
 
 private:
 	GlfwWindowView _view;
 	Model _model;
 	FileLoader _fileLoader;
+	bool _shouldContiniueLooping;
 };
