@@ -13,6 +13,7 @@ public:
 	std::vector<Point3d> getPoints();
 
 	// TODO: extent / bounding box, center
+	// TODO: kd-tree, point representation using kd-tree
 private:
 	std::vector<Point3d> _points;
 };
