@@ -78,23 +78,26 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
 
 	// TODO
 	glViewport(0, 0, this->_getWidth(), this->_getHeight());
-	_setPerspective(pointCloud.getRadius());
 	_setCameraTransformation(pointCloud.getCenter(),pointCloud.getRadius());
+	_setPerspective(pointCloud.getRadius());
 
 
 	// render point cloud
-	glPointSize(2);
+	glMatrixMode(GL_MODELVIEW);
+	
+	glPointSize(1);
 
 	if (!pointCloud.getPoints().empty())
 	{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
 		glColor3ub(255, 255, 255);
-		glEnableClientState(GL_VERTEX_ARRAY); //enable data upload to GPU
-		glVertexPointer(3, GL_DOUBLE, sizeof(Point3d), &pointCloud.getPoints()[0]);
-
-		//draw point cloud
-		glDrawArrays(GL_POINTS, 0, (unsigned int)pointCloud.getPoints().size());
-		glDisableClientState(GL_VERTEX_ARRAY);  //disable data upload to GPU
+		for each (Point3d pt in pointCloud.getPoints())
+		{
+			glVertex3d(pt.x, pt.y, pt.z);
+		}
+		glEnd();
 	}
+	
 }
 
 void GlfwWindowView::_showImage() {
@@ -121,7 +124,7 @@ void GlfwWindowView::_setPerspective(double radius) {
 	glfwGetFramebufferSize(this->_windowPtr, &windowWidth, &windowHeight);
 	const double D = radius / sin((3.1415 / 180.0) * (45.0 / 2));
 
-	const double zFar = D + radius;
+	const double zFar = D + 3 * radius;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45,(double)windowWidth/(double)windowHeight,0.001,zFar);
@@ -131,12 +134,12 @@ void GlfwWindowView::_setCameraTransformation(Point3d pointCloudCenter, double r
 {
 	Point3d upVector = Point3d(0, 1, 0);
 	const double D = radius / tan((3.1415 / 180.0) * (45.0 / 2));
-	Point3d cameraCenter = pointCloudCenter + Point3d(0,D,0);
+	Point3d cameraCenter = pointCloudCenter + Point3d(0, 0, D);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(
 		cameraCenter.x, cameraCenter.y, cameraCenter.z, 
-		pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z, 
+		pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z,
 		upVector.x, upVector.y, upVector.z
 	);
 }
