@@ -44,7 +44,7 @@ void PointCloud3d::_computeCenter() {
 
 void PointCloud3d::_computeRadius()
 {
-	this->_sceneRadius = sqrt(distance3d(this->minMax.second, this->_sceneCenter));
+	this->_sceneRadius = distance3d(minMax.second, this->_sceneCenter);
 }
 
 void PointCloud3d::_computeBoundingBox()
