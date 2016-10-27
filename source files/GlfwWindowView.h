@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "PointCloud3d.h"
+#include "CameraModel.h"
 
 #include "GlfwWindowCallbackAdapter.h"
 
@@ -13,7 +14,7 @@ public:
 	GlfwWindowView();
 	~GlfwWindowView();
 
-	void render(PointCloud3d pointCloud);
+	void render(PointCloud3d pointCloud, CameraModel cameraModel);
 	bool isCorrectlyInitialized();
 
 	void setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback);
@@ -30,10 +31,10 @@ private:
 	void _initializeGlfwWindow();
 	void _initializeCallbackAdapter();
 	void _initializeImage();
-	void _renderImage(PointCloud3d pointCloud);
+	void _renderImage(PointCloud3d pointCloud, CameraModel cameraModel);
 	void _showImage();
 	void _pollInteractionsWithWindow();
 	void _setProjektionMatrixAccordingTo(double radius);
-	void _setCameraTransformation(Point3d center, double radius);
+	void _setCameraTransformation(Point3d center, CameraModel cameraModel);
 	void _setupViewportMatrix();
 };

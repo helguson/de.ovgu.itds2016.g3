@@ -21,3 +21,8 @@ PointCloud3d Model::getPointCloud() {
 
 	return this->_pointCloud;
 }
+
+CameraModel& Model::getCameraModel() {
+
+	return this->_cameraModel;
+}

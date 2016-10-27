@@ -50,11 +50,11 @@ void GlfwWindowView::_initializeCallbackAdapter() {
 	}
 }
 
-void GlfwWindowView::render(PointCloud3d pointCloud) {
+void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel) {
 
 	if (this->isCorrectlyInitialized()) {
 		this->_initializeImage();
-		this->_renderImage(pointCloud);
+		this->_renderImage(pointCloud, cameraModel);
 		this->_showImage();
 		this->_pollInteractionsWithWindow();
 	}
@@ -119,19 +119,8 @@ void renderIndividual(PointCloud3d pointCloud) {
 	}
 }
 
-void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
+void renderCenterOf(PointCloud3d pointCloud) {
 
-	this->_setupViewportMatrix();
-
-	this->_setProjektionMatrixAccordingTo(pointCloud.getRadius());
-
-	this->_setCameraTransformation(pointCloud.getCenter(),pointCloud.getRadius());
-
-	// render point cloud
-	//renderAsArray(pointCloud);
-	renderIndividual(pointCloud);
-
-	// render center
 	glPointSize(10);
 	glBegin(GL_POINTS);
 	{
@@ -140,6 +129,22 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
 		glVertex3d(center.x, center.y, center.z);
 	}
 	glEnd();
+}
+
+void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel) {
+
+	this->_setupViewportMatrix();
+
+	this->_setProjektionMatrixAccordingTo(pointCloud.getRadius());
+
+	this->_setCameraTransformation(pointCloud.getCenter(), cameraModel);
+
+	// render point cloud
+	//renderAsArray(pointCloud);
+	renderIndividual(pointCloud);
+
+	// render center
+	renderCenterOf(pointCloud);
 }
 
 void GlfwWindowView::_showImage() {
@@ -179,18 +184,16 @@ void GlfwWindowView::_setProjektionMatrixAccordingTo(double pointCloudRadius) {
 	);
 }
 
-void GlfwWindowView::_setCameraTransformation(Point3d pointCloudCenter, double pointCloudRadius)
+void GlfwWindowView::_setCameraTransformation(Point3d pointCloudCenter, CameraModel cameraModel)
 {
 	Point3d upVector = Point3d(0, 1, 0);
 
-	double fieldOfViewAngleOnYAxis = 45;
-	const double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
-	Point3d cameraCenter = pointCloudCenter + Point3d(0, 0, overviewDistance);
+	Point3d cameraPosition = cameraModel.getWorldPosition();
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(
-		cameraCenter.x, cameraCenter.y, cameraCenter.z, 
+		cameraPosition.x, cameraPosition.y, cameraPosition.z, 
 		pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z,
 		upVector.x, upVector.y, upVector.z
 	);

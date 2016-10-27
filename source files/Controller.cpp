@@ -11,10 +11,13 @@ Controller::Controller()
 	_shouldContiniueLooping(false)
 {
 	PointCloud3d pointCloud;
-
 	pointCloud.setPointsTo(this->_fileLoader.load("data/cone.xyz"));
-
 	this->_model.setPointCloudTo(pointCloud);
+
+	double fieldOfViewAngleOnYAxis = 45;
+	const double overviewDistance = pointCloud.getRadius() / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
+	Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
+	this->_model.getCameraModel().setWorldPositionTo(cameraPosition);
 }
 
 Controller::~Controller() {
@@ -35,7 +38,10 @@ void Controller::startMainLoop() {
 
 	while (this->shouldDoNextLoop()) {
 
-		this->_view.render(this->_model.getPointCloud());
+		this->_view.render(
+			this->_model.getPointCloud(),
+			this->_model.getCameraModel()
+		);
 	}
 }
 
