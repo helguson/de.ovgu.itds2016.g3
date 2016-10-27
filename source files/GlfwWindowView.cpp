@@ -79,19 +79,10 @@ void GlfwWindowView::_setupViewportMatrix() {
 	glViewport(0, 0, this->_getWidth(), this->_getHeight());
 }
 
-void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
+void renderAsArray(PointCloud3d pointCloud) {
 
-	this->_setupViewportMatrix();
-
-	this->_setProjektionMatrixAccordingTo(pointCloud.getRadius());
-
-	this->_setCameraTransformation(pointCloud.getCenter(),pointCloud.getRadius());
-
-	// render point cloud
 	if (!pointCloud.getPoints().empty())
-	{ 
-
-
+	{
 		glPointSize(2);
 		glColor3d(1, 1, 1);
 
@@ -110,6 +101,35 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
 
 		glDisableClientState(GL_VERTEX_ARRAY);  //disable data upload to GPU
 	}
+}
+
+void renderIndividual(PointCloud3d pointCloud) {
+
+	glPointSize(1);
+
+	if (!pointCloud.getPoints().empty())
+	{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
+		glColor3ub(255, 255, 255);
+		for each (Point3d pt in pointCloud.getPoints())
+		{
+			glVertex3d(pt.x, pt.y, pt.z);
+		}
+		glEnd();
+	}
+}
+
+void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
+
+	this->_setupViewportMatrix();
+
+	this->_setProjektionMatrixAccordingTo(pointCloud.getRadius());
+
+	this->_setCameraTransformation(pointCloud.getCenter(),pointCloud.getRadius());
+
+	// render point cloud
+	//renderAsArray(pointCloud);
+	renderIndividual(pointCloud);
 
 	// render center
 	glPointSize(10);
@@ -148,7 +168,7 @@ void GlfwWindowView::_setProjektionMatrixAccordingTo(double pointCloudRadius) {
 
 	double fieldOfViewAngleOnYAxis = 45;
 	double overviewDistance = pointCloudRadius / sin((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
-	double farClippingPlaneZ = overviewDistance + pointCloudRadius;
+	double farClippingPlaneZ = overviewDistance + 3*pointCloudRadius;
 
 	double aspectRatio = (double)this->_getWidth() / (double)this->_getHeight();
 
@@ -171,7 +191,7 @@ void GlfwWindowView::_setCameraTransformation(Point3d pointCloudCenter, double p
 	glLoadIdentity();
 	gluLookAt(
 		cameraCenter.x, cameraCenter.y, cameraCenter.z, 
-		pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z, 
+		pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z,
 		upVector.x, upVector.y, upVector.z
 	);
 }
