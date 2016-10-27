@@ -1,7 +1,11 @@
 #include "PointCloud3d.h"
 
 PointCloud3d::PointCloud3d()
-	:_points()
+	:
+	_points(),
+	_sceneCenter(),
+	_sceneRadius(),
+	minMax()
 {
 
 }
@@ -33,9 +37,9 @@ double PointCloud3d::getRadius() {
 }
 
 void PointCloud3d::_computeCenter() {
-		
-		// compute center of scene
-	this->_sceneCenter = ( minMax.second + minMax.first) * 0.5;
+
+	// compute center of scene
+	this->_sceneCenter = (this->minMax.first + this->minMax.second) * 0.5;
 }
 
 void PointCloud3d::_computeRadius()
@@ -58,5 +62,5 @@ void PointCloud3d::_computeBoundingBox()
 			if (point.z > max.z) max.z = point.z;
 		}
 	}
-	minMax = std::pair<Point3d, Point3d>(min,max);
+	this->minMax = std::pair<Point3d, Point3d>(min,max);
 }
