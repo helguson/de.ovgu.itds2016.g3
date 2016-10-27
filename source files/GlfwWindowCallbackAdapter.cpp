@@ -73,6 +73,21 @@ void GlfwWindowCallbackAdapter::hookInto(GLFWwindow* windowPtr) {
 		windowPtr,
 		onScrollCallbackForGlfw
 	);
+
+	glfwSetFramebufferSizeCallback(
+		windowPtr,
+		onResizeCallbackForGlfw
+	);
+
+	glfwSetCursorPosCallback(
+		windowPtr,
+		onMouseMoveCallbackForGlfw
+	);
+
+	glfwSetMouseButtonCallback(
+		windowPtr,
+		onMousePressCallbackForGlfw
+	);
 }
 
 //##############
