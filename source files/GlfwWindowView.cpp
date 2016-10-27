@@ -16,8 +16,8 @@ GlfwWindowView::GlfwWindowView()
 
 GlfwWindowView::~GlfwWindowView() {
 
+	glfwDestroyWindow(this->_windowPtr);
 	glfwTerminate();
-	// TODO: free stuff
 }
 
 bool GlfwWindowView::isCorrectlyInitialized() {
@@ -74,27 +74,52 @@ void GlfwWindowView::_initializeImage() {
 	glClearDepth(1.0f);
 }
 
+void GlfwWindowView::_setupViewportMatrix() {
+
+	glViewport(0, 0, this->_getWidth(), this->_getHeight());
+}
+
 void GlfwWindowView::_renderImage(PointCloud3d pointCloud) {
 
-	// TODO
-	glViewport(0, 0, this->_getWidth(), this->_getHeight());
-	_setPerspective(pointCloud.getRadius());
-	_setCameraTransformation(pointCloud.getCenter(),pointCloud.getRadius());
+	this->_setupViewportMatrix();
 
+	this->_setProjektionMatrixAccordingTo(pointCloud.getRadius());
+
+	this->_setCameraTransformation(pointCloud.getCenter(),pointCloud.getRadius());
 
 	// render point cloud
-	glPointSize(2);
-
 	if (!pointCloud.getPoints().empty())
-	{ /* Drawing Points with VertexArrays */
-		glColor3ub(255, 255, 255);
-		glEnableClientState(GL_VERTEX_ARRAY); //enable data upload to GPU
-		glVertexPointer(3, GL_DOUBLE, sizeof(Point3d), &pointCloud.getPoints()[0]);
+	{ 
 
-		//draw point cloud
-		glDrawArrays(GL_POINTS, 0, (unsigned int)pointCloud.getPoints().size());
+
+		glPointSize(2);
+		glColor3d(1, 1, 1);
+
+		/* Drawing Points with VertexArrays */
+		glEnableClientState(GL_VERTEX_ARRAY); //enable data upload to GPU
+
+		unsigned int numberOfCoordinates = 3;
+		unsigned int strideBetweenStartOfElementData = sizeof(Point3d);
+		void* dataPtr = &pointCloud.getPoints()[0];
+		unsigned int initialElementIndex = 0;
+		unsigned int numberOfElements = (unsigned int)pointCloud.getPoints().size();
+
+		glVertexPointer(numberOfCoordinates, GL_DOUBLE, strideBetweenStartOfElementData, dataPtr);
+		// draw point cloud
+		glDrawArrays(GL_POINTS, initialElementIndex, numberOfElements);
+
 		glDisableClientState(GL_VERTEX_ARRAY);  //disable data upload to GPU
 	}
+
+	// render center
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	{
+		glColor3d(1.0, 0.3, 0.3);
+		Point3d center = pointCloud.getCenter();
+		glVertex3d(center.x, center.y, center.z);
+	}
+	glEnd();
 }
 
 void GlfwWindowView::_showImage() {
@@ -116,22 +141,32 @@ void GlfwWindowView::setOnDemandClosingOfWindowCallbackTo(std::function<void()> 
 	);
 }
 
-void GlfwWindowView::_setPerspective(double radius) {
-	int windowHeight, windowWidth;
-	glfwGetFramebufferSize(this->_windowPtr, &windowWidth, &windowHeight);
-	const double D = radius / sin((3.1415 / 180.0) * (45.0 / 2));
+void GlfwWindowView::_setProjektionMatrixAccordingTo(double pointCloudRadius) {
 
-	const double zFar = D + radius;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45,(double)windowWidth/(double)windowHeight,0.001,zFar);
+
+	double fieldOfViewAngleOnYAxis = 45;
+	double overviewDistance = pointCloudRadius / sin((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
+	double farClippingPlaneZ = overviewDistance + pointCloudRadius;
+
+	double aspectRatio = (double)this->_getWidth() / (double)this->_getHeight();
+
+	gluPerspective(
+		fieldOfViewAngleOnYAxis,
+		aspectRatio,
+		0.001, farClippingPlaneZ
+	);
 }
 
-void GlfwWindowView::_setCameraTransformation(Point3d pointCloudCenter, double radius)
+void GlfwWindowView::_setCameraTransformation(Point3d pointCloudCenter, double pointCloudRadius)
 {
 	Point3d upVector = Point3d(0, 1, 0);
-	const double D = radius / tan((3.1415 / 180.0) * (45.0 / 2));
-	Point3d cameraCenter = pointCloudCenter + Point3d(0,D,0);
+
+	double fieldOfViewAngleOnYAxis = 45;
+	const double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
+	Point3d cameraCenter = pointCloudCenter + Point3d(0, 0, overviewDistance);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(

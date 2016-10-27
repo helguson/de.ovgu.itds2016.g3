@@ -33,6 +33,7 @@ private:
 	void _renderImage(PointCloud3d pointCloud);
 	void _showImage();
 	void _pollInteractionsWithWindow();
-	void _setPerspective(double radius);
+	void _setProjektionMatrixAccordingTo(double radius);
 	void _setCameraTransformation(Point3d center, double radius);
+	void _setupViewportMatrix();
 };
