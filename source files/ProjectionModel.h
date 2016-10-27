@@ -7,9 +7,9 @@ public:
 	double getFieldOfViewAngleInYDirection();
 	double getNearClippingPlaneZ();
 	double getFarClippingPlaneZ();
-	double setFieldOfViewAngleInYDirectionTo(double angle);
-	double setNearClippingPlaneZTo(double z);
-	double setFarClippingPlaneZTo(double z);
+	void setFieldOfViewAngleInYDirectionTo(double angle);
+	void setNearClippingPlaneZTo(double z);
+	void setFarClippingPlaneZTo(double z);
 
 private:
 	double _fieldOfViewAngleInYDirection;

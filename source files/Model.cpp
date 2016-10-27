@@ -26,3 +26,8 @@ CameraModel& Model::getCameraModel() {
 
 	return this->_cameraModel;
 }
+
+ProjectionModel& Model::getProjectionModel() {
+
+	return this->_projectionModel;
+}

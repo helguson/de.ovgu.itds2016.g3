@@ -14,8 +14,15 @@ Controller::Controller()
 	pointCloud.setPointsTo(this->_fileLoader.load("data/cone.xyz"));
 	this->_model.setPointCloudTo(pointCloud);
 
-	double fieldOfViewAngleOnYAxis = 45;
-	const double overviewDistance = pointCloud.getRadius() / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
+	double fieldOfViewAngleOnYAxis = 45; 
+	double pointCloudRadius = pointCloud.getRadius();
+	double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
+
+	ProjectionModel& projectionModel = this->_model.getProjectionModel();
+	projectionModel.setFieldOfViewAngleInYDirectionTo(fieldOfViewAngleOnYAxis);
+	projectionModel.setNearClippingPlaneZTo(0.001);
+	projectionModel.setFarClippingPlaneZTo(overviewDistance + 3*pointCloudRadius);
+
 	Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
 	this->_model.getCameraModel().setWorldPositionTo(cameraPosition);
 }
@@ -40,7 +47,8 @@ void Controller::startMainLoop() {
 
 		this->_view.render(
 			this->_model.getPointCloud(),
-			this->_model.getCameraModel()
+			this->_model.getCameraModel(),
+			this->_model.getProjectionModel()
 		);
 	}
 }

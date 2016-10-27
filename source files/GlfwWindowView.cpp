@@ -50,11 +50,11 @@ void GlfwWindowView::_initializeCallbackAdapter() {
 	}
 }
 
-void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel) {
+void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel) {
 
 	if (this->isCorrectlyInitialized()) {
 		this->_initializeImage();
-		this->_renderImage(pointCloud, cameraModel);
+		this->_renderImage(pointCloud, cameraModel, projectionModel);
 		this->_showImage();
 		this->_pollInteractionsWithWindow();
 	}
@@ -131,11 +131,11 @@ void renderCenterOf(PointCloud3d pointCloud) {
 	glEnd();
 }
 
-void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel) {
+void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel) {
 
 	this->_setupViewportMatrix();
 
-	this->_setProjektionMatrixAccordingTo(pointCloud.getRadius());
+	this->_setProjektionMatrixAccordingTo(projectionModel);
 
 	this->_setCameraTransformation(pointCloud.getCenter(), cameraModel);
 
@@ -143,7 +143,6 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 	//renderAsArray(pointCloud);
 	renderIndividual(pointCloud);
 
-	// render center
 	renderCenterOf(pointCloud);
 }
 
@@ -166,21 +165,18 @@ void GlfwWindowView::setOnDemandClosingOfWindowCallbackTo(std::function<void()> 
 	);
 }
 
-void GlfwWindowView::_setProjektionMatrixAccordingTo(double pointCloudRadius) {
+void GlfwWindowView::_setProjektionMatrixAccordingTo(ProjectionModel projectionModel) {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	double fieldOfViewAngleOnYAxis = 45;
-	double overviewDistance = pointCloudRadius / sin((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
-	double farClippingPlaneZ = overviewDistance + 3*pointCloudRadius;
-
 	double aspectRatio = (double)this->_getWidth() / (double)this->_getHeight();
 
 	gluPerspective(
-		fieldOfViewAngleOnYAxis,
+		projectionModel.getFieldOfViewAngleInYDirection(),
 		aspectRatio,
-		0.001, farClippingPlaneZ
+		projectionModel.getNearClippingPlaneZ(),
+		projectionModel.getFarClippingPlaneZ()
 	);
 }
 

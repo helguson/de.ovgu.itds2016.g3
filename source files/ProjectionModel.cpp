@@ -17,12 +17,12 @@ double ProjectionModel::getNearClippingPlaneZ() {
 double ProjectionModel::getFarClippingPlaneZ() {
 	return this->_farClippingPlaneZ;
 }
-double ProjectionModel::setFieldOfViewAngleInYDirectionTo(double angle) {
+void ProjectionModel::setFieldOfViewAngleInYDirectionTo(double angle) {
 	this->_fieldOfViewAngleInYDirection = angle;
 }
-double ProjectionModel::setNearClippingPlaneZTo(double z) {
+void ProjectionModel::setNearClippingPlaneZTo(double z) {
 	this->_nearClippingPlaneZ = z;
 }
-double ProjectionModel::setFarClippingPlaneZTo(double z) {
+void ProjectionModel::setFarClippingPlaneZTo(double z) {
 	this->_farClippingPlaneZ = z;
 }
