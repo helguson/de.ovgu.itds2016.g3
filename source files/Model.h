@@ -16,10 +16,13 @@ public:
 	PointCloud3d getPointCloud();
 	CameraModel& getCameraModel();
 	ProjectionModel& getProjectionModel();
+	double getRotationAngleAroundYAxis();
+	void setRotationAngleAroundYAxis(double angle);
 
 private:
 	PointCloud3d _pointCloud;
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
+	double _rotationAngleAroundYAxis;
 };
 

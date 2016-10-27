@@ -4,7 +4,10 @@
 
 Model::Model()
 	:
-	_pointCloud()
+	_pointCloud(),
+	_cameraModel(),
+	_projectionModel(),
+	_rotationAngleAroundYAxis(0)
 {
 }
 
@@ -30,4 +33,11 @@ CameraModel& Model::getCameraModel() {
 ProjectionModel& Model::getProjectionModel() {
 
 	return this->_projectionModel;
+}
+
+double Model::getRotationAngleAroundYAxis() {
+	return this->_rotationAngleAroundYAxis;
+}
+void Model::setRotationAngleAroundYAxis(double angle) {
+	this->_rotationAngleAroundYAxis = angle;
 }

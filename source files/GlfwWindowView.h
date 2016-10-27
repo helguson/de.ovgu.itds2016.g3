@@ -15,7 +15,7 @@ public:
 	GlfwWindowView();
 	~GlfwWindowView();
 
-	void render(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel);
+	void render(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis);
 	bool isCorrectlyInitialized();
 
 	void setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback);
@@ -34,7 +34,7 @@ private:
 	void _initializeGlfwWindow();
 	void _initializeCallbackAdapter();
 	void _initializeImage();
-	void _renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel);
+	void _renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis);
 	void _showImage();
 	void _pollInteractionsWithWindow();
 	void _setProjektionMatrixAccordingTo(ProjectionModel projectionModel);

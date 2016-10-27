@@ -50,11 +50,11 @@ void GlfwWindowView::_initializeCallbackAdapter() {
 	}
 }
 
-void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel) {
+void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
 
 	if (this->isCorrectlyInitialized()) {
 		this->_initializeImage();
-		this->_renderImage(pointCloud, cameraModel, projectionModel);
+		this->_renderImage(pointCloud, cameraModel, projectionModel, rotationAngleAroundYAxis);
 		this->_showImage();
 		this->_pollInteractionsWithWindow();
 	}
@@ -131,13 +131,23 @@ void renderCenterOf(PointCloud3d pointCloud) {
 	glEnd();
 }
 
-void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel) {
+void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
 
 	this->_setupViewportMatrix();
 
 	this->_setProjektionMatrixAccordingTo(projectionModel);
 
 	this->_setCameraTransformation(pointCloud.getCenter(), cameraModel);
+
+	//rotate aroud y-axis through center
+	glMatrixMode(GL_MODELVIEW);
+	Point3d pointCloudCenter = pointCloud.getCenter();
+	glTranslated(pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z);
+	glRotated(
+		rotationAngleAroundYAxis,
+		0, 1, 0
+	);
+	glTranslated(-pointCloudCenter.x, -pointCloudCenter.y, -pointCloudCenter.z);
 
 	// render point cloud
 	//renderAsArray(pointCloud);

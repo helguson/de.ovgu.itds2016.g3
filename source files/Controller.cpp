@@ -29,6 +29,8 @@ Controller::Controller()
 	Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
 	this->_model.getCameraModel().setWorldPositionTo(cameraPosition);
 
+	this->_model.setRotationAngleAroundYAxis(0);
+
 	//################################
 	//### setup ui event callbacks ###
 	//################################
@@ -54,19 +56,18 @@ Controller::Controller()
 
 	std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
 
-		if (action == GLFW_PRESS) {
-			std::cout << "pressed";
-		}
+		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+			
+			if (key == GLFW_KEY_LEFT) {
+				double oldAngle = model.getRotationAngleAroundYAxis();
+				model.setRotationAngleAroundYAxis(oldAngle + 1);
+			}
 
-		if (action == GLFW_RELEASE) {
-			std::cout << "released";
+			if (key == GLFW_KEY_RIGHT) {
+				double oldAngle = model.getRotationAngleAroundYAxis();
+				model.setRotationAngleAroundYAxis(oldAngle - 1);
+			}
 		}
-
-		if (action == GLFW_REPEAT) {
-			std::cout << "repeated";
-		}
-
-		std::cout << " a key" << std::endl;
 	};
 	this->_view.setOnKeyCallbackTo(onKey);
 }
@@ -84,7 +85,8 @@ void Controller::startMainLoop() {
 		this->_view.render(
 			this->_model.getPointCloud(),
 			this->_model.getCameraModel(),
-			this->_model.getProjectionModel()
+			this->_model.getProjectionModel(),
+			this->_model.getRotationAngleAroundYAxis()
 		);
 	}
 }
