@@ -19,6 +19,7 @@ public:
 	bool isCorrectlyInitialized();
 
 	void setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback);
+	void setOnScrollCallbackTo(std::function<void(double, double)> callback);
 	
 private:
 	bool _isGlfwInitialized;

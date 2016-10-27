@@ -158,6 +158,13 @@ void GlfwWindowView::_pollInteractionsWithWindow() {
 	glfwPollEvents();
 }
 
+void GlfwWindowView::setOnScrollCallbackTo(std::function<void(double, double)> callback) {
+
+	this->_callbackAdapter.setOnMouseWheelCallbackTo(
+		[callback](GLFWwindow* windowPtr, double offsetX, double offsetY)->void { callback(offsetX, offsetY); }
+	);
+}
+
 void GlfwWindowView::setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback) {
 
 	this->_callbackAdapter.setOnDemandClosingWindowCallbackTo(

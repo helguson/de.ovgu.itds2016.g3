@@ -31,7 +31,7 @@ void onMouseMoveCallbackForGlfw(GLFWwindow* windowPtr, double currentPositionX, 
 	adapterPtr->triggerOnMouseMoveCallback(windowPtr, currentPositionX, currentPositionY);
 }
 
-void onMouseWheelCallbackForGlfw(GLFWwindow* windowPtr, double offsetX, double offsetY) {
+void onScrollCallbackForGlfw(GLFWwindow* windowPtr, double offsetX, double offsetY) {
 
 	GlfwWindowCallbackAdapter* adapterPtr = (GlfwWindowCallbackAdapter*)glfwGetWindowUserPointer(windowPtr);
 
@@ -67,6 +67,11 @@ void GlfwWindowCallbackAdapter::hookInto(GLFWwindow* windowPtr) {
 	glfwSetWindowCloseCallback(
 		windowPtr,
 		onDemandClosingCallbackForGlfw
+	);
+
+	glfwSetScrollCallback(
+		windowPtr,
+		onScrollCallbackForGlfw
 	);
 }
 

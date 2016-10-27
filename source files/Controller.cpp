@@ -38,8 +38,13 @@ void Controller::startMainLoop() {
 	std::function<void()> onDemandClosingOfWindow = [this]()->void {
 		this->stopMainLoop();
 	};
-
 	this->_view.setOnDemandClosingOfWindowCallbackTo(onDemandClosingOfWindow);
+
+	std::function<void(double, double)> onScroll = [](double offsetX, double offsetY)->void {
+		std::cout << "dx: " << offsetX << ", dy: " << offsetY << std::endl;
+	};
+	this->_view.setOnScrollCallbackTo(onScroll);
+
 
 	this->_shouldContiniueLooping = true;
 
