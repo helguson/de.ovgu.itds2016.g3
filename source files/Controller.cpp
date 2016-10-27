@@ -40,8 +40,16 @@ void Controller::startMainLoop() {
 	};
 	this->_view.setOnDemandClosingOfWindowCallbackTo(onDemandClosingOfWindow);
 
-	std::function<void(double, double)> onScroll = [](double offsetX, double offsetY)->void {
-		std::cout << "dx: " << offsetX << ", dy: " << offsetY << std::endl;
+	std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
+		
+		double maxOffsetAccordingToObservations = 16;
+		double dMax = 0.1;
+		double factor = 1 + dMax*(offsetY / maxOffsetAccordingToObservations);
+
+		double oldFieldOfViewAngle = model.getProjectionModel().getFieldOfViewAngleInYDirection();
+		double newFieldOfViewAngle = oldFieldOfViewAngle * factor;
+
+		model.getProjectionModel().setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
 	};
 	this->_view.setOnScrollCallbackTo(onScroll);
 
