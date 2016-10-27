@@ -1,7 +1,11 @@
 #include "PointCloud3d.h"
 
 PointCloud3d::PointCloud3d()
-	:_points()
+	:
+	_points(),
+	_sceneCenter(),
+	_sceneRadius(),
+	minMax()
 {
 
 }
@@ -12,7 +16,9 @@ PointCloud3d::~PointCloud3d() {
 void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
 
 	this->_points = points;
+	this->_computeBoundingBox();
 	this->_computeCenter();
+	this->_computeRadius();
 }
 
 std::vector<Point3d> PointCloud3d::getPoints() {
@@ -32,23 +38,25 @@ double PointCloud3d::getRadius() {
 
 void PointCloud3d::_computeCenter() {
 		
-		// compute center of scene
-		this->_sceneCenter = (minMax.first + minMax.second) * 0.5;
+	// compute center of scene
+	this->_sceneCenter = (this->minMax.first + this->minMax.second) * 0.5;
 }
 
 void PointCloud3d::_computeRadius()
 {
-	this->_sceneRadius = sqrt(distance3d(minMax.second, _sceneCenter));
+	this->_sceneRadius = sqrt(distance3d(this->minMax.second, this->_sceneCenter));
 }
 
 void PointCloud3d::_computeBoundingBox()
 {
 	Point3d min = Point3d(0, 0, 0);
 	Point3d max = Point3d(0, 0, 0);
+
 	if (!this->_points.empty()) {
-		Point3d min = Point3d(0, 0, 0);
-		Point3d max = Point3d(0, 0, 0);
-		for (unsigned int i = 0; i < this->_points.size(); i++) {
+		// first point is guaranteed to be inside of bounding box
+		min = this->_points[0];
+		max = this->_points[0];
+		for (unsigned int i = 1; i < this->_points.size(); i++) {
 			const Point3d& point = this->_points[i];
 			if (point.x < min.x) min.x = point.x;
 			if (point.y < min.y) min.y = point.y;
@@ -58,5 +66,5 @@ void PointCloud3d::_computeBoundingBox()
 			if (point.z > max.z) max.z = point.z;
 		}
 	}
-	minMax = std::pair<Point3d, Point3d>(min,max);
+	this->minMax = std::pair<Point3d, Point3d>(min,max);
 }
