@@ -20,6 +20,7 @@ public:
 
 	void setOnDemandClosingOfWindowCallbackTo(std::function<void()> callback);
 	void setOnScrollCallbackTo(std::function<void(double, double)> callback);
+	void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
 	
 private:
 	bool _isGlfwInitialized;

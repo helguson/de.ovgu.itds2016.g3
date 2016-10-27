@@ -10,6 +10,9 @@ Controller::Controller()
 	_fileLoader(),
 	_shouldContiniueLooping(false)
 {
+	//###################
+	//### setup model ###
+	//###################
 	PointCloud3d pointCloud;
 	pointCloud.setPointsTo(this->_fileLoader.load("data/cone.xyz"));
 	this->_model.setPointCloudTo(pointCloud);
@@ -25,14 +28,10 @@ Controller::Controller()
 
 	Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
 	this->_model.getCameraModel().setWorldPositionTo(cameraPosition);
-}
 
-Controller::~Controller() {
-
-}
-
-void Controller::startMainLoop() {
-
+	//################################
+	//### setup ui event callbacks ###
+	//################################
 	Model& model = this->_model;
 
 	std::function<void()> onDemandClosingOfWindow = [this]()->void {
@@ -41,7 +40,7 @@ void Controller::startMainLoop() {
 	this->_view.setOnDemandClosingOfWindowCallbackTo(onDemandClosingOfWindow);
 
 	std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
-		
+
 		double maxOffsetAccordingToObservations = 16;
 		double dMax = 0.1;
 		double factor = 1 + dMax*(offsetY / maxOffsetAccordingToObservations);
@@ -53,6 +52,30 @@ void Controller::startMainLoop() {
 	};
 	this->_view.setOnScrollCallbackTo(onScroll);
 
+	std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
+
+		if (action == GLFW_PRESS) {
+			std::cout << "pressed";
+		}
+
+		if (action == GLFW_RELEASE) {
+			std::cout << "released";
+		}
+
+		if (action == GLFW_REPEAT) {
+			std::cout << "repeated";
+		}
+
+		std::cout << " a key" << std::endl;
+	};
+	this->_view.setOnKeyCallbackTo(onKey);
+}
+
+Controller::~Controller() {
+
+}
+
+void Controller::startMainLoop() {
 
 	this->_shouldContiniueLooping = true;
 

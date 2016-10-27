@@ -172,6 +172,11 @@ void GlfwWindowView::setOnDemandClosingOfWindowCallbackTo(std::function<void()> 
 	);
 }
 
+void GlfwWindowView::setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback) {
+
+	this->_callbackAdapter.setOnKeyCallbackTo(callback);
+}
+
 void GlfwWindowView::_setProjektionMatrixAccordingTo(ProjectionModel projectionModel) {
 
 	glMatrixMode(GL_PROJECTION);

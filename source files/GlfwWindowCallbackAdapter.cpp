@@ -38,6 +38,13 @@ void onScrollCallbackForGlfw(GLFWwindow* windowPtr, double offsetX, double offse
 	adapterPtr->triggerOnMouseWheelCallback(windowPtr, offsetX, offsetY);
 }
 
+void onKeyCallbackForGlfw(GLFWwindow* windowPtr, int key, int scancode, int action, int mods) {
+
+	GlfwWindowCallbackAdapter* adapterPtr = (GlfwWindowCallbackAdapter*)glfwGetWindowUserPointer(windowPtr);
+
+	adapterPtr->triggerOnKeyCallback(windowPtr, key, scancode, action, mods);
+}
+
 //############################
 //### class implementation ###
 //############################
@@ -47,7 +54,8 @@ GlfwWindowCallbackAdapter::GlfwWindowCallbackAdapter()
 	_onResize(nullptr),
 	_onMousePress(nullptr),
 	_onMouseMove(nullptr),
-	_onMouseWheel(nullptr)
+	_onMouseWheel(nullptr),
+	_onKey(nullptr)
 {
 }
 
@@ -88,6 +96,11 @@ void GlfwWindowCallbackAdapter::hookInto(GLFWwindow* windowPtr) {
 		windowPtr,
 		onMousePressCallbackForGlfw
 	);
+
+	glfwSetKeyCallback(
+		windowPtr,
+		onKeyCallbackForGlfw
+	);
 }
 
 //##############
@@ -116,6 +129,11 @@ void GlfwWindowCallbackAdapter::setOnMouseMoveCallbackTo(std::function<void(GLFW
 void GlfwWindowCallbackAdapter::setOnMouseWheelCallbackTo(std::function<void(GLFWwindow*, double, double)> callback) {
 
 	this->_onMouseWheel = callback;
+}
+
+void GlfwWindowCallbackAdapter::setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback) {
+
+	this->_onKey = callback;
 }
 
 //###############
@@ -153,5 +171,12 @@ void GlfwWindowCallbackAdapter::triggerOnMouseWheelCallback(GLFWwindow* windowPt
 
 	if (this->_onMouseWheel != nullptr) {
 		this->_onMouseWheel(windowPtr, offsetX, offsetY);
+	}
+}
+
+void GlfwWindowCallbackAdapter::triggerOnKeyCallback(GLFWwindow* windowPtr, int key, int scancode, int action, int mods) {
+
+	if (this->_onKey != nullptr) {
+		this->_onKey(windowPtr, key, scancode, action, mods);
 	}
 }
