@@ -9,7 +9,7 @@ public:
 	bool inferiorBorderIsContained;
 	bool superiorBorderIsContained;
 
-	Interval(double inferiorBorder, bool inferiorBorderIsContained, double superiorBorder, bool superiorBorderIsContained);
+	Interval(double inferiorBorder = -std::numeric_limits<double>::infinity(), bool inferiorBorderIsContained = false, double superiorBorder = std::numeric_limits<double>::infinity(), bool superiorBorderIsContained = false);
 
 	bool contains(double value) const;
 	bool contains(const Interval& interval) const;
@@ -24,6 +24,7 @@ public:
 	double range() const;
 
 	static void runTest();
+	static Interval all(); // returns (-infinity, +infinity)
 private:
 	bool containsAccordingToInferiorBorder(double value) const;
 	bool containsAccordingToInferiorBorder(double borderValue, bool borderIsContained) const;

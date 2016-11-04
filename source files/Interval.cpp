@@ -245,3 +245,12 @@ bool Interval::isEmpty() const {
 double Interval::range() const {
 	return this->superiorBorder - this->inferiorBorder;
 }
+
+Interval Interval::all() {
+	return Interval(
+		-std::numeric_limits<double>::infinity(),
+		false,
+		std::numeric_limits<double>::infinity(),
+		false
+	);
+}
