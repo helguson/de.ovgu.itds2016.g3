@@ -129,3 +129,7 @@ double distance3d(const Point3d& v1, const Point3d& v2)
   const double d = std::sqrt(sqDistance3d(v1,v2));
   return d;
 }
+
+std::string Point3d::toStr() const {
+	return "(" + std::to_string(this->x) + ", " + std::to_string(this->y) + ", " + std::to_string(this->z) + ")";
+}

@@ -3,6 +3,8 @@
 #ifndef MY_POINT_H
 #define MY_POINT_H
 
+#include <string>
+
 //Definition of Point3d structure (our 3d Vector)
 struct Point3d
 {
@@ -27,6 +29,8 @@ struct Point3d
   Point3d& operator += (const Point3d& p2); // += operation of two points (pt1+= pt2  -> pt1 = pt1 + pt2)
   Point3d& operator -= (const Point3d& p2); // += operation of two points (pt1-= pt2  -> pt1 = pt1 - pt2)
   Point3d& operator *= (double scalar);     // *= multiplication with a scalar (pt1*= s  -> pt1 = pt1 * s)
+
+  std::string toStr() const;
 
   double x,y,z;
 };
