@@ -44,7 +44,7 @@ void test01_query_interval3d() {
 	std::string pointString;
 	std::for_each(
 		queryResult.begin(), queryResult.end(),
-		[&pointString](Point3d& const point)->void {
+		[&pointString](Point3d const & point)->void {
 			pointString += " " + point.toStr();
 		}
 	);
@@ -52,9 +52,59 @@ void test01_query_interval3d() {
 	log("(0,0,0) and (1,0,0) should be found:" + pointString);
 }
 
+void test02_query_Point3dWidthMaximumDistance() {
+	log("####################");
+	log("### start test02 ###");
+	log("####################");
+
+
+	// setup
+	//
+	//     -1  0  1  2  3  4  x
+	//  1   o    ---
+	//         /  o  \
+	//  0     /       \
+	//       /         \
+	// -1   |  o  *     |o
+	//       \         /
+	// -2     \       /
+    //         \     /
+	// -3        ---
+	//   
+	//  y
+
+
+	Point3d referencePoint(1, -1, 0);
+	double maximumDistance = 2;
+
+	double mu = 0.1;
+
+	std::vector<Point3d> data;
+	data.push_back(Point3d(-1, 1, 0));
+	data.push_back(Point3d(1, 1-mu, 0));
+	data.push_back(Point3d(0, -1, 0));
+	data.push_back(Point3d(3+mu, -1, 0));
+
+	ThreeDTree tree;
+	tree.buildFor(data.begin(), data.end());
+
+	std::vector<Point3d> queryResult = tree.query(referencePoint, maximumDistance);
+
+	std::string pointString;
+	std::for_each(
+		queryResult.begin(), queryResult.end(),
+		[&pointString](Point3d const & point)->void {
+		pointString += " " + point.toStr();
+	}
+	);
+
+	log("(1,1-mu,0) and (0,-1,0) should be found:" + pointString);
+}
+
 void ThreeDTree::runTests() {
 
 	test01_query_interval3d();
+	test02_query_Point3dWidthMaximumDistance();
 }
 
 void ThreeDTree::buildFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd) {
@@ -120,3 +170,27 @@ std::vector<Point3d> ThreeDTree::query(Interval3d const & range) {
 	return validPoints;
 }
 
+std::vector<Point3d> ThreeDTree::query(Point3d const & referencePoint, double maximumDistance) {
+
+	std::vector<Point3d> validPoints;
+
+	Interval3d hullRange(
+		Interval(referencePoint.x - maximumDistance, true, referencePoint.x + maximumDistance, true),
+		Interval(referencePoint.y - maximumDistance, true, referencePoint.y + maximumDistance, true),
+		Interval(referencePoint.z - maximumDistance, true, referencePoint.z + maximumDistance, true)
+	);
+
+	std::vector<Point3d> possiblyValidPoints = this->query(hullRange);
+
+	// test possibly valid points for validity
+	std::for_each(
+		possiblyValidPoints.begin(), possiblyValidPoints.end(),
+		[&validPoints, &referencePoint, &maximumDistance](Point3d& possiblyValidPoint)->void {
+			if (distance3d(referencePoint, possiblyValidPoint) <= maximumDistance) {
+				validPoints.push_back(possiblyValidPoint);
+			}
+		}
+	);
+
+	return validPoints;
+}
