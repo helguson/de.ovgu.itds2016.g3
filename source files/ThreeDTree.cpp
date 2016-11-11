@@ -49,7 +49,7 @@ void test01_query_interval3d() {
 		}
 	);
 
-	log("(0,0,0) and (1,0,0) shoulb be found:" + pointString);
+	log("(0,0,0) and (1,0,0) should be found:" + pointString);
 }
 
 void ThreeDTree::runTests() {
