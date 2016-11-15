@@ -2,7 +2,7 @@
 
 PointCloud3d::PointCloud3d()
 	:
-	_points(),
+	_tree(),
 	_sceneCenter(),
 	_sceneRadius(),
 	minMax()
@@ -14,8 +14,9 @@ PointCloud3d::~PointCloud3d() {
 }
 
 void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
-
-	this->_points = points;
+	ThreeDTree tree;
+	tree.buildFor(points.begin(), points.end());
+	this->_tree = tree;
 	this->_computeBoundingBox();
 	this->_computeCenter();
 	this->_computeRadius();
@@ -23,7 +24,7 @@ void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
 
 std::vector<Point3d> PointCloud3d::getPoints() {
 	
-	return this->_points;
+	return this->_tree.getPoints();
 }
 
 Point3d PointCloud3d::getCenter() {
@@ -49,15 +50,16 @@ void PointCloud3d::_computeRadius()
 
 void PointCloud3d::_computeBoundingBox()
 {
+	std::vector<Point3d> points = this->getPoints();
 	Point3d min = Point3d(0, 0, 0);
 	Point3d max = Point3d(0, 0, 0);
 
-	if (!this->_points.empty()) {
+	if (!points.empty()) {
 		// first point is guaranteed to be inside of bounding box
-		min = this->_points[0];
-		max = this->_points[0];
-		for (unsigned int i = 1; i < this->_points.size(); i++) {
-			const Point3d& point = this->_points[i];
+		min = points[0];
+		max = points[0];
+		for (unsigned int i = 1; i < points.size(); i++) {
+			const Point3d& point = points[i];
 			if (point.x < min.x) min.x = point.x;
 			if (point.y < min.y) min.y = point.y;
 			if (point.z < min.z) min.z = point.z;

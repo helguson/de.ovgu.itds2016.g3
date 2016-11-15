@@ -6,6 +6,7 @@
 #include "PointCloud3d.h"
 #include "CameraModel.h"
 #include "ProjectionModel.h"
+#include "ThreeDTree.h"
 
 #include "GlfwWindowCallbackAdapter.h"
 

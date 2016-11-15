@@ -144,10 +144,14 @@ std::vector<Point3d> ThreeDTree::query(Interval3d const & range) {
 			}
 		}
 		else {
+			
+			// ---if range contains represented interval
+			if (range.contains(currentNode->volume)) {
+				std::shared_ptr<std::stack<std::shared_ptr<Node>>> ptrToStack = std::make_shared<std::stack<std::shared_ptr<Node>>>(visitNeedingNodes);
+				addAllChildren(currentNode, ptrToStack); 
+			}
 			// handle inner node
 			std::shared_ptr<InnerNode> currentInnerNode = std::static_pointer_cast<InnerNode>(currentNode);
-			// TODO:
-			// ---if range contains represented interval 
 				// ---add all points of subtree to valid points
 			if (range.intersectsWith(currentInnerNode->volume)) {
 				// add children to be visited
@@ -194,3 +198,34 @@ std::vector<Point3d> ThreeDTree::query(Point3d const & referencePoint, double ma
 
 	return validPoints;
 }
+
+void ThreeDTree::addAllChildren(std::shared_ptr<Node> node, std::shared_ptr<std::stack<std::shared_ptr<Node>>> nodeStack) {
+	if (node->isLeafNode())	
+		nodeStack->push(node);
+	else {
+		std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(node);
+		addAllChildren(innerNode->inferiorChild, nodeStack);
+		addAllChildren(innerNode->superiorChild, nodeStack);
+	}
+}
+
+void getPointsStartFrom(std::shared_ptr<Node> node, std::vector<Point3d>* points) {
+	if (node->isLeafNode()) {
+		std::shared_ptr<LeafNode> leafNode = std::static_pointer_cast<LeafNode>(node);
+		points->push_back(*leafNode->pointPtr);
+	}
+	else {
+		std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(node);
+		getPointsStartFrom(innerNode->inferiorChild, points);
+		getPointsStartFrom(innerNode->superiorChild, points);
+	}
+}
+
+std::vector<Point3d> ThreeDTree::getPoints()
+{
+	std::vector<Point3d> ptrToPoints;
+	getPointsStartFrom(this->_root, &ptrToPoints);
+	return ptrToPoints;
+}
+
+

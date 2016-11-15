@@ -106,18 +106,20 @@ void renderAsArray(PointCloud3d pointCloud) {
 void renderIndividual(PointCloud3d pointCloud) {
 
 	glPointSize(1);
-
-	if (!pointCloud.getPoints().empty())
+	std::vector<Point3d> cloud = pointCloud.getPoints();
+	if (!cloud.empty())
 	{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
 		glColor3ub(255, 255, 255);
-		for each (Point3d pt in pointCloud.getPoints())
+		for each (Point3d pt in cloud)
 		{
 			glVertex3d(pt.x, pt.y, pt.z);
 		}
 		glEnd();
 	}
 }
+
+void renderNearestNeighbors(PointCloud3d pointCloud){}
 
 void renderCenterOf(PointCloud3d pointCloud) {
 
@@ -152,7 +154,7 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 	// render point cloud
 	//renderAsArray(pointCloud);
 	renderIndividual(pointCloud);
-
+	renderNearestNeighbors(pointCloud);
 	renderCenterOf(pointCloud);
 }
 

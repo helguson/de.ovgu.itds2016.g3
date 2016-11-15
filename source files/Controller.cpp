@@ -14,9 +14,8 @@ Controller::Controller()
 	//### setup model ###
 	//###################
 	PointCloud3d pointCloud;
-	pointCloud.setPointsTo(this->_fileLoader.load("data/cone.xyz"));
+	pointCloud.setPointsTo(this->_fileLoader.load());
 	this->_model.setPointCloudTo(pointCloud);
-
 	double fieldOfViewAngleOnYAxis = 45; 
 	double pointCloudRadius = pointCloud.getRadius();
 	double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
