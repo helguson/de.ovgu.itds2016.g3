@@ -17,4 +17,5 @@ public:
 	bool contains(Point3d const & point) const;
 
 	static Interval3d all();
+	static Interval3d getSphereEncapsulatingIntervalFor(Point3d const & centerPoint, double radius);
 };

@@ -35,3 +35,13 @@ bool Interval3d::contains(Point3d const & point) const {
 		&& this->y.contains(point.y)
 		&& this->z.contains(point.z);
 }
+
+Interval3d Interval3d::getSphereEncapsulatingIntervalFor(Point3d const & centerPoint, double radius) {
+
+	return Interval3d(
+		Interval(centerPoint.x - radius, true, centerPoint.x + radius, true),
+		Interval(centerPoint.y - radius, true, centerPoint.y + radius, true),
+		Interval(centerPoint.z - radius, true, centerPoint.z + radius, true)
+	);
+
+}
