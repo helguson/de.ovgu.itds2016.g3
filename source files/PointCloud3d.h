@@ -12,14 +12,16 @@ public:
 
 	void setPointsTo(std::vector<Point3d> points);
 	std::vector<Point3d> getPoints();
+	ThreeDTree getTree();
 	Point3d getCenter();
 	double getRadius();
 
 	// TODO: extent / bounding box, center
 	// TODO: kd-tree, point representation using kd-tree
 private:
+	std::vector<Point3d> _points;
 	ThreeDTree _tree;
-	std::pair<Point3d, Point3d> minMax;
+	std::pair<Point3d, Point3d> _minMax;
 	Point3d _sceneCenter;
 	double _sceneRadius;
 

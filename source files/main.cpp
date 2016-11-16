@@ -9,7 +9,7 @@ int main() {
 
 	//Interval::runTest();
 	//ThreeDTreeStructureBuilder::runTest();
-	ThreeDTree::runTests();
+	//ThreeDTree::runTests();
 	
 	Controller controller;
 	controller.startMainLoop();
