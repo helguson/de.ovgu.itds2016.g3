@@ -120,6 +120,25 @@ void ThreeDTree::buildFor(std::vector<Point3d>::iterator dataBegin, std::vector<
 	}
 }
 
+void addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoints) {
+	std::stack<std::shared_ptr<Node>> stack;
+	stack.push(node);
+
+	while (!stack.empty()) {
+		std::shared_ptr<Node> tmpNode = stack.top();
+		stack.pop();
+		if (tmpNode->isLeafNode()) {
+			std::shared_ptr<LeafNode> leafNode = std::static_pointer_cast<LeafNode>(tmpNode);
+			validPoints->push_back(*leafNode->pointPtr);
+		}
+		else {
+			std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(tmpNode);
+			stack.push(innerNode->superiorChild);
+			stack.push(innerNode->inferiorChild);
+		}
+	}
+}
+
 std::vector<Point3d> ThreeDTree::query(Interval3d const & range) {
 
 	std::vector<Point3d> validPoints;
@@ -144,13 +163,13 @@ std::vector<Point3d> ThreeDTree::query(Interval3d const & range) {
 			}
 		}
 		else {
-			
+			// handle inner node
+
 			// ---if range contains represented interval
 			if (range.contains(currentNode->volume)) {
 				addAllChildren(currentNode, &validPoints); 
 			}
 			else {
-				// handle inner node
 				std::shared_ptr<InnerNode> currentInnerNode = std::static_pointer_cast<InnerNode>(currentNode);
 				// ---add all points of subtree to valid points
 				if (range.intersectsWith(currentInnerNode->volume)) {
@@ -203,25 +222,6 @@ std::vector<Point3d> ThreeDTree::query(Point3d const & referencePoint, double ma
 Point3d ThreeDTree::estimateNearNeighborOf(const Point3d point) const
 {
 	return Point3d();
-}
-
-void ThreeDTree::addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoints) {
-	std::stack<std::shared_ptr<Node>> stack;
-	stack.push(node);
-
-	while (!stack.empty()) {
-		std::shared_ptr<Node> tmpNode = stack.top();
-		stack.pop();
-		if (tmpNode->isLeafNode()) {
-			std::shared_ptr<LeafNode> leafNode = std::static_pointer_cast<LeafNode>(tmpNode);
-			validPoints->push_back(*leafNode->pointPtr);
-		}
-		else {
-			std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(tmpNode);
-			stack.push(innerNode->superiorChild);
-			stack.push(innerNode->inferiorChild);
-		}
-	}
 }
 
 

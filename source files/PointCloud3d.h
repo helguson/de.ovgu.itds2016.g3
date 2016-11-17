@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 #include "Point3d.h"
 #include "ThreeDTree.h"
 
@@ -11,10 +12,12 @@ public:
 	~PointCloud3d();
 
 	void setPointsTo(std::vector<Point3d> points);
-	std::vector<Point3d> getPoints();
-	ThreeDTree getTree();
+	std::vector<Point3d>& getPoints();
+	ThreeDTree& getTree();
 	Point3d getCenter();
 	double getRadius();
+	std::vector<Point3d> query(Point3d const & referencePoint, double maximumDistance);
+	void smooth( const double radius);
 
 	// TODO: extent / bounding box, center
 	// TODO: kd-tree, point representation using kd-tree

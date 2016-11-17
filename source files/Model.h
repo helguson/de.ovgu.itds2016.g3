@@ -13,8 +13,9 @@ public:
 	~Model();
 
 	// TODO: replace with shared pointers or something else without copying all the points
-	void setPointCloudTo(PointCloud3d pointCloud);
-	PointCloud3d getPointCloud();
+	void setPointCloudTo(PointCloud3d& pointCloud);
+	PointCloud3d& getPointCloud();
+	PointCloud3d& getSmoothedCloud();
 	CameraModel& getCameraModel();
 	ProjectionModel& getProjectionModel();
 	double getRotationAngleAroundYAxis();

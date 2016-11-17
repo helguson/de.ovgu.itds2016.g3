@@ -12,7 +12,6 @@ public:
 	std::vector<Point3d> query(Interval3d const & range);
 	std::vector<Point3d> query(Point3d const & referencePoint, double maximumDistance);
 	Point3d estimateNearNeighborOf(const Point3d point) const;
-	void addAllChildren(std::shared_ptr<Node> currentNode, std::vector<Point3d>* nodeStack);
 	static void runTests();
 
 private:

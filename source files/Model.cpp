@@ -15,13 +15,19 @@ Model::~Model()
 {
 }
 
-void Model::setPointCloudTo(PointCloud3d pointCloud) {
+void Model::setPointCloudTo(PointCloud3d& pointCloud) {
 
 	this->_pointCloud = pointCloud;
 }
 
-PointCloud3d Model::getPointCloud() {
+PointCloud3d& Model::getPointCloud() {
 
+	return this->_pointCloud;
+}
+
+PointCloud3d& Model::getSmoothedCloud()
+{
+	this->_pointCloud.smooth(0.5);
 	return this->_pointCloud;
 }
 

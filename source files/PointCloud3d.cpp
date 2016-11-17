@@ -2,6 +2,7 @@
 
 PointCloud3d::PointCloud3d()
 	:
+	_points(),
 	_tree(),
 	_sceneCenter(),
 	_sceneRadius(),
@@ -15,20 +16,18 @@ PointCloud3d::~PointCloud3d() {
 
 void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
 	this->_points = points;
-	ThreeDTree tree;
-	tree.buildFor(this->_points.begin(), this->_points.end());
-	this->_tree = tree;
+	this->_tree.buildFor(this->_points.begin(), this->_points.end());
 	this->_computeBoundingBox();
 	this->_computeCenter();
 	this->_computeRadius();
 }
 
-std::vector<Point3d> PointCloud3d::getPoints() {
+std::vector<Point3d>& PointCloud3d::getPoints() {
 	
 	return this->_points;
 }
 
-ThreeDTree PointCloud3d::getTree() {
+ThreeDTree& PointCloud3d::getTree() {
 
 	return this->_tree;
 }
@@ -74,4 +73,29 @@ void PointCloud3d::_computeBoundingBox()
 		}
 	}
 	this->_minMax = std::pair<Point3d, Point3d>(min,max);
+}
+
+std::vector<Point3d> PointCloud3d::query(Point3d const & referencePoint, double maximumDistance) {
+	return this->_tree.query(referencePoint,maximumDistance);
+}
+
+void PointCloud3d::smooth( double radius)
+{
+	std::vector<Point3d> smoothedPoints;
+
+	std::for_each(
+		this->_points.begin(), this->_points.end(),
+		[this, &radius, &smoothedPoints](Point3d & point)->void {
+		Point3d smoothedPt;
+		std::vector<Point3d> neighborhood = query(point, radius);
+		std::for_each(
+			neighborhood.begin(), neighborhood.end(),
+			[&smoothedPt, &radius ](Point3d const & neighbor) {
+			smoothedPt *= std::exp(-distance3d(smoothedPt, neighbor) / radius); 
+		});
+		smoothedPt *= (1 / neighborhood.size());
+		smoothedPoints.push_back(smoothedPt);
+	});
+	this->setPointsTo(smoothedPoints);
+
 }
