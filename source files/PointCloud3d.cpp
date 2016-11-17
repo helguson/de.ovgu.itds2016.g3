@@ -16,7 +16,6 @@ PointCloud3d::~PointCloud3d() {
 
 void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
 	this->_points = points;
-	this->_tree.buildFor(this->_points.begin(), this->_points.end());
 	this->_computeBoundingBox();
 	this->_computeCenter();
 	this->_computeRadius();
@@ -73,6 +72,10 @@ void PointCloud3d::_computeBoundingBox()
 		}
 	}
 	this->_minMax = std::pair<Point3d, Point3d>(min,max);
+}
+
+void PointCloud3d::computeTree() {
+	this->_tree.buildFor(this->_points.begin(), this->_points.end());
 }
 
 std::vector<Point3d> PointCloud3d::query(Point3d const & referencePoint, double maximumDistance) {

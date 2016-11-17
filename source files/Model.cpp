@@ -17,18 +17,18 @@ Model::~Model()
 
 void Model::setPointCloudTo(PointCloud3d& pointCloud) {
 
-	this->_pointCloud = pointCloud;
+	this->_pointClouds.push_back(pointCloud);
+	this->_pointClouds.back().computeTree();
 }
 
-PointCloud3d& Model::getPointCloud() {
+PointCloud3d& Model::getPointCloud(int index) {
 
-	return this->_pointCloud;
+	return this->_pointClouds[index];
 }
 
-PointCloud3d& Model::getSmoothedCloud()
+PointCloud3d& Model::getSmoothedCloud(int index)
 {
-	this->_pointCloud.smooth(0.5);
-	return this->_pointCloud;
+	return PointCloud3d();
 }
 
 CameraModel& Model::getCameraModel() {

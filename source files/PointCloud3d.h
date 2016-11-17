@@ -18,6 +18,7 @@ public:
 	double getRadius();
 	std::vector<Point3d> query(Point3d const & referencePoint, double maximumDistance);
 	void smooth( const double radius);
+	void computeTree();
 
 	// TODO: extent / bounding box, center
 	// TODO: kd-tree, point representation using kd-tree
