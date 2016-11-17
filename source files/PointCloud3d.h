@@ -17,7 +17,7 @@ public:
 	Point3d getCenter();
 	double getRadius();
 	std::vector<Point3d> query(Point3d const & referencePoint, double maximumDistance);
-	void smooth( const double radius);
+	PointCloud3d smooth( const double radius);
 	void computeTree();
 
 	// TODO: extent / bounding box, center

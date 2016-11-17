@@ -82,8 +82,9 @@ std::vector<Point3d> PointCloud3d::query(Point3d const & referencePoint, double 
 	return this->_tree.query(referencePoint,maximumDistance);
 }
 
-void PointCloud3d::smooth( double radius)
+PointCloud3d PointCloud3d::smooth( double radius)
 {
+	PointCloud3d smoothedCloud;
 	std::vector<Point3d> smoothedPoints;
 
 	std::for_each(
@@ -99,6 +100,6 @@ void PointCloud3d::smooth( double radius)
 		smoothedPt *= (1 / neighborhood.size());
 		smoothedPoints.push_back(smoothedPt);
 	});
-	this->setPointsTo(smoothedPoints);
-
+	smoothedCloud.setPointsTo(smoothedPoints);
+	return smoothedCloud;
 }
