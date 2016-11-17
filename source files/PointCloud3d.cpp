@@ -87,19 +87,20 @@ PointCloud3d PointCloud3d::smooth( double radius)
 	PointCloud3d smoothedCloud;
 	std::vector<Point3d> smoothedPoints;
 
-	std::for_each(
-		this->_points.begin(), this->_points.end(),
-		[this, &radius, &smoothedPoints](Point3d & point)->void {
-		Point3d smoothedPt;
-		std::vector<Point3d> neighborhood = query(point, radius);
-		std::for_each(
-			neighborhood.begin(), neighborhood.end(),
-			[&smoothedPt, &radius ](Point3d const & neighbor) {
-			smoothedPt *= std::exp(-distance3d(smoothedPt, neighbor) / radius); 
-		});
-		smoothedPt *= (1 / neighborhood.size());
+	//#pragma omp parallel for
+	for(int i = 0; i < this->getPoints().size(); ++i)
+	{
+		Point3d origin = this->getPoints()[i];
+		Point3d smoothedPt = origin;
+		std::vector<Point3d> neighborhood = query(smoothedPt, radius);
+		for each (Point3d neighbor in neighborhood)
+		{
+			double wi = std::exp( (-1 * distance3d(origin, neighbor)) / radius);
+			smoothedPt += neighbor*wi;
+		}
+		smoothedPt *= (1.0 / (neighborhood.size() + 1));
 		smoothedPoints.push_back(smoothedPt);
-	});
+	}
 	smoothedCloud.setPointsTo(smoothedPoints);
 	return smoothedCloud;
 }

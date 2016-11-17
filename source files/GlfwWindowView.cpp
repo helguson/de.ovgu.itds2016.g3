@@ -123,14 +123,13 @@ void renderIndividual(PointCloud3d& pointCloud) {
 }
 
 void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
-
-	glBegin(GL_POINTS);
+	
 	glPointSize(1);
+	glBegin(GL_POINTS);
 	glColor3ub(0, 0, 255);
 	glVertex3d(point.x, point.y, point.z);
 	glEnd();
 
-	glPointSize(1);
 	std::vector<Point3d> queryResult = pointCloud.query(point, radius);
 	if (!queryResult.empty())
 	{ /* Drawing Points with VertexArrays */
