@@ -78,11 +78,10 @@ Controller::~Controller() {
 void Controller::startMainLoop() {
 
 	this->_shouldContiniueLooping = true;
-	this->_model.getSmoothedCloud(0,0.2);
 	while (this->shouldDoNextLoop()) {
 
 		this->_view.render(
-			this->_model.getPointCloud(1),
+			this->_model.getPointCloud(0),
 			this->_model.getCameraModel(),
 			this->_model.getProjectionModel(),
 			this->_model.getRotationAngleAroundYAxis()

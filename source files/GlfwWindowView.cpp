@@ -122,6 +122,23 @@ void renderIndividual(PointCloud3d& pointCloud) {
 	}
 }
 
+void renderSmoothedCloud(PointCloud3d& pointCloud) {
+
+	PointCloud3d newCloud = pointCloud.smooth(0.5);
+
+	glPointSize(1);
+	if (!newCloud.getPoints().empty())
+	{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
+		glColor3ub(0, 255, 0);
+		for each (Point3d pt in newCloud.getPoints())
+		{
+			glVertex3d(pt.x, pt.y, pt.z);
+		}
+		glEnd();
+	}
+}
+
 void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
 	
 	glPointSize(1);
@@ -141,7 +158,6 @@ void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) 
 		}
 		glEnd();
 	}
-	
 	
 }
 
@@ -178,9 +194,9 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 	glTranslated(-pointCloudCenter.x, -pointCloudCenter.y, -pointCloudCenter.z);
 
 	// render points
-	renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 5);
+	renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 0.3);
 	renderIndividual(pointCloud);
-
+	renderSmoothedCloud(pointCloud);
 	renderCenterOf(pointCloud);
 
 }
