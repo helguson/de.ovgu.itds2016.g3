@@ -194,9 +194,9 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 	glTranslated(-pointCloudCenter.x, -pointCloudCenter.y, -pointCloudCenter.z);
 
 	// render points
-	renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 0.3);
-	renderIndividual(pointCloud);
-	renderSmoothedCloud(pointCloud);
+	//renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 0.3);
+	//renderIndividual(pointCloud);
+	//renderSmoothedCloud(pointCloud);
 	renderCenterOf(pointCloud);
 
 }
