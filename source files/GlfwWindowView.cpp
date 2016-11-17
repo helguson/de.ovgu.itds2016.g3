@@ -122,10 +122,16 @@ void renderIndividual(PointCloud3d& pointCloud) {
 	}
 }
 
-void renderNearNeighbor(PointCloud3d& pointCloud) {
+void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
+
+	glBegin(GL_POINTS);
+	glPointSize(1);
+	glColor3ub(0, 0, 255);
+	glVertex3d(point.x, point.y, point.z);
+	glEnd();
 
 	glPointSize(1);
-	std::vector<Point3d> queryResult = pointCloud.query(pointCloud.getPoints()[0], 0.4);
+	std::vector<Point3d> queryResult = pointCloud.query(point, radius);
 	if (!queryResult.empty())
 	{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
@@ -136,6 +142,7 @@ void renderNearNeighbor(PointCloud3d& pointCloud) {
 		}
 		glEnd();
 	}
+	
 	
 }
 
@@ -172,7 +179,7 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 	glTranslated(-pointCloudCenter.x, -pointCloudCenter.y, -pointCloudCenter.z);
 
 	// render points
-	renderNearNeighbor(pointCloud);
+	renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 5);
 	renderIndividual(pointCloud);
 
 	renderCenterOf(pointCloud);
