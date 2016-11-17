@@ -26,9 +26,12 @@ PointCloud3d& Model::getPointCloud(int index) {
 	return this->_pointClouds[index];
 }
 
-PointCloud3d& Model::getSmoothedCloud(int index)
+PointCloud3d& Model::getSmoothedCloud(int index, double degree)
 {
-	return PointCloud3d();
+	PointCloud3d newCloud = this->_pointClouds[index].smooth(degree);
+	this->_pointClouds.push_back(newCloud);
+	this->_pointClouds.back().computeTree();
+	return this->_pointClouds.back();
 }
 
 CameraModel& Model::getCameraModel() {
