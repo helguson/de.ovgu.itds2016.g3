@@ -87,7 +87,7 @@ PointCloud3d PointCloud3d::smooth( double radius)
 	PointCloud3d smoothedCloud;
 	std::vector<Point3d> smoothedPoints;
 
-	//#pragma omp parallel for
+	#pragma omp parallel for
 	for(int i = 0; i < this->getPoints().size(); ++i)
 	{
 		Point3d origin = this->getPoints()[i];
