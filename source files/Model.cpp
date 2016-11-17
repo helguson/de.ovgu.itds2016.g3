@@ -4,7 +4,7 @@
 
 Model::Model()
 	:
-	_pointCloud(),
+	_pointClouds(),
 	_cameraModel(),
 	_projectionModel(),
 	_rotationAngleAroundYAxis(0)
@@ -49,4 +49,12 @@ double Model::getRotationAngleAroundYAxis() {
 }
 void Model::setRotationAngleAroundYAxis(double angle) {
 	this->_rotationAngleAroundYAxis = angle;
+}
+
+void Model::_recomputeTrees()
+{
+	for each (PointCloud3d cloud in this->_pointClouds)
+	{
+		cloud.computeTree();
+	}
 }

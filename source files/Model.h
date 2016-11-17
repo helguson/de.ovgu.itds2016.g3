@@ -26,5 +26,6 @@ private:
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
 	double _rotationAngleAroundYAxis;
+	void _recomputeTrees();
 };
 
