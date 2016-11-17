@@ -13,5 +13,4 @@ public:
 	~FileLoader();
 
 	std::vector<Point3d> load();
-	char * wchar_to_string(_TCHAR* widechar);
 };

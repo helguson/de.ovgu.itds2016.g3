@@ -1,6 +1,7 @@
 ﻿#include "FileLoader.h"
 
 #include <iostream>
+#include <string>
 
 
 //Here is the implementation of our file reader
@@ -63,22 +64,10 @@ std::vector<Point3d> FileLoader::load() {
 
 	if (openFileDialog1->ShowDialog())
 	{
-		char* filename = wchar_to_string(openFileDialog1->FileName);
+		std::string filename(openFileDialog1->FileName);
 		
-		loadFileXYZ(filename, result);
+		loadFileXYZ(filename.c_str(), result);
 
 	}
 	return result;
-}
-
-char * FileLoader::wchar_to_string(_TCHAR* widechar)
-{
-	int size = 0;
-	while ((char)widechar[size] != '\0') {
-		size++;
-	}
-	size++;
-	char * charpointer = new char[size];
-	wcstombs(charpointer, widechar, size);
-	return charpointer;
 }
