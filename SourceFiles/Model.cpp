@@ -26,8 +26,10 @@ PointCloud3d& Model::getPointCloud() {
 }
 
 PointCloud3d& Model::getPointCloud(int index) {
-	if(index>=0 && index <= this->_pointClouds.size())
-	return this->_pointClouds[index];
+	if (index >= 0 && index <= this->_pointClouds.size())
+		return this->_pointClouds[index];
+	else{ }
+		//Todo
 }
 
 ModelProperties Model::getModelProperties() {
