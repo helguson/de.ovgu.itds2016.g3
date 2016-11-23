@@ -33,9 +33,14 @@
 !*.h
 !*.cpp
 
+### 1.3 qt files
+!*.qrc
+!*.ui
+
 # 2 nevertheless ignore ...
 # 2.0 all directories
 **/
 
 # 2.1 except the following directories
-!source files/
+!SourceFiles/
+!/
