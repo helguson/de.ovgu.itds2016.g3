@@ -57,6 +57,7 @@ void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel, Pr
 		this->_renderImage(pointCloud, cameraModel, projectionModel, rotationAngleAroundYAxis);
 		this->_showImage();
 		this->_pollInteractionsWithWindow();
+
 	}
 	else {
 		// TODO: log warning
@@ -72,6 +73,9 @@ void GlfwWindowView::_initializeImage() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0f);
+
+	// enable depth test
+	glEnable(GL_DEPTH_TEST);
 }
 
 void GlfwWindowView::_setupViewportMatrix() {
@@ -103,7 +107,7 @@ void renderAsArray(PointCloud3d pointCloud) {
 	}
 }
 
-void renderIndividual(PointCloud3d pointCloud) {
+void renderIndividual(PointCloud3d& pointCloud) {
 
 	glPointSize(1);
 	if (!pointCloud.getPoints().empty())
@@ -118,20 +122,32 @@ void renderIndividual(PointCloud3d pointCloud) {
 	}
 }
 
-bool isInQuery(Point3d& pt, const std::vector<Point3d>& query) {
-	for each(Point3d pt2 in query) {
-		if (pt == pt2) return true;
+void renderSmoothedCloud(PointCloud3d& pointCloud) {
+
+	PointCloud3d newCloud = pointCloud.smooth(0.5);
+
+	glPointSize(1);
+	if (!newCloud.getPoints().empty())
+	{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
+		glColor3ub(0, 255, 0);
+		for each (Point3d pt in newCloud.getPoints())
+		{
+			glVertex3d(pt.x, pt.y, pt.z);
+		}
+		glEnd();
 	}
-	return false;
 }
 
-std::vector<Point3d> specialPoints(PointCloud3d cloud) {
-	return cloud.getTree().query(cloud.getPoints()[0], 0.3);
-}
+void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
+	
+	glPointSize(1);
+	glBegin(GL_POINTS);
+	glColor3ub(0, 0, 255);
+	glVertex3d(point.x, point.y, point.z);
+	glEnd();
 
-void renderNearNeighbors(PointCloud3d cloud) {
-	glPointSize(5);
-	std::vector<Point3d> queryResult = specialPoints(cloud);
+	std::vector<Point3d> queryResult = pointCloud.query(point, radius);
 	if (!queryResult.empty())
 	{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
@@ -142,26 +158,7 @@ void renderNearNeighbors(PointCloud3d cloud) {
 		}
 		glEnd();
 	}
-}
-
-//TODO
-void renderPoints(PointCloud3d pointCloud){
-
 	
-	Point3d pt = pointCloud.getPoints()[0];
-	std::vector<Point3d> queryResult = pointCloud.getTree().query(pt, 0.3);
-	std::vector<Point3d> normalPoints = pointCloud.getPoints();
-	glPointSize(1);
-	glBegin(GL_POINTS);
-	for each  (Point3d pt in normalPoints)
-	{
-		if (!isInQuery(pt, queryResult)) {
-			
-			glColor3ub(255, 255, 255);
-			glVertex3d(pt.x, pt.y, pt.z);
-		}
-	}
-	glEnd();
 }
 
 void renderCenterOf(PointCloud3d pointCloud) {
@@ -177,6 +174,8 @@ void renderCenterOf(PointCloud3d pointCloud) {
 }
 
 void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
 
 	this->_setupViewportMatrix();
 
@@ -194,12 +193,12 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 	);
 	glTranslated(-pointCloudCenter.x, -pointCloudCenter.y, -pointCloudCenter.z);
 
-	// render point cloud
-	//renderAsArray(pointCloud);
+	// render points
+	//renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 0.3);
 	//renderIndividual(pointCloud);
-	renderPoints(pointCloud);
-	//renderNearNeighbors(pointCloud);
+	//renderSmoothedCloud(pointCloud);
 	renderCenterOf(pointCloud);
+
 }
 
 void GlfwWindowView::_showImage() {

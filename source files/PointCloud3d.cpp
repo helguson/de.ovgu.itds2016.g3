@@ -2,6 +2,7 @@
 
 PointCloud3d::PointCloud3d()
 	:
+	_points(),
 	_tree(),
 	_sceneCenter(),
 	_sceneRadius(),
@@ -15,20 +16,17 @@ PointCloud3d::~PointCloud3d() {
 
 void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
 	this->_points = points;
-	ThreeDTree tree;
-	tree.buildFor(this->_points.begin(), this->_points.end());
-	this->_tree = tree;
 	this->_computeBoundingBox();
 	this->_computeCenter();
 	this->_computeRadius();
 }
 
-std::vector<Point3d> PointCloud3d::getPoints() {
+std::vector<Point3d>& PointCloud3d::getPoints() {
 	
 	return this->_points;
 }
 
-ThreeDTree PointCloud3d::getTree() {
+ThreeDTree& PointCloud3d::getTree() {
 
 	return this->_tree;
 }
@@ -74,4 +72,37 @@ void PointCloud3d::_computeBoundingBox()
 		}
 	}
 	this->_minMax = std::pair<Point3d, Point3d>(min,max);
+}
+
+void PointCloud3d::computeTree() {
+	this->_tree.buildFor(this->_points.begin(), this->_points.end());
+}
+
+std::vector<Point3d> PointCloud3d::query(Point3d const & referencePoint, double maximumDistance) {
+	return this->_tree.query(referencePoint,maximumDistance);
+}
+
+PointCloud3d PointCloud3d::smooth( double radius)
+{
+	PointCloud3d smoothedCloud;
+	std::vector<Point3d> smoothedPoints;
+
+	//#pragma omp parallel for
+	for(int i = 0; i < this->getPoints().size(); ++i)
+	{
+		Point3d origin = this->getPoints()[i];
+		Point3d smoothedPt = Point3d(0,0,0);
+		double weights = 0.0;
+		std::vector<Point3d> neighborhood = query(origin, radius);
+			for each (Point3d neighbor in neighborhood)
+			{
+				double wi = std::exp((-1.0 * distance3d(origin, neighbor)) / radius);
+				smoothedPt += neighbor*wi;
+				weights += wi;
+			}
+		smoothedPt *= (1.0 / weights);
+		smoothedPoints.push_back(smoothedPt);
+	}
+	smoothedCloud.setPointsTo(smoothedPoints);
+	return smoothedCloud;
 }

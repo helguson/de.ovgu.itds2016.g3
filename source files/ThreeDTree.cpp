@@ -52,7 +52,7 @@ void test01_query_interval3d() {
 	log("(0,0,0) and (1,0,0) should be found:" + pointString);
 }
 
-void test02_query_Point3dWidthMaximumDistance() {
+void test02_query_Point3dWithMaximumDistance() {
 	log("####################");
 	log("### start test02 ###");
 	log("####################");
@@ -101,10 +101,71 @@ void test02_query_Point3dWidthMaximumDistance() {
 	log("(1,1-mu,0) and (0,-1,0) should be found:" + pointString);
 }
 
+void test03_getLeafNodeNearestTo() {
+	log("####################");
+	log("### start test03 ###");
+	log("####################");
+
+	// setup
+	//
+	//     -5  -4  -3  -2  -1   0   1   2   3   x
+	//  4                           o|
+	//                              B|
+	//  3                            |
+	//                               |
+	//  2                            |
+	//      _________________________|
+	//  1   o                        |  o
+	//      A                        |  D
+	//  0                       x    |
+	//                               |_______
+	// -1                            |      o
+	//                                      C
+	//  y
+	//
+	//
+	// tree
+	//        Bx
+	//       / \
+	//      /   \
+	//     /     \
+	//    Ay      Cy
+	//   / \     / \
+	//  A   B   C   D
+
+
+	Point3d A(-5, 1, 0);
+	Point3d B(1, 4, 0);
+	Point3d C(3, -1, 0);
+	Point3d D(2, 1, 0);
+
+	Point3d referencePoint(0, 0, 0);
+
+
+
+	double maximumDistance = 2;
+
+	std::vector<Point3d> data;
+	data.push_back(A);
+	data.push_back(B);
+	data.push_back(C);
+	data.push_back(D);
+
+	ThreeDTree tree;
+	tree.buildFor(data.begin(), data.end());
+
+	std::shared_ptr<LeafNode> nearLeafNode = tree.estimateLeafNodeNearOf(referencePoint);
+	std::shared_ptr<LeafNode> nearestLeafNode = tree.getLeafNodeNearestTo(referencePoint);
+
+	log("near point estimation should be " + A.toStr() + " and is: " + nearLeafNode->pointPtr->toStr());
+	log("nearest point should be " + D.toStr() + " and is: " + nearestLeafNode->pointPtr->toStr());
+}
+
 void ThreeDTree::runTests() {
 
 	test01_query_interval3d();
-	test02_query_Point3dWidthMaximumDistance();
+	test02_query_Point3dWithMaximumDistance();
+	test03_getLeafNodeNearestTo();
 }
 
 void ThreeDTree::buildFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd) {
@@ -117,6 +178,25 @@ void ThreeDTree::buildFor(std::vector<Point3d>::iterator dataBegin, std::vector<
 	}
 	else {
 		this->_root = nullptr;
+	}
+}
+
+void addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoints) {
+	std::stack<std::shared_ptr<Node>> stack;
+	stack.push(node);
+
+	while (!stack.empty()) {
+		std::shared_ptr<Node> tmpNode = stack.top();
+		stack.pop();
+		if (tmpNode->isLeafNode()) {
+			std::shared_ptr<LeafNode> leafNode = std::static_pointer_cast<LeafNode>(tmpNode);
+			validPoints->push_back(*leafNode->pointPtr);
+		}
+		else {
+			std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(tmpNode);
+			stack.push(innerNode->superiorChild);
+			stack.push(innerNode->inferiorChild);
+		}
 	}
 }
 
@@ -144,13 +224,13 @@ std::vector<Point3d> ThreeDTree::query(Interval3d const & range) {
 			}
 		}
 		else {
-			
+			// handle inner node
+
 			// ---if range contains represented interval
 			if (range.contains(currentNode->volume)) {
 				addAllChildren(currentNode, &validPoints); 
 			}
 			else {
-				// handle inner node
 				std::shared_ptr<InnerNode> currentInnerNode = std::static_pointer_cast<InnerNode>(currentNode);
 				// ---add all points of subtree to valid points
 				if (range.intersectsWith(currentInnerNode->volume)) {
@@ -179,11 +259,7 @@ std::vector<Point3d> ThreeDTree::query(Point3d const & referencePoint, double ma
 
 	std::vector<Point3d> validPoints;
 
-	Interval3d hullRange(
-		Interval(referencePoint.x - maximumDistance, true, referencePoint.x + maximumDistance, true),
-		Interval(referencePoint.y - maximumDistance, true, referencePoint.y + maximumDistance, true),
-		Interval(referencePoint.z - maximumDistance, true, referencePoint.z + maximumDistance, true)
-	);
+	Interval3d hullRange = Interval3d::getSphereEncapsulatingIntervalFor(referencePoint, maximumDistance);
 
 	std::vector<Point3d> possiblyValidPoints = this->query(hullRange);
 
@@ -200,29 +276,87 @@ std::vector<Point3d> ThreeDTree::query(Point3d const & referencePoint, double ma
 	return validPoints;
 }
 
-Point3d ThreeDTree::estimateNearNeighborOf(const Point3d point) const
-{
-	return Point3d();
-}
+std::shared_ptr<LeafNode> ThreeDTree::estimateLeafNodeNearOf(Point3d const & referencePoint) const {
 
-void ThreeDTree::addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoints) {
-	std::stack<std::shared_ptr<Node>> stack;
-	stack.push(node);
+	std::shared_ptr<Node> currentNode = this->_root;
 
-	while (!stack.empty()) {
-		std::shared_ptr<Node> tmpNode = stack.top();
-		stack.pop();
-		if (tmpNode->isLeafNode()) {
-			std::shared_ptr<LeafNode> leafNode = std::static_pointer_cast<LeafNode>(tmpNode);
-			validPoints->push_back(*leafNode->pointPtr);
+	while (!currentNode->isLeafNode()) {
+		std::shared_ptr<InnerNode> currentInnerNode = std::static_pointer_cast<InnerNode>(currentNode);
+
+		if (currentInnerNode->inferiorChild->volume.contains(referencePoint)) {
+			currentNode = currentInnerNode->inferiorChild;
 		}
 		else {
-			std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(tmpNode);
-			stack.push(innerNode->superiorChild);
-			stack.push(innerNode->inferiorChild);
+			currentNode = currentInnerNode->superiorChild;
 		}
 	}
+
+	return std::static_pointer_cast<LeafNode>(currentNode);
 }
 
+void clear(std::stack<std::shared_ptr<Node>>& stack) {
+	std::stack<std::shared_ptr<Node>> emptyStack;
+	std::swap(stack, emptyStack);
+}
 
+std::shared_ptr<Node> topAndPop(std::stack<std::shared_ptr<Node>>& stack) {
+	std::shared_ptr<Node> topElement = stack.top();
+	stack.pop();
+	return topElement;
+}
 
+std::shared_ptr<LeafNode> ThreeDTree::_findLeafNodeNearerTo(Point3d const & referencePoint, std::shared_ptr<LeafNode> givenNearLeafNode) const {
+
+	std::shared_ptr<LeafNode> result = nullptr;
+	std::stack<std::shared_ptr<Node>> nodesForVisit;
+
+	double givenDistance = distance3d(referencePoint, *givenNearLeafNode->pointPtr);
+	Interval3d intervalOfPossiblyNearerPoints = Interval3d::getSphereEncapsulatingIntervalFor(referencePoint, givenDistance);
+
+	nodesForVisit.push(this->_root);
+
+	while (!nodesForVisit.empty()) {
+		std::shared_ptr<Node> currentNode = topAndPop(nodesForVisit);
+
+		if (currentNode->isLeafNode()) {
+
+			std::shared_ptr<LeafNode> currentLeafNode = std::static_pointer_cast<LeafNode>(currentNode);
+			double currentDistance = distance3d(referencePoint, *currentLeafNode->pointPtr);
+			if (currentDistance < givenDistance) {
+				result = currentLeafNode;
+				clear(nodesForVisit);
+			}
+		}
+		else {
+
+			std::shared_ptr<InnerNode> currentInnerNode = std::static_pointer_cast<InnerNode>(currentNode);
+			if (currentInnerNode->superiorChild->volume.intersectsWith(intervalOfPossiblyNearerPoints)) {
+				nodesForVisit.push(currentInnerNode->superiorChild);
+			}
+			if (currentInnerNode->inferiorChild->volume.intersectsWith(intervalOfPossiblyNearerPoints)) {
+				nodesForVisit.push(currentInnerNode->inferiorChild);
+			}
+		}
+	}
+
+	return result;
+}
+
+std::shared_ptr<LeafNode> ThreeDTree::getLeafNodeNearestTo(Point3d const & referencePoint) const {
+
+	std::shared_ptr<LeafNode> currentlyNearestLeafNode = this->estimateLeafNodeNearOf(referencePoint);
+
+	bool foundNearerLeafNodeInCurrentIteration;
+
+	do {
+		std::shared_ptr<LeafNode> nearerLeafNode = this->_findLeafNodeNearerTo(referencePoint, currentlyNearestLeafNode);
+
+		foundNearerLeafNodeInCurrentIteration = nearerLeafNode != nullptr;
+
+		if (foundNearerLeafNodeInCurrentIteration) {
+			currentlyNearestLeafNode = nearerLeafNode;
+		}
+	} while (foundNearerLeafNodeInCurrentIteration);
+
+	return currentlyNearestLeafNode;
+}

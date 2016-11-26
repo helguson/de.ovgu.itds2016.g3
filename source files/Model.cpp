@@ -4,7 +4,7 @@
 
 Model::Model()
 	:
-	_pointCloud(),
+	_pointClouds(),
 	_cameraModel(),
 	_projectionModel(),
 	_rotationAngleAroundYAxis(0)
@@ -15,14 +15,23 @@ Model::~Model()
 {
 }
 
-void Model::setPointCloudTo(PointCloud3d pointCloud) {
+void Model::setPointCloudTo(PointCloud3d& pointCloud) {
 
-	this->_pointCloud = pointCloud;
+	this->_pointClouds.push_back(pointCloud);
+	this->_pointClouds.back().computeTree();
 }
 
-PointCloud3d Model::getPointCloud() {
+PointCloud3d& Model::getPointCloud(int index) {
 
-	return this->_pointCloud;
+	return this->_pointClouds[index];
+}
+
+PointCloud3d& Model::getSmoothedCloud(int index, double degree)
+{
+	PointCloud3d newCloud = this->_pointClouds[index].smooth(degree);
+	this->_pointClouds.push_back(newCloud);
+	this->_pointClouds.back().computeTree();
+	return this->_pointClouds.back();
 }
 
 CameraModel& Model::getCameraModel() {
@@ -40,4 +49,12 @@ double Model::getRotationAngleAroundYAxis() {
 }
 void Model::setRotationAngleAroundYAxis(double angle) {
 	this->_rotationAngleAroundYAxis = angle;
+}
+
+void Model::_recomputeTrees()
+{
+	for each (PointCloud3d cloud in this->_pointClouds)
+	{
+		cloud.computeTree();
+	}
 }
