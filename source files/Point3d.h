@@ -27,9 +27,9 @@ struct Point3d
   //assignments with operator
   //the operators can not be marked CONST because they do change the input
   Point3d& operator += (const Point3d& p2); // += operation of two points (pt1+= pt2  -> pt1 = pt1 + pt2)
-  Point3d& operator -= (const Point3d& p2); // += operation of two points (pt1-= pt2  -> pt1 = pt1 - pt2)
+  Point3d& operator -= (const Point3d& p2); // -= operation of two points (pt1-= pt2  -> pt1 = pt1 - pt2)
   Point3d& operator *= (double scalar);     // *= multiplication with a scalar (pt1*= s  -> pt1 = pt1 * s)
-
+  bool operator == (const Point3d& p2);     // == 
   std::string toStr() const;
 
   double x,y,z;

@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-
+#include "OpenFileDialog.h"
 #include "Point3d.h"
 
 
@@ -12,5 +12,5 @@ public:
 	FileLoader();
 	~FileLoader();
 
-	std::vector<Point3d> load(std::string);
+	std::vector<Point3d> load();
 };

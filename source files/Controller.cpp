@@ -14,9 +14,8 @@ Controller::Controller()
 	//### setup model ###
 	//###################
 	PointCloud3d pointCloud;
-	pointCloud.setPointsTo(this->_fileLoader.load("data/cone.xyz"));
+	pointCloud.setPointsTo(this->_fileLoader.load());
 	this->_model.setPointCloudTo(pointCloud);
-
 	double fieldOfViewAngleOnYAxis = 45; 
 	double pointCloudRadius = pointCloud.getRadius();
 	double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
@@ -79,11 +78,10 @@ Controller::~Controller() {
 void Controller::startMainLoop() {
 
 	this->_shouldContiniueLooping = true;
-
 	while (this->shouldDoNextLoop()) {
 
 		this->_view.render(
-			this->_model.getPointCloud(),
+			this->_model.getPointCloud(0),
 			this->_model.getCameraModel(),
 			this->_model.getProjectionModel(),
 			this->_model.getRotationAngleAroundYAxis()

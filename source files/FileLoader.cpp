@@ -1,5 +1,7 @@
-#include "FileLoader.h"
+﻿#include "FileLoader.h"
+
 #include <iostream>
+#include <string>
 
 
 //Here is the implementation of our file reader
@@ -48,11 +50,24 @@ FileLoader::~FileLoader() {
 
 }
 
-std::vector<Point3d> FileLoader::load(std::string filename) {
+std::vector<Point3d> FileLoader::load() {
 
 	std::vector<Point3d> result;
 
-	loadFileXYZ(filename.c_str(), result);
+	// opens FIleDialog
+	OpenFileDialog* openFileDialog1 = new OpenFileDialog();
 
+	openFileDialog1->FilterIndex = 1;
+	openFileDialog1->Flags |= OFN_SHOWHELP;
+	openFileDialog1->InitialDir = _T("C:\\Windows\\");
+	openFileDialog1->Title = _T("Open xyz File");
+
+	if (openFileDialog1->ShowDialog())
+	{
+		std::string filename(openFileDialog1->FileName);
+		
+		loadFileXYZ(filename.c_str(), result);
+
+	}
 	return result;
 }

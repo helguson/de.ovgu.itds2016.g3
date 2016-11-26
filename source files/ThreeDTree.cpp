@@ -327,6 +327,26 @@ void ThreeDTree::buildFor(std::vector<Point3d>::iterator dataBegin, std::vector<
 	}
 }
 
+void addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoints) {
+	std::stack<std::shared_ptr<Node>> stack;
+	stack.push(node);
+
+	while (!stack.empty()) {
+		std::shared_ptr<Node> tmpNode = stack.top();
+		stack.pop();
+		if (tmpNode->isLeafNode()) {
+			std::shared_ptr<LeafNode> leafNode = std::static_pointer_cast<LeafNode>(tmpNode);
+			validPoints->push_back(*leafNode->pointPtr);
+		}
+		else {
+			std::shared_ptr<InnerNode> innerNode = std::static_pointer_cast<InnerNode>(tmpNode);
+			stack.push(innerNode->superiorChild);
+			stack.push(innerNode->inferiorChild);
+		}
+	}
+}
+
+
 ThreeDTree::QueryResult ThreeDTree::query(Interval3d const & range) {
 
 	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> validLeafNodes

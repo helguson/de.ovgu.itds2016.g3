@@ -3,6 +3,7 @@
 #include "Node.h"
 #include <memory>
 #include <vector>
+#include <stack>
 #include "Point3d.h"
 #include "LeafNode.h"
 #include "InnerNode.h"
