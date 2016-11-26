@@ -17,8 +17,18 @@ class ThreeDTreeStructureBuilder
 public:
 	ThreeDTreeStructureBuilder();
 
-	// returns root of tree structure
-	std::shared_ptr<Node> buildStructureFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
+	struct BuildResults {
+		std::shared_ptr<Node> root;
+		std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs;
+
+		BuildResults(std::shared_ptr<Node> root, std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs) 
+			:root(root),
+			leafNodePtrs(leafNodePtrs)
+		{}
+	};
+
+	// returns root of tree structure as well as a vector of all leaf nodes
+	BuildResults buildStructureFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
 
 	static void runTest();
 
@@ -68,7 +78,7 @@ private:
 	};
 
 	std::shared_ptr<Node> _root;
-	std::vector<std::shared_ptr<LeafNode>> _leafPtrs;
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> _leafPtrs;
 	std::stack<ProcessStepInformation> _toProcessStorage; // TODO: match type
 
 	void _createLeavesFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
@@ -77,7 +87,7 @@ private:
 	void _processToInnerNode(ProcessStepInformation information);
 	ProcessStepInformation _takeNextProcessStepInformation();
 	void _initializeWith(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
-	std::shared_ptr<Node> _getResult();
+	BuildResults _getResult();
 	/* 
 	 * splits the given range [first, last) into an inferior range and an superior
 	 * range according to the median element and a given dimension.
