@@ -21,4 +21,6 @@ private:
 	Model _model;
 	FileLoader _fileLoader;
 	bool _shouldContiniueLooping;
+
+	std::function<void(std::shared_ptr<std::vector<Point3d>>)> Controller::_getStoreCreatedDataFunctor();
 };

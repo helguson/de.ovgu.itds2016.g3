@@ -1,42 +1,40 @@
 #include "PointCloud3d.h"
 
-PointCloud3d::PointCloud3d()
-	:
-	_points(),
-	_tree(),
+#include "util.h"
+
+PointCloud3d::PointCloud3d(
+	std::function<void(std::shared_ptr<std::vector<Point3d>>)> storeCreatedPointData,
+	std::vector<Point3d*> const & pointData
+)
+	:_storeCreatedPointData(storeCreatedPointData),
+	_tree(pointData),
 	_sceneCenter(),
 	_sceneRadius(),
 	_minMax()
 {
 
-}
-PointCloud3d::~PointCloud3d() {
-
-}
-
-void PointCloud3d::setPointsTo(std::vector<Point3d> points) {
-	this->_points = points;
 	this->_computeBoundingBox();
 	this->_computeCenter();
 	this->_computeRadius();
 }
 
-std::vector<Point3d>& PointCloud3d::getPoints() {
+PointCloud3d::~PointCloud3d() {}
+
+void PointCloud3d::setPointDataTo(std::vector<Point3d*> const & pointData) {
 	
-	return this->_points;
+	this->_tree.buildFor(pointData);
+
+	this->_computeBoundingBox();
+	this->_computeCenter();
+	this->_computeRadius();
 }
 
-ThreeDTree& PointCloud3d::getTree() {
-
-	return this->_tree;
-}
-
-Point3d PointCloud3d::getCenter() {
+Point3d PointCloud3d::getCenter() const {
 
 	return this->_sceneCenter;
 }
 
-double PointCloud3d::getRadius() {
+double PointCloud3d::getRadius() const {
 
 	return this->_sceneRadius;
 }
@@ -54,15 +52,21 @@ void PointCloud3d::_computeRadius()
 
 void PointCloud3d::_computeBoundingBox()
 {
-	Point3d min = Point3d(0, 0, 0);
-	Point3d max = Point3d(0, 0, 0);
+	Point3d min = Point3d(
+		std::numeric_limits<double>::infinity(),
+		std::numeric_limits<double>::infinity(),
+		std::numeric_limits<double>::infinity()
+	);
+	Point3d max = Point3d(
+		-std::numeric_limits<double>::infinity(),
+		-std::numeric_limits<double>::infinity(),
+		-std::numeric_limits<double>::infinity()
+	);
 
-	if (!this->_points.empty()) {
-		// first point is guaranteed to be inside of bounding box
-		min = this->_points[0];
-		max = this->_points[0];
-		for (unsigned int i = 1; i < this->_points.size(); i++) {
-			const Point3d& point = this->_points[i];
+	this->toEachPointApply(
+		[&min, &max](Point3d* pointPtr)->void {
+
+			const Point3d& point = *pointPtr;
 			if (point.x < min.x) min.x = point.x;
 			if (point.y < min.y) min.y = point.y;
 			if (point.z < min.z) min.z = point.z;
@@ -70,51 +74,80 @@ void PointCloud3d::_computeBoundingBox()
 			if (point.y > max.y) max.y = point.y;
 			if (point.z > max.z) max.z = point.z;
 		}
-	}
+	);
+
 	this->_minMax = std::pair<Point3d, Point3d>(min,max);
 }
 
-void PointCloud3d::computeTree() {
-	this->_tree.buildFor(this->_points.begin(), this->_points.end());
+void PointCloud3d::recomputeTree() {
+	this->_tree.rebuildStructure();
 }
 
-std::vector<Point3d> PointCloud3d::query(Point3d const & referencePoint, double maximumDistance) {
-	std::vector<Point3d> result;
+std::shared_ptr<std::vector<Point3d*>> PointCloud3d::query(Point3d const & referencePoint, double maximumDistance) const {
 
-	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs 
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs
 		=  this->_tree.query(referencePoint,maximumDistance).leafNodePtrs;
+
+	std::shared_ptr<std::vector<Point3d*>> result = std::make_shared<std::vector<Point3d*>>();
+	result->reserve(leafNodePtrs->size());
 
 	std::for_each(
 		leafNodePtrs->begin(), leafNodePtrs->end(),
 		[&result](std::shared_ptr<LeafNode> nodePtr)->void {
-			result.push_back(*nodePtr->pointPtr);
+			result->push_back(nodePtr->pointPtr);
 		}
 	);
 
 	return result;
 }
 
-PointCloud3d PointCloud3d::smooth( double radius)
-{
-	PointCloud3d smoothedCloud;
-	std::vector<Point3d> smoothedPoints;
+bool PointCloud3d::isEmpty() const {
+	return this->getNumberOfPoints() == 0;
+}
 
-	//#pragma omp parallel for
-	for(int i = 0; i < this->getPoints().size(); ++i)
-	{
-		Point3d origin = this->getPoints()[i];
-		Point3d smoothedPt = Point3d(0,0,0);
-		double weights = 0.0;
-		std::vector<Point3d> neighborhood = query(origin, radius);
-			for each (Point3d neighbor in neighborhood)
+size_t PointCloud3d::getNumberOfPoints() const {
+	return this->_tree.getNumberOfLeafNodes();
+}
+
+void PointCloud3d::toEachPointApply(std::function<void(Point3d*)> functor) const {
+
+	this->_tree.toEachLeafNodeApply(
+		[functor](LeafNode const & leafNode)->void {
+			functor(leafNode.pointPtr);
+		}
+	);
+}
+
+std::shared_ptr<PointCloud3d> PointCloud3d::computeSmoothedVersionWith(double radius)
+{
+	std::shared_ptr<std::vector<Point3d>> smoothedPoints 
+		= std::make_shared<std::vector<Point3d>>();
+	smoothedPoints->reserve(this->getNumberOfPoints());
+
+	ThreeDTree const & tree = this->_tree;
+
+	// TODO: #pragma omp parallel for
+	this->toEachPointApply(
+		[&smoothedPoints, this, radius](Point3d* pointPtr) {
+
+			Point3d const & origin = *pointPtr;
+			Point3d smoothedPt = Point3d(0, 0, 0);
+			double weights = 0.0;
+			std::shared_ptr<std::vector<Point3d*>> neighborhood = this->query(origin, radius);
+			for each (Point3d* neighborPtr in *neighborhood)
 			{
+				Point3d const & neighbor = *neighborPtr;
 				double wi = std::exp((-1.0 * distance3d(origin, neighbor)) / radius);
 				smoothedPt += neighbor*wi;
 				weights += wi;
 			}
-		smoothedPt *= (1.0 / weights);
-		smoothedPoints.push_back(smoothedPt);
-	}
-	smoothedCloud.setPointsTo(smoothedPoints);
-	return smoothedCloud;
+			smoothedPt *= (1.0 / weights);
+			smoothedPoints->push_back(smoothedPt);
+		}
+	);
+
+	this->_storeCreatedPointData(smoothedPoints);
+	std::shared_ptr<std::vector<Point3d*>> smoothedPointPtrs = util::computePointPtrVectorFrom(*smoothedPoints);
+
+	return std::make_shared<PointCloud3d>(this->_storeCreatedPointData, *smoothedPointPtrs);
 }

@@ -50,9 +50,9 @@ FileLoader::~FileLoader() {
 
 }
 
-std::vector<Point3d> FileLoader::load() {
+std::shared_ptr<std::vector<Point3d>> FileLoader::load() {
 
-	std::vector<Point3d> result;
+	std::shared_ptr<std::vector<Point3d>> result = std::make_shared<std::vector<Point3d>>();
 
 	// opens FIleDialog
 	OpenFileDialog* openFileDialog1 = new OpenFileDialog();
@@ -66,7 +66,7 @@ std::vector<Point3d> FileLoader::load() {
 	{
 		std::string filename(openFileDialog1->FileName);
 		
-		loadFileXYZ(filename.c_str(), result);
+		loadFileXYZ(filename.c_str(), *result);
 
 	}
 	return result;

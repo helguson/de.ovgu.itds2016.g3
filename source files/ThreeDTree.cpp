@@ -2,7 +2,9 @@
 #include <algorithm>
 #include "LeafNode.h"
 #include "ThreeDTreeStructureBuilder.h"
+
 #include "testHelpers.h"
+#include "util.h"
 
 
 void test01_query_interval3d() {
@@ -29,15 +31,15 @@ void test01_query_interval3d() {
 	data.push_back(Point3d(1, 0, 0));
 	data.push_back(Point3d(2, 0, 0));
 	data.push_back(Point3d(0, -1, 0));
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
+
+	ThreeDTree tree(*dataPtrs);
 
 	Interval3d range(
 		Interval(0, true, 1, true),	// x [0, 1]
 		Interval(-1, false, 1, false), // y (-1, 1)
 		Interval(0, true, 0, true)  // z [0, 0]
 	);
-
-	ThreeDTree tree;
-	tree.buildFor(data.begin(), data.end());
 
 	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> queryResult = tree.query(range).leafNodePtrs;
 
@@ -77,16 +79,15 @@ void test02_query_interval3d_2() {
 	data.push_back(Point3d(0, 2, 0));
 	data.push_back(Point3d(1, 1, 0));
 	data.push_back(Point3d(1, 0, 0));
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
+
+	ThreeDTree tree(*dataPtrs);
 
 	Interval3d range(
 		Interval(1, true, 1, true),	// x [1, 1]
 		Interval(0, true, 1, true), // y [0, 1]
 		Interval(0, true, 0, true)  // z [0, 0]
 	);
-
-	ThreeDTree tree;
-	tree.buildFor(data.begin(), data.end());
-
 
 	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> queryResult = tree.query(range).leafNodePtrs;
 
@@ -133,9 +134,9 @@ void test03_query_Point3dWithMaximumDistance() {
 	data.push_back(Point3d(1, 1-mu, 0));
 	data.push_back(Point3d(0, -1, 0));
 	data.push_back(Point3d(3+mu, -1, 0));
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
-	ThreeDTree tree;
-	tree.buildFor(data.begin(), data.end());
+	ThreeDTree tree(*dataPtrs);
 
 	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> queryResult = tree.query(referencePoint, maximumDistance).leafNodePtrs;
 
@@ -199,9 +200,9 @@ void test04_getLeafNodeNearestTo() {
 	data.push_back(B);
 	data.push_back(C);
 	data.push_back(D);
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
-	ThreeDTree tree;
-	tree.buildFor(data.begin(), data.end());
+	ThreeDTree tree(*dataPtrs);
 
 	std::shared_ptr<LeafNode> nearLeafNode = tree.estimateLeafNodeNearOf(referencePoint);
 	std::shared_ptr<LeafNode> nearestLeafNode = tree.getLeafNodeNearestTo(referencePoint);
@@ -221,9 +222,9 @@ void test05_query_interval3d_hiddenPoint() {
 	std::vector<Point3d> data;
 	data.push_back(A);
 	data.push_back(B);
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
-	ThreeDTree tree;
-	tree.buildFor(data.begin(), data.end());
+	ThreeDTree tree(*dataPtrs);
 
 	std::shared_ptr<LeafNode> ALeaf = tree.getLeafNodeNearestTo(A);
 	ALeaf->hide();
@@ -271,9 +272,9 @@ void test06_query_interval3d_hiddenInnerNode() {
 	data.push_back(A);
 	data.push_back(B);
 	data.push_back(C);
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
-	ThreeDTree tree;
-	tree.buildFor(data.begin(), data.end());
+	ThreeDTree tree(*dataPtrs);
 
 	std::shared_ptr<InnerNode> Ay = tree.query(Interval3d(
 		Interval(-std::numeric_limits<double>::infinity(), false, B.x, true), //(-Inf, B.x]
@@ -307,26 +308,38 @@ void ThreeDTree::runTests() {
 }
 
 
-ThreeDTree::ThreeDTree()
+ThreeDTree::ThreeDTree(std::vector<Point3d*> const & dataPtrs)
 	:_root(nullptr),
 	_leafNodePtrs(nullptr)
-{}
+{
+	this->buildFor(dataPtrs);
+}
 
-void ThreeDTree::buildFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd) {
+void ThreeDTree::buildFor(std::vector<Point3d*> const & dataPtrs) {
 
-	size_t size = std::distance(dataBegin, dataEnd);
-
-	if (size >= 1) {
+	if (dataPtrs.size() >= 1) {
 		ThreeDTreeStructureBuilder builder;
-		ThreeDTreeStructureBuilder::BuildResults buildResult = builder.buildStructureFor(dataBegin, dataEnd);
-		this->_root = buildResult.root;
-		this->_leafNodePtrs = buildResult.leafNodePtrs;
+		this->_leafNodePtrs = builder.buildLeafNodesFor(dataPtrs);
+		this->_root = builder.buildStructureFor(this->_leafNodePtrs);
+	}
+	else {
+		this->_root = nullptr;
+		this->_leafNodePtrs = nullptr;
+	}
+}
+
+void ThreeDTree::rebuildStructure() {
+
+	if (this->_leafNodePtrs != nullptr) {
+		ThreeDTreeStructureBuilder builder;
+		this->_root = builder.buildStructureFor(this->_leafNodePtrs);
 	}
 	else {
 		this->_root = nullptr;
 	}
 }
 
+// TODO: use _traverseTreeAt-function
 void addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoints) {
 	std::stack<std::shared_ptr<Node>> stack;
 	stack.push(node);
@@ -347,7 +360,7 @@ void addAllChildren(std::shared_ptr<Node> node, std::vector<Point3d>* validPoint
 }
 
 
-ThreeDTree::QueryResult ThreeDTree::query(Interval3d const & range) {
+ThreeDTree::QueryResult ThreeDTree::query(Interval3d const & range) const {
 
 	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> validLeafNodes
 		= std::make_shared<std::vector<std::shared_ptr<LeafNode>>>();
@@ -416,7 +429,7 @@ ThreeDTree::QueryResult ThreeDTree::query(Interval3d const & range) {
 	return QueryResult(validLeafNodes, validInnerNodes);
 }
 
-ThreeDTree::QueryResult ThreeDTree::query(Point3d const & referencePoint, double maximumDistance) {
+ThreeDTree::QueryResult ThreeDTree::query(Point3d const & referencePoint, double maximumDistance) const {
 
 	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> validLeafNodes
 		= std::make_shared<std::vector<std::shared_ptr<LeafNode>>>();
@@ -452,6 +465,7 @@ ThreeDTree::QueryResult ThreeDTree::query(Point3d const & referencePoint, double
 	return QueryResult(validLeafNodes, validInnerNodes);
 }
 
+// TODO: use _traverseTreeAt-function (?)
 std::shared_ptr<LeafNode> ThreeDTree::estimateLeafNodeNearOf(Point3d const & referencePoint) const {
 
 	std::shared_ptr<Node> currentNode = this->_root;
@@ -704,4 +718,24 @@ void ThreeDTree::toEachLeafNodeApply(std::function<void(LeafNode &)> functor) {
 			functor(*leafNodePtr);
 		}
 	);
+}
+
+void ThreeDTree::toEachLeafNodeApply(std::function<void(LeafNode const &)> functor) const {
+
+	std::for_each(
+		this->_leafNodePtrs->begin(), this->_leafNodePtrs->end(),
+		[functor](std::shared_ptr<LeafNode const> const leafNodePtr)->void {
+			functor(*leafNodePtr);
+		}
+	);
+}
+
+size_t ThreeDTree::getNumberOfLeafNodes() const {
+	size_t result = 0;
+
+	if (this->_leafNodePtrs != nullptr) {
+		result = this->_leafNodePtrs->size();
+	}
+
+	return result;
 }

@@ -1,37 +1,27 @@
 #include "Model.h"
 
-
-
 Model::Model()
 	:
+	_pointDataSets(),
 	_pointClouds(),
 	_cameraModel(),
 	_projectionModel(),
 	_rotationAngleAroundYAxis(0)
-{
-}
+{}
 
 Model::~Model()
-{
+{}
+
+void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
+	this->_pointClouds.push_back(pointCloudPtr);
 }
 
-void Model::setPointCloudTo(PointCloud3d& pointCloud) {
-
-	this->_pointClouds.push_back(pointCloud);
-	this->_pointClouds.back().computeTree();
+size_t Model::getNumberOfPointClouds() const {
+	return this->_pointClouds.size();
 }
 
-PointCloud3d& Model::getPointCloud(int index) {
-
-	return this->_pointClouds[index];
-}
-
-PointCloud3d& Model::getSmoothedCloud(int index, double degree)
-{
-	PointCloud3d newCloud = this->_pointClouds[index].smooth(degree);
-	this->_pointClouds.push_back(newCloud);
-	this->_pointClouds.back().computeTree();
-	return this->_pointClouds.back();
+PointCloud3d& Model::getPointCloudAt(int index) {
+	return *(this->_pointClouds[index]);
 }
 
 CameraModel& Model::getCameraModel() {
@@ -44,17 +34,14 @@ ProjectionModel& Model::getProjectionModel() {
 	return this->_projectionModel;
 }
 
-double Model::getRotationAngleAroundYAxis() {
+double Model::getRotationAngleAroundYAxis() const {
 	return this->_rotationAngleAroundYAxis;
 }
+
 void Model::setRotationAngleAroundYAxis(double angle) {
 	this->_rotationAngleAroundYAxis = angle;
 }
 
-void Model::_recomputeTrees()
-{
-	for each (PointCloud3d cloud in this->_pointClouds)
-	{
-		cloud.computeTree();
-	}
+void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
+	this->_pointDataSets.push_back(pointDataSet);
 }

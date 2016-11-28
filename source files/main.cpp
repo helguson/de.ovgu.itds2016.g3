@@ -8,9 +8,9 @@
 
 int main() {
 
-	//Interval::runTest();
-	//Interval3d::runTest();
-	//ThreeDTreeStructureBuilder::runTest();
+	Interval::runTest();
+	Interval3d::runTest();
+	ThreeDTreeStructureBuilder::runTest();
 	ThreeDTree::runTests();
 	
 	Controller controller;

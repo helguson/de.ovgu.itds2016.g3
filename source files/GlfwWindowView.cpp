@@ -50,7 +50,7 @@ void GlfwWindowView::_initializeCallbackAdapter() {
 	}
 }
 
-void GlfwWindowView::render(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
+void GlfwWindowView::render(PointCloud3d const & pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
 
 	if (this->isCorrectlyInitialized()) {
 		this->_initializeImage();
@@ -83,63 +83,49 @@ void GlfwWindowView::_setupViewportMatrix() {
 	glViewport(0, 0, this->_getWidth(), this->_getHeight());
 }
 
-void renderAsArray(PointCloud3d pointCloud) {
+void renderAsArray(PointCloud3d const & pointCloud) {
 
-	if (!pointCloud.getPoints().empty())
+	if (!pointCloud.isEmpty())
 	{
-		glPointSize(2);
-		glColor3d(1, 1, 1);
+		//glPointSize(2);
+		//glColor3d(1, 1, 1);
 
-		/* Drawing Points with VertexArrays */
-		glEnableClientState(GL_VERTEX_ARRAY); //enable data upload to GPU
+		///* Drawing Points with VertexArrays */
+		//glEnableClientState(GL_VERTEX_ARRAY); //enable data upload to GPU
 
-		unsigned int numberOfCoordinates = 3;
-		unsigned int strideBetweenStartOfElementData = sizeof(Point3d);
-		void* dataPtr = &pointCloud.getPoints()[0];
-		unsigned int initialElementIndex = 0;
-		unsigned int numberOfElements = (unsigned int)pointCloud.getPoints().size();
+		//unsigned int numberOfCoordinates = 3;
+		//unsigned int strideBetweenStartOfElementData = sizeof(Point3d);
+		//void* dataPtr = &pointCloud.getPoints()[0];
+		//unsigned int initialElementIndex = 0;
+		//unsigned int numberOfElements = (unsigned int)pointCloud.getNumberOfPoints();
 
-		glVertexPointer(numberOfCoordinates, GL_DOUBLE, strideBetweenStartOfElementData, dataPtr);
-		// draw point cloud
-		glDrawArrays(GL_POINTS, initialElementIndex, numberOfElements);
+		//glVertexPointer(numberOfCoordinates, GL_DOUBLE, strideBetweenStartOfElementData, dataPtr);
+		//// draw point cloud
+		//glDrawArrays(GL_POINTS, initialElementIndex, numberOfElements);
 
-		glDisableClientState(GL_VERTEX_ARRAY);  //disable data upload to GPU
+		//glDisableClientState(GL_VERTEX_ARRAY);  //disable data upload to GPU
 	}
 }
 
-void renderIndividual(PointCloud3d& pointCloud) {
+void renderIndividual(PointCloud3d const & pointCloud) {
 
 	glPointSize(1);
-	if (!pointCloud.getPoints().empty())
-	{ /* Drawing Points with VertexArrays */
+	if (!pointCloud.isEmpty())
+	{
 		glBegin(GL_POINTS);
 		glColor3ub(255, 255, 255);
-		for each (Point3d pt in pointCloud.getPoints())
-		{
-			glVertex3d(pt.x, pt.y, pt.z);
-		}
+
+		pointCloud.toEachPointApply(
+			[](Point3d* pointPtr)->void {
+				glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z);
+			}
+		);
+
 		glEnd();
 	}
 }
 
-void renderSmoothedCloud(PointCloud3d& pointCloud) {
-
-	PointCloud3d newCloud = pointCloud.smooth(0.5);
-
-	glPointSize(1);
-	if (!newCloud.getPoints().empty())
-	{ /* Drawing Points with VertexArrays */
-		glBegin(GL_POINTS);
-		glColor3ub(0, 255, 0);
-		for each (Point3d pt in newCloud.getPoints())
-		{
-			glVertex3d(pt.x, pt.y, pt.z);
-		}
-		glEnd();
-	}
-}
-
-void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
+void renderNearNeighbor(PointCloud3d const & pointCloud, Point3d point, double radius) {
 	
 	glPointSize(1);
 	glBegin(GL_POINTS);
@@ -147,21 +133,21 @@ void renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) 
 	glVertex3d(point.x, point.y, point.z);
 	glEnd();
 
-	std::vector<Point3d> queryResult = pointCloud.query(point, radius);
-	if (!queryResult.empty())
+	std::shared_ptr<std::vector<Point3d*>> queryResult = pointCloud.query(point, radius);
+	if (!queryResult->empty())
 	{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
 		glColor3ub(255, 0, 0);
-		for each (Point3d pt in queryResult)
+		for each (Point3d* pt in *queryResult)
 		{
-			glVertex3d(pt.x, pt.y, pt.z);
+			glVertex3d(pt->x, pt->y, pt->z);
 		}
 		glEnd();
 	}
 	
 }
 
-void renderCenterOf(PointCloud3d pointCloud) {
+void renderCenterOf(PointCloud3d const & pointCloud) {
 
 	glPointSize(10);
 	glBegin(GL_POINTS);
@@ -173,7 +159,7 @@ void renderCenterOf(PointCloud3d pointCloud) {
 	glEnd();
 }
 
-void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
+void GlfwWindowView::_renderImage(PointCloud3d const & pointCloud, CameraModel cameraModel, ProjectionModel projectionModel, double rotationAngleAroundYAxis) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
 
@@ -195,8 +181,7 @@ void GlfwWindowView::_renderImage(PointCloud3d pointCloud, CameraModel cameraMod
 
 	// render points
 	//renderNearNeighbor(pointCloud, pointCloud.getPoints()[0], 0.3);
-	//renderIndividual(pointCloud);
-	//renderSmoothedCloud(pointCloud);
+	renderIndividual(pointCloud);
 	renderCenterOf(pointCloud);
 
 }

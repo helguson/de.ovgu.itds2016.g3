@@ -17,18 +17,12 @@ class ThreeDTreeStructureBuilder
 public:
 	ThreeDTreeStructureBuilder();
 
-	struct BuildResults {
-		std::shared_ptr<Node> root;
-		std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs;
-
-		BuildResults(std::shared_ptr<Node> root, std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs) 
-			:root(root),
-			leafNodePtrs(leafNodePtrs)
-		{}
-	};
-
-	// returns root of tree structure as well as a vector of all leaf nodes
-	BuildResults buildStructureFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> buildLeafNodesFor(
+		std::vector<Point3d*> const & dataPtrs
+	);	// build leaf nodes for given point pointers
+	std::shared_ptr<Node> buildStructureFor(
+		std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs
+	);	// build kd-tree structure for given leaf nodes
 
 	static void runTest();
 
@@ -45,14 +39,14 @@ private:
 			std::vector<std::shared_ptr<LeafNode>>::iterator rangeLast,
 			Dimension splitDimension)
 			:representedInterval(representedInterval),
-			parentToChildPtr(parentToChildPtr),		//TODO: reference stored as attribute, is it possible?
+			parentToChildPtr(parentToChildPtr),
 			rangeFirst(rangeFirst),
 			rangeLast(rangeLast),
 			splitDimension(splitDimension)
 		{}
 
 		size_t getNumberOfElements() {
-			return this->rangeLast - this->rangeFirst;
+			return std::distance(this->rangeFirst, this->rangeLast);
 		}
 	};
 
@@ -78,21 +72,19 @@ private:
 	};
 
 	std::shared_ptr<Node> _root;
-	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> _leafPtrs;
-	std::stack<ProcessStepInformation> _toProcessStorage; // TODO: match type
+	std::stack<ProcessStepInformation> _toProcessStorage;
 
-	void _createLeavesFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
 	bool _hasSomethingForProcessing();
 	void _processToLeafNode(ProcessStepInformation information);
 	void _processToInnerNode(ProcessStepInformation information);
 	ProcessStepInformation _takeNextProcessStepInformation();
-	void _initializeWith(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd);
-	BuildResults _getResult();
+	void _initializeWith(std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs);
+	std::shared_ptr<Node> _provideStructure();
 	/* 
-	 * splits the given range [first, last) into an inferior range and an superior
+	 * splits the given range [first, last) into an inferior range and a superior
 	 * range according to the median element and a given dimension.
-	 * The inferior range may contain elements all that are inferior as well some
-	 * elments that are equivalent as well as the median element. The superior 
+	 * The inferior range may contain elements that are inferior as well some
+	 * elements that are equivalent as well as the median element. The superior 
 	 * range may contain elements that are superior to the median element as well
 	 * as some elements that are equivalent.
 	 * This method manipulates the given range.

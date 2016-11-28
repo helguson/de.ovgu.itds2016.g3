@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <iostream>
+#include "util.h"
 
 Controller::Controller()
 	:
@@ -13,11 +14,18 @@ Controller::Controller()
 	//###################
 	//### setup model ###
 	//###################
-	PointCloud3d pointCloud;
-	pointCloud.setPointsTo(this->_fileLoader.load());
-	this->_model.setPointCloudTo(pointCloud);
+
+
+	std::shared_ptr<std::vector<Point3d>> pointData = this->_fileLoader.load();
+	this->_model.addPointDataSet(pointData);
+	
+	std::shared_ptr<PointCloud3d> pointCloudPtr = std::make_shared<PointCloud3d>(
+		this->_getStoreCreatedDataFunctor(),
+		*util::computePointPtrVectorFrom(*pointData)
+	);
+	this->_model.add(pointCloudPtr);
 	double fieldOfViewAngleOnYAxis = 45; 
-	double pointCloudRadius = pointCloud.getRadius();
+	double pointCloudRadius = pointCloudPtr->getRadius();
 	double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
 
 	ProjectionModel& projectionModel = this->_model.getProjectionModel();
@@ -25,7 +33,7 @@ Controller::Controller()
 	projectionModel.setNearClippingPlaneZTo(0.001);
 	projectionModel.setFarClippingPlaneZTo(overviewDistance + 3*pointCloudRadius);
 
-	Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
+	Point3d cameraPosition = pointCloudPtr->getCenter() + Point3d(0, 0, overviewDistance);
 	this->_model.getCameraModel().setWorldPositionTo(cameraPosition);
 
 	this->_model.setRotationAngleAroundYAxis(0);
@@ -75,13 +83,21 @@ Controller::~Controller() {
 
 }
 
+std::function<void(std::shared_ptr<std::vector<Point3d>>)> Controller::_getStoreCreatedDataFunctor() {
+
+	Model & model = this->_model;
+	return [&model](std::shared_ptr<std::vector<Point3d>> pointData)->void {
+		model.addPointDataSet(pointData);
+	};
+}
+
 void Controller::startMainLoop() {
 
 	this->_shouldContiniueLooping = true;
 	while (this->shouldDoNextLoop()) {
 
 		this->_view.render(
-			this->_model.getPointCloud(0),
+			this->_model.getPointCloudAt(0),
 			this->_model.getCameraModel(),
 			this->_model.getProjectionModel(),
 			this->_model.getRotationAngleAroundYAxis()
