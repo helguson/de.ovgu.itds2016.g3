@@ -151,3 +151,34 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeSmoothedVersionWith(double ra
 
 	return std::make_shared<PointCloud3d>(this->_storeCreatedPointData, *smoothedPointPtrs);
 }
+
+std::shared_ptr<PointCloud3d> PointCloud3d::computeThinnedVersionWith(double thinningRadius) {
+
+	std::vector<Point3d*> remainingPointPtrs;
+
+	ThreeDTree & tree = this->_tree;
+	tree.unhideAllNodes();
+
+	tree.toEachLeafNodeApply(
+		[&tree, &remainingPointPtrs, thinningRadius](LeafNode & leafNode)->void {
+			
+			if (leafNode.isHidden()) {
+				// there is nothing to do
+			}
+			else {
+				remainingPointPtrs.push_back(leafNode.pointPtr);
+
+				ThreeDTree::QueryResult nearNodes = tree.query(*leafNode.pointPtr, thinningRadius);
+				for each ( std::shared_ptr<InnerNode> nearInnerNodePtr in *nearNodes.innerNodePtrs) {
+					ThreeDTree::hideSubtreeAt(nearInnerNodePtr, true);
+				}
+				for each (std::shared_ptr<LeafNode> nearLeafNodePtr in *nearNodes.leafNodePtrs) {
+					nearLeafNodePtr->hide();
+				}
+			}
+		}
+	);
+
+	tree.unhideAllNodes();
+	return std::make_shared<PointCloud3d>(this->_storeCreatedPointData, remainingPointPtrs);
+}
