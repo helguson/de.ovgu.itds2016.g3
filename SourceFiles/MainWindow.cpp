@@ -28,11 +28,16 @@ MainWindow::MainWindow()
 	this->_thinBtPtr->setMaximumWidth(100);
 	QObject::connect(this->_thinBtPtr, SIGNAL(clicked()), this, SLOT(thinCloud()));
 
-
+	this->_smoothFactorSbPtr = new QDoubleSpinBox;
+	this->_thinRadiusSbPtr = new QDoubleSpinBox;
+	QObject::connect(this->_smoothFactorSbPtr, SIGNAL(valueChanged()), this, SLOT(changeSmoothFactor()));
+	QObject::connect(this->_thinRadiusSbPtr, SIGNAL(valueChanged()), this, SLOT(changeThinRadius()));
 
 	QVBoxLayout* settingsLayoutPtr = new QVBoxLayout;
 	settingsLayoutPtr->setAlignment(Qt::AlignTop);
+	settingsLayoutPtr->addWidget(this->_thinRadiusSbPtr);
 	settingsLayoutPtr->addWidget(this->_thinBtPtr);
+	settingsLayoutPtr->addWidget(this->_smoothFactorSbPtr);
 	settingsLayoutPtr->addWidget(this->_smoothBtPtr);
 
 	QHBoxLayout* layoutPtr = new QHBoxLayout;
@@ -49,6 +54,14 @@ MainWindow::MainWindow()
 	this->setMinimumSize(160, 160);
 	this->resize(600, 400);
 	
+}
+
+void MainWindow::changeSmoothFactor() {
+	_settings.smoothFactor = this->_smoothFactorSbPtr->value();
+}
+
+void MainWindow::changeThinRadius() {
+	_settings.thinRadius = this->_thinRadiusSbPtr->value();
 }
 
 void MainWindow::editSettings()

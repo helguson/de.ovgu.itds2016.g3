@@ -54,7 +54,7 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	view.setOnRequestSmoothCloud(
 		[&view, &model]()->void {
 		if (model.getNumberOfPointClouds() == 0) return;
-		model.smoothVisibleClouds(view.getSettings().smoothFactor);
+		model.smoothVisibleClouds(0.01);
 		view.render(model.getVisibleClouds(), model.getModelProperties());
 	}
 	);

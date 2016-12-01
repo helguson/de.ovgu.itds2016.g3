@@ -7,6 +7,7 @@ public:
 
 	bool showQuery;
 	double smoothFactor;
+	double thinRadius;
 	double nnRadius;
 };
 

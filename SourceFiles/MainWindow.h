@@ -35,6 +35,10 @@ private:
 	QPushButton* _smoothBtPtr;
 	QPushButton* _thinBtPtr;
 
+	// SpinnBoxes
+	QDoubleSpinBox* _smoothFactorSbPtr;
+	QDoubleSpinBox* _thinRadiusSbPtr;
+
 	//callbacks
 	std::function<void(std::string)> _onRequestLoadFile;
 	std::function<void()> _onRequestSmoothCloud;
@@ -73,5 +77,7 @@ private slots:
 	void closeApplication();
 	void thinCloud();
 	void smoothCloud();
+	void changeSmoothFactor();
+	void changeThinRadius();
 	//void setOnScrollCallbackTo(std::function<void(double, double)> callback);
 	};

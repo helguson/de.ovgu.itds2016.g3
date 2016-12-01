@@ -82,8 +82,7 @@ void Model::setFarClippingPlaneZTo(double z)
 
 void Model::smoothVisibleClouds(double smoothFactor) {
 	for (int i = 0; i < _visibleClouds.size(); i++) {
-		std::shared_ptr<PointCloud3d> newSmoothedCloud = _visibleClouds.at(i).get()->computeSmoothedVersionWith(smoothFactor);
-		_visibleClouds.at(i).swap(newSmoothedCloud);
+		_visibleClouds.at(i) = _visibleClouds.at(i).get()->computeSmoothedVersionWith(smoothFactor);
 	}
 }
 
