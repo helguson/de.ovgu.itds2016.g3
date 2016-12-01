@@ -1,90 +1,118 @@
 #include "OGLWidget.h"
 
-OGLWidget::OGLWidget(QWidget *parent)
-	: QOpenGLWidget(parent),
-	_onPaintRequest(nullptr)
+#include <iostream>
+
+OGLWidget::OGLWidget(QWidget *parentPtr)
+	:
+	QOpenGLWidget(parentPtr),
+	_onRequestPaintGL(nullptr)
 {
 }
 
-OGLWidget::~OGLWidget()
-{
+void OGLWidget::_renderPoints(PointCloud3d& cloud) {
+
+	{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
+		glColor3ub(255, 255, 255);
+		for each (Point3d pt in cloud.getPoints())
+		{
+			glVertex3d(pt.x, pt.y, pt.z);
+		}
+		glEnd();
+	}
 }
 
-void OGLWidget::_setupViewPortMatrix() {
-	glViewport(0, 0, this->size().width(), this->size().height());
+void OGLWidget::_renderSmoothedCloud(PointCloud3d& pointCloud, double smoothFactor) {
+
+	PointCloud3d newCloud = pointCloud.smooth(smoothFactor);
+
+	glPointSize(1);
+	if (!newCloud.getPoints().empty())
+		{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
+		glColor3ub(0, 255, 0);
+		for each (Point3d pt in newCloud.getPoints())
+			{
+			glVertex3d(pt.x, pt.y, pt.z);
+			}
+		glEnd();
+		}
+
 }
 
-void OGLWidget::renderData(PointCloud3d& pointCloud, ModelProperties props, SettingsContainer settings)
-{
-	// clear image buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	this->_setupViewPortMatrix();
-
-	this->_setProjektionMatrixAccordingTo();
-
-	this->_setCameraTransformation();
-
-	this->_rotateAroundAngle();
-
-	// render points
-	this->_renderPoints();
-
-	// render Center
-	glPointSize(10);
+void OGLWidget::_renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
+	
+	glPointSize(1);
 	glBegin(GL_POINTS);
-	{
-		glColor3d(1.0, 0.3, 0.3);
-		Point3d center = this->_points.getCenter();
-		glVertex3d(center.x, center.y, center.z);
-	}
+	glColor3ub(0, 0, 255);
+	glVertex3d(point.x, point.y, point.z);
 	glEnd();
+	
+	std::vector<Point3d> queryResult = pointCloud.query(point, radius);
+	if (!queryResult.empty())
+		{ /* Drawing Points with VertexArrays */
+		glBegin(GL_POINTS);
+		glColor3ub(255, 0, 0);
+		for each (Point3d pt in queryResult)
+			{
+			glVertex3d(pt.x, pt.y, pt.z);
+			}
+		glEnd();
+		}
 }
 
-void OGLWidget::setOnPaintRequest(std::function<void()> callback)
+void OGLWidget::render(PointCloud3d& pointCloud, ModelProperties& props, SettingsContainer& settings)
 {
-	this->_onPaintRequest = callback;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
+	glClearDepth(1.0f); //clear depth buffer
+
+	if (pointCloud.getPoints().empty()) return;
+
+	_setProjektionMatrixAccordingTo(props);
+
+	_setCameraTransformation(pointCloud, props);
+
+	_rotateAroundAngle(pointCloud, props);
+
+	if (settings.showQuery) {
+		_renderNearNeighbor(pointCloud, pointCloud.getPoints().front(), settings.nnRadius);
+		return;
+	}
+	if (settings.smooth) {
+		_renderSmoothedCloud(pointCloud, settings.smoothFactor);
+		return;
+	}
+	_renderPoints(pointCloud);
 }
 
-void OGLWidget::_renderPoints() {
+void OGLWidget::render(int r, int g, int b)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
+	glClearColor(r, g, b, 1.0f);   //clear background color
+	glClearDepth(1.0f);                     //clear depth buffer
+}
 
-	if (this->_settings.showQuery) {
-		glColor3d(1.0, 0.3, 0.3);
-		for each (Point3d qpt in this->_points.query(this->_points.getCenter(), this->_settings.nnRadius))
-		{
-			glBegin(GL_POINTS);
-			{
-				glVertex3d(qpt.x, qpt.y, qpt.z);
-			}
-			glEnd();
-		}
-
-	}
-		glColor3d(0.0, 1.0, 0.0);
-		glPointSize(2);
-		for each (Point3d pt in this->_points.getPoints())
-		{
-			glBegin(GL_POINTS);
-			{
-				glVertex3d(pt.x, pt.y, pt.z);
-			}
-			glEnd();
-		}
+void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
+{
+	this->_onRequestPaintGL = callback;
 }
 
 void OGLWidget::paintGL()
 {
-	if (_onPaintRequest != nullptr)
-		_onPaintRequest();
+	std::cout << "invoked paintGL" << std::endl;
+	this->_triggerOnRequestPaintGL();
 }
 
 void OGLWidget::resizeGL(int w ,int h)
 {
+	glViewport(0, 0, w,h);
 }
 
 void OGLWidget::initializeGL()
 {
-
+	initializeOpenGLFunctions();
+	
 	// clear image buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -94,26 +122,34 @@ void OGLWidget::initializeGL()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void OGLWidget::_setProjektionMatrixAccordingTo() {
+void OGLWidget::_triggerOnRequestPaintGL() {
+	if (this->_onRequestPaintGL != nullptr) {
+		this->_onRequestPaintGL();
+	}
+}
 
+void OGLWidget::_setProjektionMatrixAccordingTo(ModelProperties& props) {
+
+	makeCurrent();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
 	double aspectRatio = (double)this->size().width() / (double)this->size().height();
 
 	gluPerspective(
-		this->_props._fieldOfViewAngleInYDirection,
+		props._fieldOfViewAngleInYDirection,
 		aspectRatio,
-		this->_props._nearClippingPlaneZ,
-		this->_props._farClippingPlaneZ
+		props._nearClippingPlaneZ,
+		props._farClippingPlaneZ
 	);
 }
 
-void OGLWidget::_setCameraTransformation()
+void OGLWidget::_setCameraTransformation(PointCloud3d& pointCloud, ModelProperties& props)
 {
+	makeCurrent();
 	Point3d upVector = Point3d(0, 1, 0);
-	Point3d pointCloudCenter = this->_points.getCenter();
-	Point3d cameraPosition = this->_props._worldPosition;
+	Point3d pointCloudCenter = pointCloud.getCenter();
+	Point3d cameraPosition = props._worldPosition;
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -124,14 +160,15 @@ void OGLWidget::_setCameraTransformation()
 	);
 }
 
-void OGLWidget::_rotateAroundAngle()
+void OGLWidget::_rotateAroundAngle(PointCloud3d& pointCloud, ModelProperties& props)
 {
+	makeCurrent();
 	//rotate aroud y-axis through center
 	glMatrixMode(GL_MODELVIEW);
-	Point3d pointCloudCenter = _points.getCenter();
+	Point3d pointCloudCenter = pointCloud.getCenter();
 	glTranslated(pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z);
 	glRotated(
-		_props._rotationAngle,
+		props._rotationAngle,
 		0, 1, 0
 	);
 	glTranslated(-pointCloudCenter.x, -pointCloudCenter.y, -pointCloudCenter.z);

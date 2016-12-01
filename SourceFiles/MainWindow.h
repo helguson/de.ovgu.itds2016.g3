@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include "ui_mainwindow.h"
 #include <functional>
 #include <string>
 #include "OGLWidget.h"
@@ -16,29 +15,46 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = Q_NULLPTR);
+    MainWindow();
 	std::string getCurrentFile();
-	bool isCorrectlyInitialized();
-	void renderData(PointCloud3d& cloud, ModelProperties props);
-	void setOnNewFileLoaded(std::function<void(std::string )> callback);
-	void setOnPaintRequest(std::function<void() > callback);
+	void render(PointCloud3d& cloud, ModelProperties& props);
+	void render(int r, int g, int b);
+	void setOnRequestLoadFile(std::function<void(std::string)> callback);
+	void setOnRequestPaintGL(std::function<void() > callback);
 	//void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
 
 private:
 	std::string _currFile;
-    Ui::MainWindowClass ui;
-	OGLWidget _oglView;
+	OGLWidget* _oglWidgetPtr;
 	SettingsContainer _settings;
-	bool _isWindowInitialized;
-
-	void _initializeWindow();
+	std::function<void(std::string)> _onRequestLoadFile;
 	//void _pollInteractionsWithWindow();
 
-	//Callbacks:
-	std::function<void(std::string)> newFileLoaded;
+	void _createActions();
+	void _createMenus();
+	void _createLoadFileAction();
+	void _createCloseApplicationAction();
+	void _createEditSettingsAction();
+
+	// menus
+	QMenu* fileMenu;
+	QMenu* settingsMenu;
+
+	// file menu
+	QAction* loadFileAction;
+	QAction* closeApplicationAction;
+
+	//settings
+	QAction* editSettingsAction;
+
+	// help menu
+	QAction* showHelpAction;
+	QAction* showInformationAboutThisApplicationAction;
+
 
 private slots:
 	void loadFile();
-	SettingsContainer editSettings();
+	void editSettings();
+	void closeApplication();
 	//void setOnScrollCallbackTo(std::function<void(double, double)> callback);
 	};

@@ -1,44 +1,45 @@
 #include "Controller.h"
 
 
-Controller::Controller(int argc, char* argv[])
+Controller::Controller(int numberOfArguments, char** arguments)
 	:
-	_view(),
+	_view(numberOfArguments, arguments),
 	_model()
 {
+	QtView& view = this->_view;
+	Model& model = this->_model;
 	//################################
 	//### setup ui event callbacks ###
 	//################################
-	Model& model = this->_model;
 
 	//function if new File loaded
-	std::function<void(std::string)> onNewFile = [this](std::string path)->void {
+	view.setOnRequestLoadFile( [&model, &view](std::string path)->void {
 
 		PointCloud3d pointCloud;
 		FileLoader fileLoader;
 		pointCloud.setPointsTo(fileLoader.load(path));
-		this->_model.setPointCloudTo(pointCloud);
+		model.setPointCloudTo(pointCloud);
 
 		double fieldOfViewAngleOnYAxis = 45;
 		double pointCloudRadius = pointCloud.getRadius();
 		double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
 
-		this->_model.setFieldOfViewAngleInYDirectionTo(fieldOfViewAngleOnYAxis);
-		this->_model.setNearClippingPlaneZTo(0.001);
-		this->_model.setFarClippingPlaneZTo(overviewDistance + 3 * pointCloudRadius);
+		model.setFieldOfViewAngleInYDirectionTo(fieldOfViewAngleOnYAxis);
+		model.setNearClippingPlaneZTo(0.001);
+		model.setFarClippingPlaneZTo(overviewDistance + 3 * pointCloudRadius);
 
 		Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
-		this->_model.setWorldPositionTo(cameraPosition);
+		model.setWorldPositionTo(cameraPosition);
 
-		this->_model.setRotationAngleAroundYAxis(0);
-		renderData();
-	};
-	this->_view.setOnNewFileLoaded(onNewFile);
-
-	std::function<void()> onPaintRequest = [this]()->void {
-		this->_view.renderData(this->_model.getPointCloud(), this->_model.getModelProperties());
-	};
-	this->_view.setOnPaintRequest(onPaintRequest);
+		model.setRotationAngleAroundYAxis(0);
+		view.render(model.getPointCloud(), model.getModelProperties());
+	});
+	
+	view.setOnRequestPaintGL( 
+		[&view, &model]()->void { 
+			view.render(model.getPointCloud(), model.getModelProperties());
+		}
+	);
 
 	/*std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
 
@@ -69,16 +70,12 @@ Controller::Controller(int argc, char* argv[])
 	//	}
 	//};
 	//this->_view.setOnKeyCallbackTo(onKey);
-
-	this->_view.show();
 }
 
 Controller::~Controller() {
 
 }
 
-void Controller::renderData()
-{		
-	this->_view.renderData( this->_model.getPointCloud(),  this->_model.getModelProperties());
+int Controller::startApplication() {
+	return this->_view.startApplication();
 }
-

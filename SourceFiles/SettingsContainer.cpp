@@ -5,7 +5,10 @@
 SettingsContainer::SettingsContainer() 
 	:
 	showQuery(false),
-	nnRadius(0)
+	smooth(false),
+	thinning(false),
+	smoothFactor(0.0),
+	nnRadius(0.0)
 {
 }
 

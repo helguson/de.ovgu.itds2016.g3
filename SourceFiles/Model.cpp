@@ -22,7 +22,9 @@ void Model::setPointCloudTo(PointCloud3d& pointCloud) {
 }
 
 PointCloud3d& Model::getPointCloud() {
+	if(!this->_pointClouds.empty())
 	return this->_pointClouds.back();
+	else return PointCloud3d();
 }
 
 PointCloud3d& Model::getPointCloud(int index) {
