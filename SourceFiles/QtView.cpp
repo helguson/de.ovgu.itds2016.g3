@@ -20,6 +20,16 @@ void QtView::setOnRequestLoadFile(std::function<void(std::string)> callback)
 	this->_window.setOnRequestLoadFile(callback);
 }
 
+void QtView::setOnRequestThinCloud(std::function<void()> callback)
+{
+	this->_window.setOnRequestThinCloud(callback);
+}
+
+void QtView::setOnRequestSmoothCloud(std::function<void()> callback)
+{
+	this->_window.setOnRequestSmoothCloud(callback);
+}
+
 void QtView::render(double r, double g, double b) {
 	this->_window.render(r, g, b);
 }

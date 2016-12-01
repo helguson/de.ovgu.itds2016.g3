@@ -28,7 +28,8 @@ public:
 	void setFieldOfViewAngleInYDirectionTo(double angle);
 	void setNearClippingPlaneZTo(double z);
 	void setFarClippingPlaneZTo(double z);
-
+	void smoothVisibleClouds(double smoothFactor);
+	void thinVisibleClouds(double smoothFactor);
 	void addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet);
 
 private:

@@ -79,3 +79,17 @@ void Model::setFarClippingPlaneZTo(double z)
 {
 	this->_projectionModel.setFarClippingPlaneZTo(z);
 }
+
+void Model::smoothVisibleClouds(double smoothFactor) {
+	for (int i = 0; i < _visibleClouds.size(); i++) {
+		std::shared_ptr<PointCloud3d> newSmoothedCloud = _visibleClouds.at(i).get()->computeSmoothedVersionWith(smoothFactor);
+		_visibleClouds.at(i).swap(newSmoothedCloud);
+	}
+}
+
+void Model::thinVisibleClouds(double thinningRadius) {
+	for (int i = 0; i < _visibleClouds.size(); i++) {
+		std::shared_ptr<PointCloud3d> newThinnedCloud = _visibleClouds.at(i).get()->computeThinnedVersionWith(thinningRadius);
+		_visibleClouds.at(i).swap(newThinnedCloud);
+	}
+}

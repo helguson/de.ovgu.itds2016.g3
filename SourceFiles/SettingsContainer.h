@@ -6,8 +6,6 @@ public:
 	~SettingsContainer();
 
 	bool showQuery;
-	bool smooth;
-	bool thinning;
 	double smoothFactor;
 	double nnRadius;
 };

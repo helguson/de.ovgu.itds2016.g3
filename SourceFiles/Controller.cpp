@@ -51,6 +51,20 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		}
 	);
 
+	view.setOnRequestSmoothCloud(
+		[&view, &model]()->void {
+		if (model.getNumberOfPointClouds() == 0) return;
+		model.smoothVisibleClouds(view.getSettings().smoothFactor);
+		view.render(model.getVisibleClouds(), model.getModelProperties());
+	}
+	);
+
+	view.setOnRequestThinCloud(
+		[&view, &model]()->void {
+		if (model.getNumberOfPointClouds() == 0) return;
+		view.render(model.getVisibleClouds(), model.getModelProperties());
+	}
+	);
 	/*std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
 
 		double maxOffsetAccordingToObservations = 16;

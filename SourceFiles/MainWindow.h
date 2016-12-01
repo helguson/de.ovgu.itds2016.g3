@@ -21,6 +21,9 @@ public:
 	void render(int r, int g, int b);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
+	void setOnRequestThinCloud(std::function<void() > callback);
+	void setOnRequestSmoothCloud(std::function<void() > callback);
+	SettingsContainer getSettings() { return _settings; };
 	//void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
 
 private:
@@ -34,6 +37,8 @@ private:
 
 	//callbacks
 	std::function<void(std::string)> _onRequestLoadFile;
+	std::function<void()> _onRequestSmoothCloud;
+	std::function<void()> _onRequestThinCloud;
 	//void _pollInteractionsWithWindow();
 
 	void _createActions();
@@ -41,8 +46,6 @@ private:
 	void _createLoadFileAction();
 	void _createCloseApplicationAction();
 	void _createEditSettingsAction();
-	void _createSmoothAction();
-	void _createThinAction();
 
 	// menus
 	QMenu* fileMenu;
