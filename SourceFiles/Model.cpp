@@ -4,6 +4,7 @@
 
 Model::Model()
 	:
+	_pointDataSets(),
 	_pointClouds(),
 	_cameraModel(),
 	_projectionModel(),
@@ -15,23 +16,30 @@ Model::~Model()
 {
 }
 
-void Model::setPointCloudTo(PointCloud3d& pointCloud) {
-
-	this->_pointClouds.push_back(pointCloud);
-	this->_pointClouds.back().computeTree();
+void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
+	this->_pointClouds.push_back(pointCloudPtr);
 }
 
-PointCloud3d& Model::getPointCloud() {
-	if(!this->_pointClouds.empty())
-	return this->_pointClouds.back();
-	else return PointCloud3d();
+void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
+	this->_pointDataSets.push_back(pointDataSet);
 }
 
-PointCloud3d& Model::getPointCloud(int index) {
-	if (index >= 0 && index <= this->_pointClouds.size())
-		return this->_pointClouds[index];
-	else{ }
-		//Todo
+size_t Model::getNumberOfPointClouds() const {
+	return this->_pointClouds.size();
+}
+
+PointCloud3d& Model::getPointCloudAt(int index) {
+	return *(this->_pointClouds[index]);
+}
+
+CameraModel& Model::getCameraModel() {
+
+	return this->_cameraModel;
+}
+
+ProjectionModel& Model::getProjectionModel() {
+
+	return this->_projectionModel;
 }
 
 ModelProperties Model::getModelProperties() {
@@ -65,12 +73,4 @@ void Model::setNearClippingPlaneZTo(double z)
 void Model::setFarClippingPlaneZTo(double z)
 {
 	this->_projectionModel.setFarClippingPlaneZTo(z);
-}
-
-void Model::_recomputeTrees()
-{
-	for each (PointCloud3d cloud in this->_pointClouds)
-	{
-		cloud.computeTree();
-	}
 }

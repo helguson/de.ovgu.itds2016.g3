@@ -1,6 +1,6 @@
 ﻿#include "FileLoader.h"
-
 #include <iostream>
+#include <string>
 
 
 //Here is the implementation of our file reader
@@ -49,11 +49,11 @@ FileLoader::~FileLoader() {
 
 }
 
-std::vector<Point3d> FileLoader::load(std::string fileName) {
+std::shared_ptr<std::vector<Point3d>> FileLoader::load(std::string fileName) {	
 
-	std::vector<Point3d> result;
-
-	loadFileXYZ(fileName.c_str(), result);
+		std::shared_ptr<std::vector<Point3d>> result = std::make_shared<std::vector<Point3d>>();
+		loadFileXYZ(fileName.c_str(), *result);
 
 	return result;
 }
+

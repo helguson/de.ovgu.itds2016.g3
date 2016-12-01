@@ -6,6 +6,7 @@
 #include <string>
 
 #include "testHelpers.h"
+#include "util.h"
 
 void test01_manualStructure() {
 
@@ -46,9 +47,11 @@ void test02_buildFor_1Point() {
 
 	std::vector<Point3d> data;
 	data.push_back(Point3d(1, 1, 1));
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
 	ThreeDTreeStructureBuilder builder;
-	std::shared_ptr<Node> root = builder.buildStructureFor(data.begin(), data.end());
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs = builder.buildLeafNodesFor(*dataPtrs);
+	std::shared_ptr<Node> root = builder.buildStructureFor(leafNodePtrs);
 
 	log("one point tree root should be a leaf: " + toStr(root->isLeafNode()));
 }
@@ -61,9 +64,11 @@ void test03_buildFor_2Points() {
 	std::vector<Point3d> data;
 	data.push_back(Point3d(1, 1, 1));
 	data.push_back(Point3d(2, 2, 2));
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
 	ThreeDTreeStructureBuilder builder;
-	std::shared_ptr<Node> structureRootPtr = builder.buildStructureFor(data.begin(), data.end());
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs = builder.buildLeafNodesFor(*dataPtrs);
+	std::shared_ptr<Node> structureRootPtr = builder.buildStructureFor(leafNodePtrs);
 
 	log("two point tree root should be no leaf: " + toStr(!structureRootPtr->isLeafNode()));
 
@@ -82,9 +87,11 @@ void test04_buildFor_3Points() {
 	data.push_back(Point3d(1, 1, 1));
 	data.push_back(Point3d(2, 2, 2));
 	data.push_back(Point3d(3, 3, 3));
+	std::shared_ptr<std::vector<Point3d*>> dataPtrs = util::computePointPtrVectorFrom(data);
 
 	ThreeDTreeStructureBuilder builder;
-	std::shared_ptr<Node> structureRootPtr = builder.buildStructureFor(data.begin(), data.end());
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs = builder.buildLeafNodesFor(*dataPtrs);
+	std::shared_ptr<Node> structureRootPtr = builder.buildStructureFor(leafNodePtrs);
 
 	/* tree should look like:
 	 *
@@ -127,15 +134,15 @@ void ThreeDTreeStructureBuilder::runTest() {
 }
 
 ThreeDTreeStructureBuilder::ThreeDTreeStructureBuilder()
-	:_leafPtrs(),
-	_root(),
+	:_root(),
 	_toProcessStorage()
-{
-}
+{}
 
-std::shared_ptr<Node> ThreeDTreeStructureBuilder::buildStructureFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd) {
+std::shared_ptr<Node> ThreeDTreeStructureBuilder::buildStructureFor(
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs
+) {
 	
-	this->_initializeWith(dataBegin, dataEnd);
+	this->_initializeWith(leafNodePtrs);
 
 	while (this->_hasSomethingForProcessing()) {
 		ProcessStepInformation processStep = this->_takeNextProcessStepInformation();
@@ -149,27 +156,29 @@ std::shared_ptr<Node> ThreeDTreeStructureBuilder::buildStructureFor(std::vector<
 		}
 	}
 		
-	return this->_getResult();
+	return this->_provideStructure();
 }
 
-void ThreeDTreeStructureBuilder::_createLeavesFor(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd) {
-
-	size_t size = std::distance(dataBegin, dataEnd);
-	this->_leafPtrs.reserve(size);
-
-	std::vector<std::shared_ptr<LeafNode>>& leafNodePtrs = this->_leafPtrs;
+std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> ThreeDTreeStructureBuilder::buildLeafNodesFor(
+	std::vector<Point3d*> const & dataPtrs
+) {
+	std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs 
+		= std::make_shared<std::vector<std::shared_ptr<LeafNode>>>();
+	leafNodePtrs->reserve(dataPtrs.size());
 
 	std::for_each(
-		dataBegin, dataEnd,
-		[&leafNodePtrs](Point3d& point)->void { 
+		dataPtrs.begin(), dataPtrs.end(),
+		[&leafNodePtrs](Point3d* pointPtr)->void { 
 		
-			std::shared_ptr<LeafNode> leafPtr = std::make_shared<LeafNode>(Interval3d::all(), &point);
+			std::shared_ptr<LeafNode> leafNodePtr = std::make_shared<LeafNode>(Interval3d::all(), pointPtr);
 
-			leafNodePtrs.push_back(
-				leafPtr
+			leafNodePtrs->push_back(
+				leafNodePtr
 			);
 		}
 	);
+
+	return leafNodePtrs;
 }
 
 bool ThreeDTreeStructureBuilder::_hasSomethingForProcessing() {
@@ -230,20 +239,18 @@ void ThreeDTreeStructureBuilder::_processToInnerNode(ThreeDTreeStructureBuilder:
 	this->_toProcessStorage.push(inferiorRangeProcessing);
 }
 
-void ThreeDTreeStructureBuilder::_initializeWith(std::vector<Point3d>::iterator dataBegin, std::vector<Point3d>::iterator dataEnd) {
+void ThreeDTreeStructureBuilder::_initializeWith(std::shared_ptr<std::vector<std::shared_ptr<LeafNode>>> leafNodePtrs) {
 
-	this->_createLeavesFor(dataBegin, dataEnd);
-
-	ProcessStepInformation information(Interval3d::all(), this->_root, this->_leafPtrs.begin(), this->_leafPtrs.end(), Dimension::X);
+	ProcessStepInformation information(Interval3d::all(), this->_root, leafNodePtrs->begin(), leafNodePtrs->end(), Dimension::X);
 	this->_toProcessStorage.push(information);
 }
 
-std::shared_ptr<Node> ThreeDTreeStructureBuilder::_getResult() {
+std::shared_ptr<Node> ThreeDTreeStructureBuilder::_provideStructure() {
 
-	std::shared_ptr<Node> result = this->_root;
+	std::shared_ptr<Node> root = this->_root;
 	this->_root = nullptr;
 
-	return result;
+	return root;
 }
 
 ThreeDTreeStructureBuilder::MedianSplit ThreeDTreeStructureBuilder::_splitAccordingToMedian(std::vector<std::shared_ptr<LeafNode>>::iterator first,

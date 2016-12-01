@@ -14,7 +14,9 @@ public:
 	~Controller();
 
 	int startApplication();
+
 private:
+	std::function<void(std::shared_ptr<std::vector<Point3d>>)> _getStoreCreatedDataFunctor();
 	QtView _view;
 	Model _model;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <string>
 #include "Point3d.h"
 
@@ -11,5 +12,6 @@ public:
 	FileLoader();
 	~FileLoader();
 
-	std::vector<Point3d> load(std::string fileName);
+	std::shared_ptr<std::vector<Point3d>> load(std::string fileName);
+
 };

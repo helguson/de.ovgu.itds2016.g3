@@ -5,7 +5,8 @@
 #include "ProjectionModel.h"
 #include "ThreeDTree.h"
 #include "ModelProperties.h"
-
+#include <memory>
+#include <vector>
 
 class Model
 {
@@ -13,10 +14,12 @@ public:
 	Model();
 	~Model();
 
-	// TODO: replace with shared pointers or something else without copying all the points
-	void setPointCloudTo(PointCloud3d& pointCloud);
-	PointCloud3d& getPointCloud();
-	PointCloud3d& getPointCloud(int index);
+	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
+	size_t getNumberOfPointClouds() const;
+	PointCloud3d & getPointCloudAt(int index);
+
+	CameraModel& getCameraModel();
+	ProjectionModel& getProjectionModel();
 	void setRotationAngleAroundYAxis(double angle);
 	ModelProperties Model::getModelProperties();
 	//change CameraModel
@@ -26,11 +29,13 @@ public:
 	void setNearClippingPlaneZTo(double z);
 	void setFarClippingPlaneZTo(double z);
 
+	void addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet);
+
 private:
-	std::vector<PointCloud3d> _pointClouds;
+	std::vector<std::shared_ptr<std::vector<Point3d>>> _pointDataSets;
+	std::vector<std::shared_ptr<PointCloud3d>> _pointClouds;
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
 	double _rotationAngleAroundYAxis;
-	void _recomputeTrees();
 };
 

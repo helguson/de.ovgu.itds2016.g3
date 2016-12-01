@@ -14,30 +14,32 @@ void OGLWidget::_renderPoints(PointCloud3d& cloud) {
 	{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
 		glColor3ub(255, 255, 255);
-		for each (Point3d pt in cloud.getPoints())
-		{
-			glVertex3d(pt.x, pt.y, pt.z);
-		}
+		cloud.toEachPointApply(
+			[](Point3d* pointPtr)->void
+			{
+			glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z); 
+			}
+		);
 		glEnd();
 	}
 }
 
-void OGLWidget::_renderSmoothedCloud(PointCloud3d& pointCloud, double smoothFactor) {
+void OGLWidget::_renderSmoothedCloud(PointCloud3d& pointCloud, double smoothRadius) {
 
-	PointCloud3d newCloud = pointCloud.smooth(smoothFactor);
-
+	PointCloud3d* newCloud = pointCloud.computeSmoothedVersionWith(smoothRadius).get();
+	
 	glPointSize(1);
-	if (!newCloud.getPoints().empty())
-		{ /* Drawing Points with VertexArrays */
+	{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
-		glColor3ub(0, 255, 0);
-		for each (Point3d pt in newCloud.getPoints())
-			{
-			glVertex3d(pt.x, pt.y, pt.z);
-			}
-		glEnd();
+		glColor3ub(255, 255, 255);
+		newCloud->toEachPointApply(
+			[](Point3d* pointPtr)->void
+		{
+			glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z);
 		}
-
+		);
+		glEnd();
+	}
 }
 
 void OGLWidget::_renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
@@ -48,14 +50,15 @@ void OGLWidget::_renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, dou
 	glVertex3d(point.x, point.y, point.z);
 	glEnd();
 	
-	std::vector<Point3d> queryResult = pointCloud.query(point, radius);
-	if (!queryResult.empty())
+	std::vector<Point3d*>* query = pointCloud.query(point, radius).get();
+
+	if (!query->empty())
 		{ /* Drawing Points with VertexArrays */
 		glBegin(GL_POINTS);
 		glColor3ub(255, 0, 0);
-		for each (Point3d pt in queryResult)
+		for each (Point3d* pt in *query)
 			{
-			glVertex3d(pt.x, pt.y, pt.z);
+			glVertex3d(pt->x, pt->y, pt->z); 
 			}
 		glEnd();
 		}
@@ -67,7 +70,7 @@ void OGLWidget::render(PointCloud3d& pointCloud, ModelProperties& props, Setting
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
 	glClearDepth(1.0f); //clear depth buffer
 
-	if (pointCloud.getPoints().empty()) return;
+	if (pointCloud.getNumberOfPoints() == 0) return;
 
 	_setProjektionMatrixAccordingTo(props);
 
@@ -76,7 +79,7 @@ void OGLWidget::render(PointCloud3d& pointCloud, ModelProperties& props, Setting
 	_rotateAroundAngle(pointCloud, props);
 
 	if (settings.showQuery) {
-		_renderNearNeighbor(pointCloud, pointCloud.getPoints().front(), settings.nnRadius);
+		_renderNearNeighbor(pointCloud, pointCloud.getCenter(), settings.nnRadius);
 		return;
 	}
 	if (settings.smooth) {

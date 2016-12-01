@@ -1,5 +1,8 @@
 #include "Controller.h"
 
+#include <functional>
+#include <iostream>
+#include "util.h"
 
 Controller::Controller(int numberOfArguments, char** arguments)
 	:
@@ -13,31 +16,38 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	//################################
 
 	//function if new File loaded
-	view.setOnRequestLoadFile( [&model, &view](std::string path)->void {
+	view.setOnRequestLoadFile( [this, &model, &view](std::string path)->void {
 
-		PointCloud3d pointCloud;
-		FileLoader fileLoader;
-		pointCloud.setPointsTo(fileLoader.load(path));
-		model.setPointCloudTo(pointCloud);
+	std::shared_ptr<std::vector<Point3d>> pointData = FileLoader().load(path);
+	model.addPointDataSet(pointData);
+	
+	std::shared_ptr<PointCloud3d> pointCloudPtr = std::make_shared<PointCloud3d>(
+		this->_getStoreCreatedDataFunctor(),
+		*util::computePointPtrVectorFrom(*pointData)
+	);
+	model.add(pointCloudPtr);
+	double fieldOfViewAngleOnYAxis = 45; 
+	double pointCloudRadius = pointCloudPtr->getRadius();
+	double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
 
-		double fieldOfViewAngleOnYAxis = 45;
-		double pointCloudRadius = pointCloud.getRadius();
-		double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
+	ProjectionModel& projectionModel = model.getProjectionModel();
+	projectionModel.setFieldOfViewAngleInYDirectionTo(fieldOfViewAngleOnYAxis);
+	projectionModel.setNearClippingPlaneZTo(0.001);
+	projectionModel.setFarClippingPlaneZTo(overviewDistance + 3*pointCloudRadius);
 
-		model.setFieldOfViewAngleInYDirectionTo(fieldOfViewAngleOnYAxis);
-		model.setNearClippingPlaneZTo(0.001);
-		model.setFarClippingPlaneZTo(overviewDistance + 3 * pointCloudRadius);
+	Point3d cameraPosition = pointCloudPtr->getCenter() + Point3d(0, 0, overviewDistance);
+	model.getCameraModel().setWorldPositionTo(cameraPosition);
 
-		Point3d cameraPosition = pointCloud.getCenter() + Point3d(0, 0, overviewDistance);
-		model.setWorldPositionTo(cameraPosition);
+	model.setRotationAngleAroundYAxis(0);
 
-		model.setRotationAngleAroundYAxis(0);
-		view.render(model.getPointCloud(), model.getModelProperties());
+	model.setRotationAngleAroundYAxis(0);
+	view.render(model.getPointCloudAt(0), model.getModelProperties());
 	});
 	
 	view.setOnRequestPaintGL( 
 		[&view, &model]()->void { 
-			view.render(model.getPointCloud(), model.getModelProperties());
+		if (model.getNumberOfPointClouds() == 0) return;
+			view.render(model.getPointCloudAt(0), model.getModelProperties());
 		}
 	);
 
@@ -52,30 +62,38 @@ Controller::Controller(int numberOfArguments, char** arguments)
 
 		model.getProjectionModel().setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
 	};
-	this->_view.setOnScrollCallbackTo(onScroll);*/
+        this->_view.setOnScrollCallbackTo(onScroll)
 
-	//std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
+	std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
 
-	//	if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-	//		
-	//		if (key == GLFW_KEY_LEFT) {
-	//			double oldAngle = model.getRotationAngleAroundYAxis();
-	//			model.setRotationAngleAroundYAxis(oldAngle + 1);
-	//		}
+		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+			
+			if (key == GLFW_KEY_LEFT) {
+				double oldAngle = model.getRotationAngleAroundYAxis();
+				model.setRotationAngleAroundYAxis(oldAngle + 1);
+			}
 
-	//		if (key == GLFW_KEY_RIGHT) {
-	//			double oldAngle = model.getRotationAngleAroundYAxis();
-	//			model.setRotationAngleAroundYAxis(oldAngle - 1);
-	//		}
-	//	}
-	//};
-	//this->_view.setOnKeyCallbackTo(onKey);
+			if (key == GLFW_KEY_RIGHT) {
+				double oldAngle = model.getRotationAngleAroundYAxis();
+				model.setRotationAngleAroundYAxis(oldAngle - 1);
+			}
+		}
+	};
+        this->_view.setOnKeyCallbackTo(onKey);*/
 }
 
 Controller::~Controller() {
 
 }
 
-int Controller::startApplication() {
+int Controller::startApplication(){
 	return this->_view.startApplication();
+}
+
+std::function<void(std::shared_ptr<std::vector<Point3d>>)> Controller::_getStoreCreatedDataFunctor() {
+
+	Model & model = this->_model;
+	return [&model](std::shared_ptr<std::vector<Point3d>> pointData)->void {
+		model.addPointDataSet(pointData);
+	};
 }
