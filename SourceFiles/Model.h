@@ -34,6 +34,7 @@ public:
 private:
 	std::vector<std::shared_ptr<std::vector<Point3d>>> _pointDataSets;
 	std::vector<std::shared_ptr<PointCloud3d>> _pointClouds;
+	std::vector<std::shared_ptr<PointCloud3d>> _visibleClouds;
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
 	double _rotationAngleAroundYAxis;

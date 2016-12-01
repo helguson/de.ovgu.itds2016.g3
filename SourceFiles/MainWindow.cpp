@@ -14,9 +14,25 @@ MainWindow::MainWindow()
 		QSizePolicy::Expanding
 	);
 
-	QVBoxLayout* layoutPtr = new QVBoxLayout;
+	this->_smoothBtPtr = new QPushButton;
+	this->_smoothBtPtr->setText(tr("Smoothing"));
+	this->_smoothBtPtr->setMaximumHeight(30);
+	this->_smoothBtPtr->setMaximumWidth(100);
+
+	this->_thinBtPtr = new QPushButton;
+	this->_thinBtPtr->setText(tr("Thinning"));
+	this->_thinBtPtr->setMaximumHeight(30);
+	this->_thinBtPtr->setMaximumWidth(100);
+
+	QVBoxLayout* settingsLayoutPtr = new QVBoxLayout;
+	settingsLayoutPtr->setAlignment(Qt::AlignTop);
+	settingsLayoutPtr->addWidget(this->_thinBtPtr);
+	settingsLayoutPtr->addWidget(this->_smoothBtPtr);
+
+	QHBoxLayout* layoutPtr = new QHBoxLayout;
 	layoutPtr->setMargin(5);
 	layoutPtr->addWidget(this->_oglWidgetPtr);
+	layoutPtr->addLayout(settingsLayoutPtr);
 
 	widgetPtr->setLayout(layoutPtr);
 
@@ -47,6 +63,12 @@ void MainWindow::loadFile()
 
 }
 
+void MainWindow::thinCloud(){
+}
+
+void MainWindow::smoothCloud() {
+
+}
 std::string MainWindow::getCurrentFile() {
 	return this->_currFile;
 }
@@ -84,6 +106,8 @@ void MainWindow::_createActions() {
 	this->_createLoadFileAction();
 	this->_createCloseApplicationAction();
 	this->_createEditSettingsAction();
+	this->_createSmoothAction();
+	this->_createThinAction();
 }
 
 void MainWindow::_createLoadFileAction() {
@@ -121,6 +145,30 @@ void MainWindow::_createEditSettingsAction() {
 		&QAction::triggered,
 		this,
 		&MainWindow::editSettings
+	);
+}
+
+void MainWindow::_createSmoothAction() {
+
+	this->smoothAction = new QAction(tr("&edit Settings"), this);
+	this->smoothAction->setStatusTip(tr("TODO"));
+	this->connect(
+		this->smoothAction,
+		&QAction::triggered,
+		this,
+		&MainWindow::smoothCloud
+	);
+}
+
+void MainWindow::_createThinAction() {
+
+	this->thinAction = new QAction(tr("&edit Settings"), this);
+	this->thinAction->setStatusTip(tr("TODO"));
+	this->connect(
+		this->thinAction,
+		&QAction::triggered,
+		this,
+		&MainWindow::thinCloud
 	);
 }
 

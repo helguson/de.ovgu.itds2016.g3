@@ -80,7 +80,6 @@ void OGLWidget::render(PointCloud3d& pointCloud, ModelProperties& props, Setting
 
 	if (settings.showQuery) {
 		_renderNearNeighbor(pointCloud, pointCloud.getCenter(), settings.nnRadius);
-		return;
 	}
 	if (settings.smooth) {
 		_renderSmoothedCloud(pointCloud, settings.smoothFactor);
@@ -126,7 +125,7 @@ void OGLWidget::initializeGL()
 }
 
 void OGLWidget::_triggerOnRequestPaintGL() {
-	if (this->_onRequestPaintGL != nullptr) {
+	if (this->_onRequestPaintGL != nullptr ) {
 		this->_onRequestPaintGL();
 	}
 }

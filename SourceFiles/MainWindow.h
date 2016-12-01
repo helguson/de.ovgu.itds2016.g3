@@ -27,6 +27,12 @@ private:
 	std::string _currFile;
 	OGLWidget* _oglWidgetPtr;
 	SettingsContainer _settings;
+
+	// buttons
+	QPushButton* _smoothBtPtr;
+	QPushButton* _thinBtPtr;
+
+	//callbacks
 	std::function<void(std::string)> _onRequestLoadFile;
 	//void _pollInteractionsWithWindow();
 
@@ -35,19 +41,25 @@ private:
 	void _createLoadFileAction();
 	void _createCloseApplicationAction();
 	void _createEditSettingsAction();
+	void _createSmoothAction();
+	void _createThinAction();
 
 	// menus
 	QMenu* fileMenu;
 	QMenu* settingsMenu;
 
-	// file menu
+	// file menu actions
 	QAction* loadFileAction;
 	QAction* closeApplicationAction;
 
-	//settings
+	//buttons actions
+	QAction* smoothAction;
+	QAction* thinAction;
+
+	//settings actions
 	QAction* editSettingsAction;
 
-	// help menu
+	// help menu actions
 	QAction* showHelpAction;
 	QAction* showInformationAboutThisApplicationAction;
 
@@ -56,5 +68,7 @@ private slots:
 	void loadFile();
 	void editSettings();
 	void closeApplication();
+	void thinCloud();
+	void smoothCloud();
 	//void setOnScrollCallbackTo(std::function<void(double, double)> callback);
 	};
