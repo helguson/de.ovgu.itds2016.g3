@@ -12,7 +12,7 @@ public:
 
 	void setOnRequestPaintGL(std::function<void()> callback);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
-	void render(PointCloud3d& cloud, ModelProperties& props);
+	void render(std::vector<std::shared_ptr< PointCloud3d>>& cloud, ModelProperties& props);
 	void render(double r, double g, double b);
 
 private:

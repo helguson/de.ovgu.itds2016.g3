@@ -18,6 +18,7 @@ Model::~Model()
 
 void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
 	this->_pointClouds.push_back(pointCloudPtr);
+	this->_visibleClouds.push_back(pointCloudPtr);
 }
 
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
@@ -30,6 +31,10 @@ size_t Model::getNumberOfPointClouds() const {
 
 PointCloud3d& Model::getPointCloudAt(int index) {
 	return *(this->_pointClouds[index]);
+}
+
+std::vector<std::shared_ptr<PointCloud3d>>& Model::getVisibleClouds() {
+	return this->_visibleClouds;
 }
 
 CameraModel& Model::getCameraModel() {

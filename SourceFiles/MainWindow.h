@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 	std::string getCurrentFile();
-	void render(PointCloud3d& cloud, ModelProperties& props);
+	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud, ModelProperties& props);
 	void render(int r, int g, int b);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);

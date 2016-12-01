@@ -17,7 +17,7 @@ public:
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
 	size_t getNumberOfPointClouds() const;
 	PointCloud3d & getPointCloudAt(int index);
-
+	std::vector<std::shared_ptr<PointCloud3d>>& getVisibleClouds();
 	CameraModel& getCameraModel();
 	ProjectionModel& getProjectionModel();
 	void setRotationAngleAroundYAxis(double angle);

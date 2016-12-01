@@ -73,7 +73,7 @@ std::string MainWindow::getCurrentFile() {
 	return this->_currFile;
 }
 
-void MainWindow::render(PointCloud3d& pointCloud, ModelProperties& props) {
+void MainWindow::render(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props) {
 
 		//send render info to widget
 		this->_oglWidgetPtr->render(pointCloud, props, this->_settings);

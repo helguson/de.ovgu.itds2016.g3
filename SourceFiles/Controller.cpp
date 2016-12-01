@@ -41,13 +41,13 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	model.setRotationAngleAroundYAxis(0);
 
 	model.setRotationAngleAroundYAxis(0);
-	view.render(model.getPointCloudAt(0), model.getModelProperties());
+	view.render(model.getVisibleClouds(), model.getModelProperties());
 	});
 	
 	view.setOnRequestPaintGL( 
 		[&view, &model]()->void { 
 		if (model.getNumberOfPointClouds() == 0) return;
-			view.render(model.getPointCloudAt(0), model.getModelProperties());
+			view.render(model.getVisibleClouds(), model.getModelProperties());
 		}
 	);
 

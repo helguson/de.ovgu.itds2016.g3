@@ -64,28 +64,28 @@ void OGLWidget::_renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, dou
 		}
 }
 
-void OGLWidget::render(PointCloud3d& pointCloud, ModelProperties& props, SettingsContainer& settings)
+void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props, SettingsContainer& settings)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
 	glClearDepth(1.0f); //clear depth buffer
 
-	if (pointCloud.getNumberOfPoints() == 0) return;
+	if (pointClouds.empty()) return;
 
 	_setProjektionMatrixAccordingTo(props);
 
-	_setCameraTransformation(pointCloud, props);
+	_setCameraTransformation(pointClouds, props);
 
-	_rotateAroundAngle(pointCloud, props);
+	_rotateAroundAngle(pointClouds, props);
 
 	if (settings.showQuery) {
-		_renderNearNeighbor(pointCloud, pointCloud.getCenter(), settings.nnRadius);
+		_renderNearNeighbor(*pointClouds.front().get(), pointClouds.front().get()->getCenter(), settings.nnRadius);
 	}
 	if (settings.smooth) {
-		_renderSmoothedCloud(pointCloud, settings.smoothFactor);
+		_renderSmoothedCloud(*pointClouds.front().get(), settings.smoothFactor);
 		return;
 	}
-	_renderPoints(pointCloud);
+	_renderPoints(*pointClouds.front().get());
 }
 
 void OGLWidget::render(int r, int g, int b)
@@ -146,11 +146,11 @@ void OGLWidget::_setProjektionMatrixAccordingTo(ModelProperties& props) {
 	);
 }
 
-void OGLWidget::_setCameraTransformation(PointCloud3d& pointCloud, ModelProperties& props)
+void OGLWidget::_setCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props)
 {
 	makeCurrent();
 	Point3d upVector = Point3d(0, 1, 0);
-	Point3d pointCloudCenter = pointCloud.getCenter();
+	Point3d pointCloudCenter = pointClouds.front().get()->getCenter();
 	Point3d cameraPosition = props._worldPosition;
 
 	glMatrixMode(GL_MODELVIEW);
@@ -162,12 +162,12 @@ void OGLWidget::_setCameraTransformation(PointCloud3d& pointCloud, ModelProperti
 	);
 }
 
-void OGLWidget::_rotateAroundAngle(PointCloud3d& pointCloud, ModelProperties& props)
+void OGLWidget::_rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props)
 {
 	makeCurrent();
 	//rotate aroud y-axis through center
 	glMatrixMode(GL_MODELVIEW);
-	Point3d pointCloudCenter = pointCloud.getCenter();
+	Point3d pointCloudCenter = pointClouds.front().get()->getCenter();
 	glTranslated(pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z);
 	glRotated(
 		props._rotationAngle,
