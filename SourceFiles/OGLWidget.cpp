@@ -9,59 +9,21 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 {
 }
 
-void OGLWidget::_renderPoints(PointCloud3d& cloud) {
+void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds) {
 
-	{ /* Drawing Points with VertexArrays */
-		glBegin(GL_POINTS);
-		glColor3ub(255, 255, 255);
-		cloud.toEachPointApply(
-			[](Point3d* pointPtr)->void
-			{
-			glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z); 
-			}
-		);
-		glEnd();
-	}
-}
-
-void OGLWidget::_renderSmoothedCloud(PointCloud3d& pointCloud, double smoothRadius) {
-
-	PointCloud3d* newCloud = pointCloud.computeSmoothedVersionWith(smoothRadius).get();
-	
-	glPointSize(1);
-	{ /* Drawing Points with VertexArrays */
-		glBegin(GL_POINTS);
-		glColor3ub(255, 255, 255);
-		newCloud->toEachPointApply(
-			[](Point3d* pointPtr)->void
-		{
-			glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z);
-		}
-		);
-		glEnd();
-	}
-}
-
-void OGLWidget::_renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius) {
-	
-	glPointSize(1);
-	glBegin(GL_POINTS);
-	glColor3ub(0, 0, 255);
-	glVertex3d(point.x, point.y, point.z);
-	glEnd();
-	
-	std::vector<Point3d*>* query = pointCloud.query(point, radius).get();
-
-	if (!query->empty())
+	for each(std::shared_ptr<PointCloud3d> cloud in  pointClouds) {
 		{ /* Drawing Points with VertexArrays */
-		glBegin(GL_POINTS);
-		glColor3ub(255, 0, 0);
-		for each (Point3d* pt in *query)
+			glBegin(GL_POINTS);
+			glColor3ub(255, 255, 255);
+			cloud->toEachPointApply(
+				[](Point3d* pointPtr)->void
 			{
-			glVertex3d(pt->x, pt->y, pt->z); 
+				glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z);
 			}
-		glEnd();
+			);
+			glEnd();
 		}
+	}
 }
 
 void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props, SettingsContainer& settings)
@@ -78,14 +40,7 @@ void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, 
 
 	_rotateAroundAngle(pointClouds, props);
 
-	if (settings.showQuery) {
-		_renderNearNeighbor(*pointClouds.front().get(), pointClouds.front().get()->getCenter(), settings.nnRadius);
-	}
-	if (settings.smooth) {
-		_renderSmoothedCloud(*pointClouds.front().get(), settings.smoothFactor);
-		return;
-	}
-	_renderPoints(*pointClouds.front().get());
+	_renderPoints(pointClouds);
 }
 
 void OGLWidget::render(int r, int g, int b)
@@ -150,7 +105,11 @@ void OGLWidget::_setCameraTransformation(std::vector<std::shared_ptr<PointCloud3
 {
 	makeCurrent();
 	Point3d upVector = Point3d(0, 1, 0);
-	Point3d pointCloudCenter = pointClouds.front().get()->getCenter();
+
+	Point3d pointCloudCenter = Point3d(0, 0, 0);
+	for each(std::shared_ptr<PointCloud3d> cloud in pointClouds)
+		pointCloudCenter += cloud->getCenter();
+
 	Point3d cameraPosition = props._worldPosition;
 
 	glMatrixMode(GL_MODELVIEW);
@@ -167,7 +126,11 @@ void OGLWidget::_rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& p
 	makeCurrent();
 	//rotate aroud y-axis through center
 	glMatrixMode(GL_MODELVIEW);
-	Point3d pointCloudCenter = pointClouds.front().get()->getCenter();
+
+	Point3d pointCloudCenter = Point3d(0, 0, 0);
+	for each(std::shared_ptr<PointCloud3d> cloud in pointClouds)
+		pointCloudCenter += cloud->getCenter();
+
 	glTranslated(pointCloudCenter.x, pointCloudCenter.y, pointCloudCenter.z);
 	glRotated(
 		props._rotationAngle,

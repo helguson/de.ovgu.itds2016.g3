@@ -25,9 +25,7 @@ private:
 	void _setProjektionMatrixAccordingTo(ModelProperties& props);
 	void _setCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
 	void _rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
-	void _renderPoints(PointCloud3d& cloud);
-	void _renderSmoothedCloud(PointCloud3d& pointCloud, double smoothFactor);
-	void _renderNearNeighbor(PointCloud3d& pointCloud, Point3d point, double radius);
+	void _renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
 	void _triggerOnRequestPaintGL();
 
 	std::function<void()> _onRequestPaintGL;
