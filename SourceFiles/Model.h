@@ -28,8 +28,8 @@ public:
 	void setNearClippingPlaneZTo(double z);
 	void setFarClippingPlaneZTo(double z);
 	void setSceneCenterTo(Point3d position);
-	void smoothVisibleClouds(double smoothFactor);
-	void thinVisibleClouds(double smoothFactor);
+	void smoothVisibleCloud(int index, double smoothFactor);
+	void thinVisibleCloud(int index, double smoothFactor);
 	void addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet);
 
 private:

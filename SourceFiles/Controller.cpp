@@ -59,7 +59,7 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	view.setOnRequestSmoothCloud(
 		[this, &view, &model]()->void {
 		for each (int index in view.getVisibleElementsIndicies()) {
-			model.smoothVisibleClouds(view.getSettings().smoothFactor);
+			model.smoothVisibleCloud(index, view.getSettings().smoothFactor);
 			view.addVisibleElementToList();
 		}
 		this->_updateModelProperties();
@@ -70,7 +70,7 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	view.setOnRequestThinCloud(
 		[this, &view, &model]()->void {
 		for each (int index in view.getVisibleElementsIndicies()) {
-			model.thinVisibleClouds(view.getSettings().thinRadius);
+			model.thinVisibleCloud(index, view.getSettings().thinRadius);
 			view.addVisibleElementToList();
 		}
 		this->_updateModelProperties();

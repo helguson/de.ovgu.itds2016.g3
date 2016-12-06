@@ -81,16 +81,10 @@ void Model::setSceneCenterTo(Point3d position)
 	this->_cameraModel.setSceneCenterTo(position);
 }
 
-void Model::smoothVisibleClouds(double smoothFactor) {
-	int numOfClouds = _pointClouds.size();
-	for (int i = 0; i < numOfClouds; i++) {
-		this->add(this->_pointClouds.at(i).get()->computeSmoothedVersionWith(smoothFactor));
-	}
-	
+void Model::smoothVisibleCloud(int index, double smoothFactor) {
+		this->add(this->_pointClouds.at(index).get()->computeSmoothedVersionWith(smoothFactor));
 }
 
-void Model::thinVisibleClouds(double thinningRadius) {
-	for (int i = 0; i < _pointClouds.size(); i++) {
-		this->add(this->_pointClouds.at(i).get()->computeThinnedVersionWith(thinningRadius));
-	}
+void Model::thinVisibleCloud(int index, double thinningRadius) {
+		this->add(this->_pointClouds.at(index).get()->computeThinnedVersionWith(thinningRadius));
 }

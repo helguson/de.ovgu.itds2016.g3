@@ -11,9 +11,10 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 
 void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds) {
 
+	glBegin(GL_POINTS);
 	for each(std::shared_ptr<PointCloud3d> cloud in  pointClouds) {
 		{ /* Drawing Points with VertexArrays */
-			glBegin(GL_POINTS);
+			
 			glColor3ub(255, 255, 255);
 			cloud->toEachPointApply(
 				[](Point3d* pointPtr)->void
@@ -21,9 +22,10 @@ void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointC
 				glVertex3d(pointPtr->x, pointPtr->y, pointPtr->z);
 			}
 			);
-			glEnd();
+			
 		}
 	}
+	glEnd();
 }
 
 void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElements)

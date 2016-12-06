@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-
+#include <QSurfaceFormat>
 
 MainWindow::MainWindow()
 	:
@@ -9,7 +9,10 @@ MainWindow::MainWindow()
 	QWidget* widgetPtr = new QWidget;
 	this->setCentralWidget(widgetPtr);
 
+	const QSurfaceFormat glFormat;
+
 	this->_oglWidgetPtr = new OGLWidget;
+	this->_oglWidgetPtr->setFormat(glFormat);
 	this->_oglWidgetPtr->setSizePolicy(
 		QSizePolicy::Expanding,
 		QSizePolicy::Expanding
@@ -146,7 +149,8 @@ void MainWindow::addVisibleElementToList()
 	QListWidgetItem* newListWidgetPtr = new QListWidgetItem(this->_visibleElementsScrollWidgetPtr);
 	newListWidgetPtr->setFlags(newListWidgetPtr->flags() | Qt::ItemIsUserCheckable);
 	newListWidgetPtr->setCheckState(Qt::Unchecked);
-	newListWidgetPtr->setText(tr("&PointCloud " + (this->_visibleElementsScrollWidgetPtr->count() + 1)));
+	QString text = QString("PointCloud %1").arg(this->_visibleElementsScrollWidgetPtr->count());
+	newListWidgetPtr->setText(text);
 	this->_visibleElementsScrollWidgetPtr->addItem(newListWidgetPtr);
 }
 
