@@ -17,6 +17,7 @@ public:
 
 private:
 	std::function<void(std::shared_ptr<std::vector<Point3d>>)> _getStoreCreatedDataFunctor();
+	void _updateModelProperties();
 	QtView _view;
 	Model _model;
 

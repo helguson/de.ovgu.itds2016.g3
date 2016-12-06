@@ -30,10 +30,24 @@ void QtView::setOnRequestSmoothCloud(std::function<void()> callback)
 	this->_window.setOnRequestSmoothCloud(callback);
 }
 
+void QtView::setOnRequestUpdateOGLWidget(std::function<void()> callback)
+{
+	this->_window.setOnRequestUpdateOGLWidget(callback);
+}
+
 void QtView::render(double r, double g, double b) {
 	this->_window.render(r, g, b);
 }
 
-void QtView::render(std::vector<std::shared_ptr<PointCloud3d>>& cloud, ModelProperties& props) {
-	this->_window.render(cloud, props);
+void QtView::addVisibleElementToList()
+{
+	this->_window.addVisibleElementToList();
+}
+
+void QtView::updateProjectionModelView(ModelProperties& props) {
+	this->_window.updateProjectionModelView(props);
+}
+
+void QtView::render(std::vector<std::shared_ptr<PointCloud3d>>& cloud) {
+	this->_window.render(cloud); 
 }

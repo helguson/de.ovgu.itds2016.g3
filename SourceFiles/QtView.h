@@ -14,10 +14,13 @@ public:
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
-	void render(std::vector<std::shared_ptr< PointCloud3d>>& cloud, ModelProperties& props);
+	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
+	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud);
 	void render(double r, double g, double b);
-
+	void addVisibleElementToList();
+	void updateProjectionModelView(ModelProperties& props);
 	SettingsContainer getSettings() { return _window.getSettings(); };
+	std::vector<int> getVisibleElementsIndicies() { return _window.getVisibleElementsIndices(); };
 
 private:
 	QApplication _qApplication;

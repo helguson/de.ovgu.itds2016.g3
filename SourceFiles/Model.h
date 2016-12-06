@@ -17,7 +17,6 @@ public:
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
 	size_t getNumberOfPointClouds() const;
 	PointCloud3d & getPointCloudAt(int index);
-	std::vector<std::shared_ptr<PointCloud3d>>& getVisibleClouds();
 	CameraModel& getCameraModel();
 	ProjectionModel& getProjectionModel();
 	void setRotationAngleAroundYAxis(double angle);
@@ -28,6 +27,7 @@ public:
 	void setFieldOfViewAngleInYDirectionTo(double angle);
 	void setNearClippingPlaneZTo(double z);
 	void setFarClippingPlaneZTo(double z);
+	void setSceneCenterTo(Point3d position);
 	void smoothVisibleClouds(double smoothFactor);
 	void thinVisibleClouds(double smoothFactor);
 	void addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet);
@@ -35,7 +35,6 @@ public:
 private:
 	std::vector<std::shared_ptr<std::vector<Point3d>>> _pointDataSets;
 	std::vector<std::shared_ptr<PointCloud3d>> _pointClouds;
-	std::vector<std::shared_ptr<PointCloud3d>> _visibleClouds;
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
 	double _rotationAngleAroundYAxis;

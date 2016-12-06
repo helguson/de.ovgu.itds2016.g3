@@ -10,7 +10,8 @@ public:
 		double farClippingPlaneZ, 
 		double nearClippingPlaneZ,
 		double rotationAngle,
-		Point3d worldPosition);
+		Point3d worldPosition,
+		Point3d sceneCenter);
 
 	~ModelProperties();
 
@@ -19,5 +20,6 @@ public:
 	double _nearClippingPlaneZ;
 	double _rotationAngle;
 	Point3d _worldPosition;
+	Point3d _sceneCenter;
 };
 

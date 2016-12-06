@@ -18,15 +18,18 @@ public:
 	OGLWidget(QWidget* parentPtr = nullptr);
 	void setOnRequestPaintGL(std::function<void()> callback);
 
-	void render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props, SettingsContainer& settings);
+	void render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
+	void updateProjectionModelView(ModelProperties& props);
+	
 	void render(int r, int g, int b);
 
 private:
-	void _setProjektionMatrixAccordingTo(ModelProperties& props);
-	void _setCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
-	void _rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
+
 	void _renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
 	void _triggerOnRequestPaintGL();
+	void _setProjektionMatrixAccordingTo(ModelProperties& props);
+	void _setCameraTransformation(ModelProperties& props);
+	void _rotateAroundAngle(ModelProperties& props);
 
 	std::function<void()> _onRequestPaintGL;
 

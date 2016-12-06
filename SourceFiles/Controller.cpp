@@ -9,8 +9,13 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	_view(numberOfArguments, arguments),
 	_model()
 {
+	//Initialize Model and View
 	QtView& view = this->_view;
 	Model& model = this->_model;
+	model.setFieldOfViewAngleInYDirectionTo(45);
+	model.setNearClippingPlaneZTo(0.001);
+	model.setRotationAngleAroundYAxis(0);
+
 	//################################
 	//### setup ui event callbacks ###
 	//################################
@@ -26,45 +31,56 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		*util::computePointPtrVectorFrom(*pointData)
 	);
 	model.add(pointCloudPtr);
-	double fieldOfViewAngleOnYAxis = 45; 
-	double pointCloudRadius = pointCloudPtr->getRadius();
-	double overviewDistance = pointCloudRadius / tan((3.1415 / 180.0) * (fieldOfViewAngleOnYAxis / 2));
-
-	ProjectionModel& projectionModel = model.getProjectionModel();
-	projectionModel.setFieldOfViewAngleInYDirectionTo(fieldOfViewAngleOnYAxis);
-	projectionModel.setNearClippingPlaneZTo(0.001);
-	projectionModel.setFarClippingPlaneZTo(overviewDistance + 3*pointCloudRadius);
-
-	Point3d cameraPosition = pointCloudPtr->getCenter() + Point3d(0, 0, overviewDistance);
-	model.getCameraModel().setWorldPositionTo(cameraPosition);
-
-	model.setRotationAngleAroundYAxis(0);
-
-	model.setRotationAngleAroundYAxis(0);
-	view.render(model.getVisibleClouds(), model.getModelProperties());
+	view.addVisibleElementToList();
+	this->_updateModelProperties();
+	view.updateProjectionModelView(model.getModelProperties());
 	});
 	
+	//function for rendering loop
 	view.setOnRequestPaintGL( 
 		[&view, &model]()->void { 
-		if (model.getNumberOfPointClouds() == 0) return;
-			view.render(model.getVisibleClouds(), model.getModelProperties());
+			std::vector<std::shared_ptr<PointCloud3d>> visibleClouds; 
+			for each (int index in view.getVisibleElementsIndicies()) {
+				visibleClouds.push_back(std::make_shared<PointCloud3d>(model.getPointCloudAt(index)));
+			}
+			view.render(visibleClouds);
 		}
 	);
 
+	//function to update Transformation matrices and repaint visible elements
+	view.setOnRequestUpdateOGLWidget(
+		[this, &view, &model]()->void {
+		this->_updateModelProperties();
+		view.updateProjectionModelView(model.getModelProperties());
+		}
+	);
+
+	//function to smooth clouds
 	view.setOnRequestSmoothCloud(
-		[&view, &model]()->void {
-		if (model.getNumberOfPointClouds() == 0) return;
-		model.smoothVisibleClouds(0.01);
-		view.render(model.getVisibleClouds(), model.getModelProperties());
+		[this, &view, &model]()->void {
+		for each (int index in view.getVisibleElementsIndicies()) {
+			model.smoothVisibleClouds(view.getSettings().smoothFactor);
+			view.addVisibleElementToList();
+		}
+		this->_updateModelProperties();
 	}
 	);
 
+	//function to thin clouds
 	view.setOnRequestThinCloud(
-		[&view, &model]()->void {
-		if (model.getNumberOfPointClouds() == 0) return;
-		view.render(model.getVisibleClouds(), model.getModelProperties());
+		[this, &view, &model]()->void {
+		for each (int index in view.getVisibleElementsIndicies()) {
+			model.thinVisibleClouds(view.getSettings().thinRadius);
+			view.addVisibleElementToList();
+		}
+		this->_updateModelProperties();
 	}
 	);
+
+	//#############################
+	//### setup ui mouse events ###
+	//#############################
+
 	/*std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
 
 		double maxOffsetAccordingToObservations = 16;
@@ -110,4 +126,30 @@ std::function<void(std::shared_ptr<std::vector<Point3d>>)> Controller::_getStore
 	return [&model](std::shared_ptr<std::vector<Point3d>> pointData)->void {
 		model.addPointDataSet(pointData);
 	};
+}
+
+void Controller::_updateModelProperties() {
+
+	//compute average of cloud centers
+	Point3d sceneCenter = Point3d(0, 0, 0);
+	for each (int index in this->_view.getVisibleElementsIndicies())
+	{
+		sceneCenter += this->_model.getPointCloudAt(index).getCenter();
+	}
+	this->_model.setSceneCenterTo(sceneCenter * (1.0 / this->_view.getVisibleElementsIndicies().size()));
+
+	//compute radius of whole scene
+	double sceneRadius = 0;
+	for each (int index in this->_view.getVisibleElementsIndicies())
+	{
+		double tmpRadius = distance3d(this->_model.getPointCloudAt(index).getCenter(), sceneCenter) + this->_model.getPointCloudAt(index).getRadius();
+		if (tmpRadius > sceneRadius) sceneRadius = tmpRadius;
+	}
+
+	double overviewDistance = sceneRadius / tan((3.1415 / 180.0) * (this->_model.getModelProperties()._fieldOfViewAngleInYDirection / 2));
+
+	this->_model.setFarClippingPlaneZTo(overviewDistance + 3 * sceneRadius);
+
+	Point3d cameraPosition = sceneCenter + Point3d(0, 0, overviewDistance);
+	this->_model.setWorldPositionTo(cameraPosition);
 }

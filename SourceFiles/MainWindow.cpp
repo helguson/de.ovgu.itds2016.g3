@@ -1,6 +1,5 @@
 #include "mainwindow.h"
-#include <QtWidgets>
-#include <iostream>
+
 
 MainWindow::MainWindow()
 	:
@@ -16,29 +15,40 @@ MainWindow::MainWindow()
 		QSizePolicy::Expanding
 	);
 
+	//PushButtons
 	this->_smoothBtPtr = new QPushButton;
 	this->_smoothBtPtr->setText(tr("Smoothing"));
 	this->_smoothBtPtr->setMaximumHeight(30);
-	this->_smoothBtPtr->setMaximumWidth(100);
+	this->_smoothBtPtr->setMaximumWidth(120);
 	QObject::connect(this->_smoothBtPtr, SIGNAL(clicked()),this,SLOT(smoothCloud()));
 
 	this->_thinBtPtr = new QPushButton;
 	this->_thinBtPtr->setText(tr("Thinning"));
 	this->_thinBtPtr->setMaximumHeight(30);
-	this->_thinBtPtr->setMaximumWidth(100);
+	this->_thinBtPtr->setMaximumWidth(120);
 	QObject::connect(this->_thinBtPtr, SIGNAL(clicked()), this, SLOT(thinCloud()));
 
+
+	//SpinBoxes
 	this->_smoothFactorSbPtr = new QDoubleSpinBox;
 	this->_thinRadiusSbPtr = new QDoubleSpinBox;
-	QObject::connect(this->_smoothFactorSbPtr, SIGNAL(valueChanged()), this, SLOT(changeSmoothFactor()));
-	QObject::connect(this->_thinRadiusSbPtr, SIGNAL(valueChanged()), this, SLOT(changeThinRadius()));
+	QObject::connect(this->_smoothFactorSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeSmoothFactor(double)));
+	QObject::connect(this->_thinRadiusSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeThinRadius(double)));
 
+
+	//ListView of visible Data
+	this->_visibleElementsScrollWidgetPtr = new QListWidget;
+	this->_visibleElementsScrollWidgetPtr->setMaximumWidth(120);
+	QObject::connect(this->_visibleElementsScrollWidgetPtr, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(repaintOGLWidget(QListWidgetItem*)));
+
+	//Layouts
 	QVBoxLayout* settingsLayoutPtr = new QVBoxLayout;
 	settingsLayoutPtr->setAlignment(Qt::AlignTop);
 	settingsLayoutPtr->addWidget(this->_thinRadiusSbPtr);
 	settingsLayoutPtr->addWidget(this->_thinBtPtr);
 	settingsLayoutPtr->addWidget(this->_smoothFactorSbPtr);
 	settingsLayoutPtr->addWidget(this->_smoothBtPtr);
+	settingsLayoutPtr->addWidget(this->_visibleElementsScrollWidgetPtr);
 
 	QHBoxLayout* layoutPtr = new QHBoxLayout;
 	layoutPtr->setMargin(5);
@@ -56,12 +66,12 @@ MainWindow::MainWindow()
 	
 }
 
-void MainWindow::changeSmoothFactor() {
-	_settings.smoothFactor = this->_smoothFactorSbPtr->value();
+void MainWindow::changeSmoothFactor(double value) {
+	_settings.smoothFactor = value;
 }
 
-void MainWindow::changeThinRadius() {
-	_settings.thinRadius = this->_thinRadiusSbPtr->value();
+void MainWindow::changeThinRadius(double value) {
+	_settings.thinRadius = value;
 }
 
 void MainWindow::editSettings()
@@ -75,11 +85,18 @@ void MainWindow::loadFile()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "C:\\Windows\\", tr("xyz Files (*.xyz)"));
 	if (!fileName.isNull()) {
-		this->_currFile = fileName.toStdString();
+		// inform Controller:
+		this->_onRequestLoadFile(fileName.toStdString());
 	}
-	// inform Controller:
-	this->_onRequestLoadFile(this->_currFile);
+}
 
+void MainWindow::repaintOGLWidget(QListWidgetItem* sender) {
+	this->_onRequestUpdateOGLWidget();
+}
+
+void MainWindow::updateProjectionModelView(ModelProperties& props) {
+	this->_oglWidgetPtr->updateProjectionModelView(props);
+	this->_oglWidgetPtr->update();
 }
 
 void MainWindow::thinCloud(){
@@ -89,14 +106,11 @@ void MainWindow::thinCloud(){
 void MainWindow::smoothCloud() {
 	this->_onRequestSmoothCloud();
 }
-std::string MainWindow::getCurrentFile() {
-	return this->_currFile;
-}
 
-void MainWindow::render(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props) {
+void MainWindow::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElements) {
 
 		//send render info to widget
-		this->_oglWidgetPtr->render(pointCloud, props, this->_settings);
+		this->_oglWidgetPtr->render(visibleElements);
 		//this->_pollInteractionsWithWindow();
 }
 
@@ -120,6 +134,32 @@ void MainWindow::setOnRequestThinCloud(std::function<void()> callback)
 void MainWindow::setOnRequestSmoothCloud(std::function<void()> callback)
 {
 	this->_onRequestSmoothCloud = callback;
+}
+
+void MainWindow::setOnRequestUpdateOGLWidget(std::function<void()> callback)
+{
+	this->_onRequestUpdateOGLWidget = callback;
+}
+
+void MainWindow::addVisibleElementToList()
+{
+	QListWidgetItem* newListWidgetPtr = new QListWidgetItem(this->_visibleElementsScrollWidgetPtr);
+	newListWidgetPtr->setFlags(newListWidgetPtr->flags() | Qt::ItemIsUserCheckable);
+	newListWidgetPtr->setCheckState(Qt::Unchecked);
+	newListWidgetPtr->setText(tr("&PointCloud " + (this->_visibleElementsScrollWidgetPtr->count() + 1)));
+	this->_visibleElementsScrollWidgetPtr->addItem(newListWidgetPtr);
+}
+
+std::vector<int> MainWindow::getVisibleElementsIndices()
+{
+	std::vector<int> indicesVector;
+	int size = this->_visibleElementsScrollWidgetPtr->count();
+	for (int i = 0; i < size; i++) {
+		if (this->_visibleElementsScrollWidgetPtr->item(i)->checkState() == Qt::Checked){
+			indicesVector.push_back(i);
+		}
+	}
+	return indicesVector;
 }
 
 void MainWindow::setOnRequestPaintGL(std::function<void()> callback)

@@ -3,6 +3,9 @@
 #include <QtWidgets/QMainWindow>
 #include <functional>
 #include <string>
+#include <QtWidgets>
+#include <iostream>
+#include <QListWidget>
 #include "OGLWidget.h"
 #include "SettingsContainer.h"
 #include "ModelProperties.h"
@@ -16,22 +19,24 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-	std::string getCurrentFile();
-	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud, ModelProperties& props);
+	void render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElements);
 	void render(int r, int g, int b);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
+	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
+	void addVisibleElementToList();
+	void updateProjectionModelView(ModelProperties& props);
 	SettingsContainer getSettings() { return _settings; };
+	std::vector<int> getVisibleElementsIndices();
 	//void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
 
 private:
-	std::string _currFile;
 	OGLWidget* _oglWidgetPtr;
 	SettingsContainer _settings;
 
-	// buttons
+	// buttons 
 	QPushButton* _smoothBtPtr;
 	QPushButton* _thinBtPtr;
 
@@ -39,10 +44,14 @@ private:
 	QDoubleSpinBox* _smoothFactorSbPtr;
 	QDoubleSpinBox* _thinRadiusSbPtr;
 
+	//List of visible Elements
+	QListWidget* _visibleElementsScrollWidgetPtr;
+
 	//callbacks
 	std::function<void(std::string)> _onRequestLoadFile;
 	std::function<void()> _onRequestSmoothCloud;
 	std::function<void()> _onRequestThinCloud;
+	std::function<void()> _onRequestUpdateOGLWidget;
 	//void _pollInteractionsWithWindow();
 
 	void _createActions();
@@ -77,7 +86,8 @@ private slots:
 	void closeApplication();
 	void thinCloud();
 	void smoothCloud();
-	void changeSmoothFactor();
-	void changeThinRadius();
+	void changeSmoothFactor(double value);
+	void changeThinRadius(double value);
+	void repaintOGLWidget(QListWidgetItem* sender);
 	//void setOnScrollCallbackTo(std::function<void(double, double)> callback);
 	};

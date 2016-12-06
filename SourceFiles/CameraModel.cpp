@@ -19,3 +19,13 @@ Point3d CameraModel::getWorldPosition() {
 	
 	return this->_worldPosition;
 }
+
+void CameraModel::setSceneCenterTo(Point3d position) {
+
+	this->_sceneCenter = position;
+}
+
+Point3d CameraModel::getSceneCenter() {
+
+	return this->_sceneCenter;
+}

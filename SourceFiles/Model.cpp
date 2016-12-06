@@ -18,7 +18,6 @@ Model::~Model()
 
 void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
 	this->_pointClouds.push_back(pointCloudPtr);
-	this->_visibleClouds.push_back(pointCloudPtr);
 }
 
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
@@ -31,10 +30,6 @@ size_t Model::getNumberOfPointClouds() const {
 
 PointCloud3d& Model::getPointCloudAt(int index) {
 	return *(this->_pointClouds[index]);
-}
-
-std::vector<std::shared_ptr<PointCloud3d>>& Model::getVisibleClouds() {
-	return this->_visibleClouds;
 }
 
 CameraModel& Model::getCameraModel() {
@@ -53,7 +48,8 @@ ModelProperties Model::getModelProperties() {
 		this->_projectionModel.getFarClippingPlaneZ(),
 		this->_projectionModel.getNearClippingPlaneZ(),
 		this->_rotationAngleAroundYAxis,
-		this->_cameraModel.getWorldPosition());
+		this->_cameraModel.getWorldPosition(),
+		this->_cameraModel.getSceneCenter());
 }
 
 void Model::setRotationAngleAroundYAxis(double angle) {
@@ -80,15 +76,21 @@ void Model::setFarClippingPlaneZTo(double z)
 	this->_projectionModel.setFarClippingPlaneZTo(z);
 }
 
+void Model::setSceneCenterTo(Point3d position)
+{
+	this->_cameraModel.setSceneCenterTo(position);
+}
+
 void Model::smoothVisibleClouds(double smoothFactor) {
-	for (int i = 0; i < _visibleClouds.size(); i++) {
-		_visibleClouds.at(i) = _visibleClouds.at(i).get()->computeSmoothedVersionWith(smoothFactor);
+	int numOfClouds = _pointClouds.size();
+	for (int i = 0; i < numOfClouds; i++) {
+		this->add(this->_pointClouds.at(i).get()->computeSmoothedVersionWith(smoothFactor));
 	}
+	
 }
 
 void Model::thinVisibleClouds(double thinningRadius) {
-	for (int i = 0; i < _visibleClouds.size(); i++) {
-		std::shared_ptr<PointCloud3d> newThinnedCloud = _visibleClouds.at(i).get()->computeThinnedVersionWith(thinningRadius);
-		_visibleClouds.at(i).swap(newThinnedCloud);
+	for (int i = 0; i < _pointClouds.size(); i++) {
+		this->add(this->_pointClouds.at(i).get()->computeThinnedVersionWith(thinningRadius));
 	}
 }
