@@ -26,6 +26,7 @@ public:
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
+	void setOnRequestScroll(std::function<void(double, double)> callback);
 	void addVisibleElementToList();
 	void updateProjectionModelView(ModelProperties& props);
 	SettingsContainer getSettings() { return _settings; };

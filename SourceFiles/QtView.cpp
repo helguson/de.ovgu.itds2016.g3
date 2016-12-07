@@ -35,6 +35,11 @@ void QtView::setOnRequestUpdateOGLWidget(std::function<void()> callback)
 	this->_window.setOnRequestUpdateOGLWidget(callback);
 }
 
+void QtView::setOnRequestScroll(std::function<void(double , double )> callback)
+{
+	this->_window.setOnRequestScroll(callback);
+}
+
 void QtView::render(double r, double g, double b) {
 	this->_window.render(r, g, b);
 }

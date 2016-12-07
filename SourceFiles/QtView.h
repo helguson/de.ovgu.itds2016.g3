@@ -15,6 +15,7 @@ public:
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
+	void setOnRequestScroll(std::function<void(double, double) > callback);
 	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud);
 	void render(double r, double g, double b);
 	void addVisibleElementToList();

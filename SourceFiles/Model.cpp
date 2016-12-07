@@ -32,16 +32,6 @@ PointCloud3d& Model::getPointCloudAt(int index) {
 	return *(this->_pointClouds[index]);
 }
 
-CameraModel& Model::getCameraModel() {
-
-	return this->_cameraModel;
-}
-
-ProjectionModel& Model::getProjectionModel() {
-
-	return this->_projectionModel;
-}
-
 ModelProperties Model::getModelProperties() {
 	return ModelProperties(
 		this->_projectionModel.getFieldOfViewAngleInYDirection(),

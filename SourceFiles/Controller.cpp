@@ -81,20 +81,22 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	//### setup ui mouse events ###
 	//#############################
 
-	/*std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
+	view.setOnRequestScroll(
+		[&view, &model ](double offsetX, double offsetY)->void {
 
 		double maxOffsetAccordingToObservations = 16;
 		double dMax = 0.1;
 		double factor = 1 + dMax*(offsetY / maxOffsetAccordingToObservations);
 
-		double oldFieldOfViewAngle = model.getProjectionModel().getFieldOfViewAngleInYDirection();
+		double oldFieldOfViewAngle = model.getModelProperties()._fieldOfViewAngleInYDirection;
 		double newFieldOfViewAngle = oldFieldOfViewAngle * factor;
 
-		model.getProjectionModel().setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
-	};
-        this->_view.setOnScrollCallbackTo(onScroll)
+		model.setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
+		view.updateProjectionModelView(model.getModelProperties());
+		}
+	);
 
-	std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
+	/*std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
 
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 			

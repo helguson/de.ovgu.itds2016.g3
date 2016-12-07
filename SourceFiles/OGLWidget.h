@@ -7,6 +7,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QMainWindow>
+#include <QWheelEvent>
 #include <gl\GL.h>
 #include <gl\GLU.h>
 
@@ -17,6 +18,7 @@ class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
 	OGLWidget(QWidget* parentPtr = nullptr);
 	void setOnRequestPaintGL(std::function<void()> callback);
+	void setOnRequestScroll(std::function<void(double, double)> callback);
 
 	void render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
 	void updateProjectionModelView(ModelProperties& props);
@@ -29,12 +31,17 @@ private:
 	void _triggerOnRequestPaintGL();
 	void _setProjektionMatrixAccordingTo(ModelProperties& props);
 	void _setCameraTransformation(ModelProperties& props);
-	void _rotateAroundAngle(ModelProperties& props);
+	//void _rotateAroundAngle(ModelProperties& props);
 
 	std::function<void()> _onRequestPaintGL;
+	std::function<void(double, double)> _onRequestScroll;
 
 protected:
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int w, int h);
+	//void mousePressEvent(QMouseEvent *event);
+	//void mouseReleaseEvent(QMouseEvent *event);
+	//void mouseMoveEvent(QMouseEvent *event);
+	void wheelEvent(QWheelEvent *event) override;
 };

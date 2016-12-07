@@ -42,7 +42,6 @@ void OGLWidget::updateProjectionModelView(ModelProperties & props)
 {
 	this->_setProjektionMatrixAccordingTo(props);
 	this->_setCameraTransformation(props);
-	this->_rotateAroundAngle(props);
 }
 
 void OGLWidget::render(int r, int g, int b)
@@ -55,6 +54,11 @@ void OGLWidget::render(int r, int g, int b)
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
 {
 	this->_onRequestPaintGL = callback;
+}
+
+void OGLWidget::setOnRequestScroll(std::function<void(double, double)> callback)
+{
+	this->_onRequestScroll = callback;
 }
 
 void OGLWidget::paintGL()
@@ -118,17 +122,12 @@ void OGLWidget::_setCameraTransformation(ModelProperties& props)
 	);
 }
 
-void OGLWidget::_rotateAroundAngle(ModelProperties& props)
+/*####################
+  ### Mouse Events ###
+  ####################*/
+
+void OGLWidget::wheelEvent(QWheelEvent* event)
 {
-	makeCurrent();
-	//rotate aroud y-axis through center
-	glMatrixMode(GL_MODELVIEW);
-
-	glTranslated(props._sceneCenter.x, props._sceneCenter.y, props._sceneCenter.z);
-	glRotated(
-		props._rotationAngle,
-		0, 1, 0
-	);
-	glTranslated(-props._sceneCenter.x, -props._sceneCenter.y, -props._sceneCenter.z);
+	this->_onRequestScroll(event->angleDelta().x(), event->angleDelta().y());
+	this->update();
 }
-

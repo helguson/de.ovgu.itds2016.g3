@@ -144,6 +144,11 @@ void MainWindow::setOnRequestUpdateOGLWidget(std::function<void()> callback)
 	this->_onRequestUpdateOGLWidget = callback;
 }
 
+void MainWindow::setOnRequestScroll(std::function<void(double, double)> callback)
+{
+	this->_oglWidgetPtr->setOnRequestScroll(callback);
+}
+
 void MainWindow::addVisibleElementToList()
 {
 	QListWidgetItem* newListWidgetPtr = new QListWidgetItem(this->_visibleElementsScrollWidgetPtr);
@@ -231,18 +236,6 @@ void MainWindow::_createMenus() {
 	this->settingsMenu->addAction(this->editSettingsAction);
 }
 
-//void MainWindow::_pollInteractionsWithWindow() {
-//
-//	// Poll for and process events
-//	glfwPollEvents();
-//}
-//
-//void MainWindow::setOnScrollCallbackTo(std::function<void(double, double)> callback) {
-//
-//	this->_callbackAdapter.setOnMouseWheelCallbackTo(
-//		[callback](GLFWwindow* windowPtr, double offsetX, double offsetY)->void { callback(offsetX, offsetY); }
-//	);
-//}
 //
 //void MainWindow::setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback) {
 //
