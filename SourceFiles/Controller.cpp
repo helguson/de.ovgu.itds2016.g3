@@ -14,7 +14,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	Model& model = this->_model;
 	model.setFieldOfViewAngleInYDirectionTo(45);
 	model.setNearClippingPlaneZTo(0.001);
-	model.setRotationAngleAroundYAxis(0);
 
 	//################################
 	//### setup ui event callbacks ###
@@ -92,26 +91,53 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		double newFieldOfViewAngle = oldFieldOfViewAngle * factor;
 
 		model.setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
-		view.updateProjectionModelView(model.getModelProperties());
+		view.updateScrolling(model.getModelProperties());
 		}
 	);
 
-	/*std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
+	view.setOnRequestRotate(
+		[&view, &model](double x1, double y1, double x2, double y2, int height, int width)->void {
+		//The center of our virtual rotation ball is in the center of the screen
+		const double x0 = width / 2.0;
+		const double y0 = height / 2.0;
+		//We set the radius of rotation ball to half of the screen height
+		const double r = height / 2.0; //ball radius is half the window height
+		//const double r  = sqrt(sqr(m_winWidth) + sqr(m_winHeight)) / 2; //ball radius is half the window diagonal;
 
-		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-			
-			if (key == GLFW_KEY_LEFT) {
-				double oldAngle = model.getRotationAngleAroundYAxis();
-				model.setRotationAngleAroundYAxis(oldAngle + 1);
-			}
+		double lastposX = x1;
+		double lastposY = y1;
+		double currposX = x2;
+		double currposY = y2;
 
-			if (key == GLFW_KEY_RIGHT) {
-				double oldAngle = model.getRotationAngleAroundYAxis();
-				model.setRotationAngleAroundYAxis(oldAngle - 1);
-			}
-		}
-	};
-        this->_view.setOnKeyCallbackTo(onKey);*/
+		double lastPosZ = (sqr(r) - sqr(lastposX - x0) - sqr(lastposY - y0));
+		double currPosZ = (sqr(r) - sqr(currposX - x0) - sqr(currposY - y0));
+
+		//if z is negative then we are outside the virtual ball and the rotation is just around the current view direction/z-axis
+		if (lastPosZ<0) lastPosZ = 0;
+		else            lastPosZ = sqrt(lastPosZ);
+
+		if (currPosZ<0) currPosZ = 0;
+		else            currPosZ = sqrt(currPosZ);
+
+		//take into account that the screen origin is in the top left corner (and not bottom left) -> x'=x-x0 and y'=y0-y
+		Point3d lastPos3d(lastposX - x0, y0 - lastposY, lastPosZ);
+		Point3d currPos3d(currposX - x0, y0 - currposY, currPosZ);
+
+		normalizeVector(lastPos3d); //make unit normal vector
+		normalizeVector(currPos3d); //make unit normal vector
+
+		//the current mouse interaction results in this 3d rotation in camera space (unit sphere) 
+		Point3d axisCS = crossProduct(lastPos3d, currPos3d);
+		double  angle = acos(dotProduct(lastPos3d, currPos3d));
+		double fov = model.getModelProperties()._fieldOfViewAngleInYDirection;
+		model.setFieldOfViewAngleInYDirectionTo(45);
+		view.updateScrolling(model.getModelProperties());
+		view.updateRotation(axisCS, model.getModelProperties()._sceneCenter, angle); 
+		model.setFieldOfViewAngleInYDirectionTo(fov);
+		view.updateScrolling(model.getModelProperties());
+	}
+	);
+	
 }
 
 Controller::~Controller() {

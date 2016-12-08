@@ -7,8 +7,7 @@ Model::Model()
 	_pointDataSets(),
 	_pointClouds(),
 	_cameraModel(),
-	_projectionModel(),
-	_rotationAngleAroundYAxis(0)
+	_projectionModel()
 {
 }
 
@@ -37,13 +36,8 @@ ModelProperties Model::getModelProperties() {
 		this->_projectionModel.getFieldOfViewAngleInYDirection(),
 		this->_projectionModel.getFarClippingPlaneZ(),
 		this->_projectionModel.getNearClippingPlaneZ(),
-		this->_rotationAngleAroundYAxis,
 		this->_cameraModel.getWorldPosition(),
 		this->_cameraModel.getSceneCenter());
-}
-
-void Model::setRotationAngleAroundYAxis(double angle) {
-	this->_rotationAngleAroundYAxis = angle;
 }
 
 void Model::setWorldPositionTo(Point3d position)

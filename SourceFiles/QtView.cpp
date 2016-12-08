@@ -40,6 +40,11 @@ void QtView::setOnRequestScroll(std::function<void(double , double )> callback)
 	this->_window.setOnRequestScroll(callback);
 }
 
+void QtView::setOnRequestRotate(std::function<void(double, double, double, double, int, int)> callback)
+{
+	this->_window.setOnRequestRotate(callback);
+}
+
 void QtView::render(double r, double g, double b) {
 	this->_window.render(r, g, b);
 }
@@ -52,6 +57,17 @@ void QtView::addVisibleElementToList()
 void QtView::updateProjectionModelView(ModelProperties& props) {
 	this->_window.updateProjectionModelView(props);
 }
+
+void QtView::updateRotation(Point3d axis, Point3d center, double angle)
+{
+	this->_window.updateRotation(axis, center, angle);
+}
+
+void QtView::updateScrolling(ModelProperties & props)
+{
+	this->_window.updateScrolling(props);
+}
+
 
 void QtView::render(std::vector<std::shared_ptr<PointCloud3d>>& cloud) {
 	this->_window.render(cloud); 

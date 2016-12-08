@@ -10,7 +10,6 @@ MainWindow::MainWindow()
 	this->setCentralWidget(widgetPtr);
 
 	const QSurfaceFormat glFormat;
-
 	this->_oglWidgetPtr = new OGLWidget;
 	this->_oglWidgetPtr->setFormat(glFormat);
 	this->_oglWidgetPtr->setSizePolicy(
@@ -102,6 +101,16 @@ void MainWindow::updateProjectionModelView(ModelProperties& props) {
 	this->_oglWidgetPtr->update();
 }
 
+void MainWindow::updateRotation(Point3d axis, Point3d center, double angle)
+{
+	this->_oglWidgetPtr->updateRotation(axis, center, angle);
+}
+
+void MainWindow::updateScrolling(ModelProperties & props)
+{
+	this->_oglWidgetPtr->updateScrolling(props);
+}
+
 void MainWindow::thinCloud(){
 	this->_onRequestThinCloud();
 }
@@ -147,6 +156,11 @@ void MainWindow::setOnRequestUpdateOGLWidget(std::function<void()> callback)
 void MainWindow::setOnRequestScroll(std::function<void(double, double)> callback)
 {
 	this->_oglWidgetPtr->setOnRequestScroll(callback);
+}
+
+void MainWindow::setOnRequestRotate(std::function<void(double, double, double, double, int, int)> callback)
+{
+	this->_oglWidgetPtr->setOnRequestRotate(callback);
 }
 
 void MainWindow::addVisibleElementToList()

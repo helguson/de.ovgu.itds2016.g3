@@ -16,10 +16,13 @@ public:
 	void setOnRequestSmoothCloud(std::function<void() > callback);
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
 	void setOnRequestScroll(std::function<void(double, double) > callback);
+	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud);
 	void render(double r, double g, double b);
 	void addVisibleElementToList();
 	void updateProjectionModelView(ModelProperties& props);
+	void updateRotation(Point3d axis, Point3d center, double angle);
+	void updateScrolling(ModelProperties & props);
 	SettingsContainer getSettings() { return _window.getSettings(); };
 	std::vector<int> getVisibleElementsIndicies() { return _window.getVisibleElementsIndices(); };
 
