@@ -46,8 +46,10 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	
 	view.setOnRequestPaintGL( 
 		[&view, &model]()->void { 
-		if (model.getNumberOfPointClouds() == 0) return;
-			view.render(model.getVisibleClouds(), model.getModelProperties());
+			if (model.getNumberOfPointClouds() > 0) {
+				//view.render(model.getVisibleClouds(), model.getModelProperties());
+			}
+			view.render(0.5, 0.0, 0.0);
 		}
 	);
 

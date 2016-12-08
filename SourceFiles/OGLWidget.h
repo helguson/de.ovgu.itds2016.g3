@@ -7,8 +7,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QMainWindow>
-#include <gl\GL.h>
-#include <gl\GLU.h>
+//#include <gl\GL.h>
+//#include <gl\GLU.h>
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -19,14 +19,14 @@ public:
 	void setOnRequestPaintGL(std::function<void()> callback);
 
 	void render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props, SettingsContainer& settings);
-	void render(int r, int g, int b);
+	void render(double r, double g, double b);
 
 private:
-	void _setProjektionMatrixAccordingTo(ModelProperties& props);
+/*	void _setProjektionMatrixAccordingTo(ModelProperties& props);
 	void _setCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
 	void _rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
 	void _renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
-	void _triggerOnRequestPaintGL();
+*/	void _triggerOnRequestPaintGL();
 
 	std::function<void()> _onRequestPaintGL;
 

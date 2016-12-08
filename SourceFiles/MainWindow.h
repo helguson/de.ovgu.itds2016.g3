@@ -18,7 +18,7 @@ public:
     MainWindow();
 	std::string getCurrentFile();
 	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud, ModelProperties& props);
-	void render(int r, int g, int b);
+	void render(double r, double g, double b);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
