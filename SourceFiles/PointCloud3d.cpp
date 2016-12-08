@@ -1,5 +1,4 @@
 #include "PointCloud3d.h"
-
 #include "util.h"
 
 PointCloud3d::PointCloud3d(
@@ -10,7 +9,9 @@ PointCloud3d::PointCloud3d(
 	_tree(pointData),
 	_sceneCenter(),
 	_sceneRadius(),
-	_minMax()
+	_minMax(),
+	_type("pc"),
+	_color(255,255,255)
 {
 
 	this->_computeBoundingBox();
@@ -27,6 +28,26 @@ void PointCloud3d::setPointDataTo(std::vector<Point3d*> const & pointData) {
 	this->_computeBoundingBox();
 	this->_computeCenter();
 	this->_computeRadius();
+}
+
+void PointCloud3d::setType(std::string type)
+{
+	this->_type = type;
+}
+
+std::string PointCloud3d::getType() const
+{
+	return this->_type;
+}
+
+void PointCloud3d::setColor(QColor color)
+{
+	this->_color = color;
+}
+
+QColor PointCloud3d::getColor() const
+{
+	return this->_color;
 }
 
 Point3d PointCloud3d::getCenter() const {
@@ -126,7 +147,7 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeSmoothedVersionWith(double ra
 
 	ThreeDTree const & tree = this->_tree;
 
-	// TODO: #pragma omp parallel for
+	
 	this->toEachPointApply(
 		[&smoothedPoints, this, radius](Point3d* pointPtr) {
 
@@ -134,11 +155,12 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeSmoothedVersionWith(double ra
 			Point3d smoothedPt = Point3d(0, 0, 0);
 			double weights = 0.0;
 			std::shared_ptr<std::vector<Point3d*>> neighborhood = this->query(origin, radius);
-			for each (Point3d* neighborPtr in *neighborhood)
+			#pragma omp parallel for
+			for (int i = 0; i < neighborhood->size(); ++i)
 			{
-				Point3d const & neighbor = *neighborPtr;
-				double wi = std::exp((-1.0 * distance3d(origin, neighbor)) / radius);
-				smoothedPt += neighbor*wi;
+				
+				double wi = std::exp((-1.0 * distance3d(origin, *neighborhood->at(i))) / radius);
+				smoothedPt += *neighborhood->at(i)*wi;
 				weights += wi;
 			}
 			smoothedPt *= (1.0 / weights);
@@ -148,8 +170,9 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeSmoothedVersionWith(double ra
 
 	this->_storeCreatedPointData(smoothedPoints);
 	std::shared_ptr<std::vector<Point3d*>> smoothedPointPtrs = util::computePointPtrVectorFrom(*smoothedPoints);
-
-	return std::make_shared<PointCloud3d>(this->_storeCreatedPointData, *smoothedPointPtrs);
+	std::shared_ptr<PointCloud3d> smoothedCloud = std::make_shared<PointCloud3d>(this->_storeCreatedPointData, *smoothedPointPtrs);
+	smoothedCloud->setType("sc");
+	return smoothedCloud;
 }
 
 std::shared_ptr<PointCloud3d> PointCloud3d::computeThinnedVersionWith(double thinningRadius) {
@@ -180,5 +203,7 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeThinnedVersionWith(double thi
 	);
 
 	tree.unhideAllNodes();
-	return std::make_shared<PointCloud3d>(this->_storeCreatedPointData, remainingPointPtrs);
+	std::shared_ptr<PointCloud3d> thinnedCloud = std::make_shared<PointCloud3d>(this->_storeCreatedPointData, remainingPointPtrs);
+	thinnedCloud->setType("tc");
+	return thinnedCloud;
 }

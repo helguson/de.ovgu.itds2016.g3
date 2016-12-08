@@ -44,6 +44,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pBNNColor">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -52,6 +59,13 @@
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>PointCloud Color:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pBPCColor">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -66,6 +80,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pBSCColor">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -74,6 +95,13 @@
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Thinned Cloud Color:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pBTCColor">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -91,8 +119,8 @@
    <slot>setShowQuery(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>309</x>
-     <y>30</y>
+     <x>428</x>
+     <y>45</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -100,9 +128,76 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pBNNColor</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>setNNColor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>321</x>
+     <y>103</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>-11</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBPCColor</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>setPCColor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>351</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>441</x>
+     <y>211</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBSCColor</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>setSCColor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>339</x>
+     <y>245</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>201</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pBTCColor</sender>
+   <signal>clicked()</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>setTCColor()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>366</x>
+     <y>313</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>393</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>setShowQuery(int)</slot>
-  <slot>setQueryRadius(double)</slot>
+  <slot>setNNColor()</slot>
+  <slot>setPCColor()</slot>
+  <slot>setSCColor()</slot>
+  <slot>setTCColor()</slot>
  </slots>
 </ui>

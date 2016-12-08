@@ -40,7 +40,11 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		[&view, &model]()->void { 
 			std::vector<std::shared_ptr<PointCloud3d>> visibleClouds; 
 			for each (int index in view.getVisibleElementsIndicies()) {
-				visibleClouds.push_back(std::make_shared<PointCloud3d>(model.getPointCloudAt(index)));
+				std::shared_ptr<PointCloud3d> cloud = std::make_shared<PointCloud3d>(model.getPointCloudAt(index));
+				if (cloud->getType() == "pc") cloud->setColor(view.getSettings().PCColor);
+				if (cloud->getType() == "sc") cloud->setColor(view.getSettings().SCColor);
+				if (cloud->getType() == "tc") cloud->setColor(view.getSettings().TCColor);
+				visibleClouds.push_back(cloud);
 			}
 			view.render(visibleClouds);
 		}

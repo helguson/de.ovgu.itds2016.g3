@@ -11,14 +11,12 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 
 void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds) 
 {
-	int i = 255;
-	int j = 1;
 	for each(std::shared_ptr<PointCloud3d> cloud in  pointClouds) {
 
 		 /* Drawing Points with VertexArrays */
 			glBegin(GL_POINTS);
-			glPointSize(j);
-			glColor3ub(255, i, i);
+			glPointSize(2);
+			glColor3ub(cloud->getColor().red(),cloud->getColor().green(),cloud->getColor().blue()); 
 			cloud->toEachPointApply(
 				[](Point3d* pointPtr)->void
 			{
@@ -26,9 +24,6 @@ void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointC
 			}
 			);
 			glEnd();
-			i -= 100;
-			j += 3;
-		
 	}
 
 }
@@ -37,7 +32,6 @@ void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElemen
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
-	glClearDepth(1.0f); //clear depth buffer
 
 	if (visibleElements.empty()) return;
 	_renderPoints(visibleElements);
@@ -48,7 +42,6 @@ void OGLWidget::render(int r, int g, int b)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(r, g, b, 1.0f);   //clear background color
-	glClearDepth(1.0f);                     //clear depth buffer
 }
 
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
@@ -84,10 +77,6 @@ void OGLWidget::initializeGL()
 	// clear image buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
-
-	// enable depth test
-	glEnable(GL_DEPTH_TEST);
 }
 
 void OGLWidget::_triggerOnRequestPaintGL() 

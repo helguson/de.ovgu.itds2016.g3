@@ -69,18 +69,20 @@ MainWindow::MainWindow()
 }
 
 void MainWindow::changeSmoothFactor(double value) {
-	_settings.smoothFactor = value;
+	this->_settings.smoothFactor = value;
 }
 
 void MainWindow::changeThinRadius(double value) {
-	_settings.thinRadius = value;
+	this->_settings.thinRadius = value;
 }
 
 void MainWindow::editSettings()
 {
 	SettingsWindow setWin(this);
+	setWin.loadCurrent(this->_settings);
 	setWin.exec();
 	_settings = setWin.getContainer();
+	this->update();
 }
 
 void MainWindow::loadFile()
