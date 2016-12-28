@@ -14,10 +14,11 @@ public:
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
-	void render(std::vector<std::shared_ptr< PointCloud3d>>& cloud, ModelProperties& props);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& objects, ModelProperties& props);
 	void render(double r, double g, double b);
 
 	SettingsContainer getSettings() { return _window.getSettings(); };
+	std::vector<std::string> getSelectedNames() { return _window.getSelectedNames(); };
 
 private:
 	QApplication _qApplication;

@@ -5,7 +5,7 @@
 Model::Model()
 	:
 	_pointDataSets(),
-	_pointClouds(),
+	_renderableObjects(),
 	_cameraModel(),
 	_projectionModel(),
 	_rotationAngleAroundYAxis(0)
@@ -17,24 +17,34 @@ Model::~Model()
 }
 
 void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
-	this->_pointClouds.push_back(pointCloudPtr);
-	this->_visibleClouds.push_back(pointCloudPtr);
+
+	this->_renderableObjects.push_back((std::static_pointer_cast<RenderableObjects>(pointCloudPtr)));
 }
 
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
 	this->_pointDataSets.push_back(pointDataSet);
 }
 
-size_t Model::getNumberOfPointClouds() const {
-	return this->_pointClouds.size();
+size_t Model::getNumberOfRenderableObjects() const {
+	return this->_renderableObjects.size();
 }
 
-PointCloud3d& Model::getPointCloudAt(int index) {
-	return *(this->_pointClouds[index]);
+RenderableObjects& Model::getRenderableObjectAt(int index) {
+	return *(this->_renderableObjects[index]);
 }
 
-std::vector<std::shared_ptr<PointCloud3d>>& Model::getVisibleClouds() {
-	return this->_visibleClouds;
+std::vector<std::shared_ptr<RenderableObjects>>& Model::getVisibleObjects(std::vector<std::string> names)
+{
+	std::vector<std::shared_ptr<RenderableObjects>> visibleObjects = std::vector<std::shared_ptr<RenderableObjects>>(names.size());
+	for(int nameIndex = 0; nameIndex < names.size(); nameIndex++)
+	{
+		for(int objIndex = 0; objIndex < this->_renderableObjects.size(); objIndex++)
+		{
+			if (this->_renderableObjects.at(objIndex)->getName() == names.at(nameIndex))
+				visibleObjects.at(nameIndex) = this->_renderableObjects.at(objIndex);
+		}
+	}
+	return visibleObjects;
 }
 
 CameraModel& Model::getCameraModel() {

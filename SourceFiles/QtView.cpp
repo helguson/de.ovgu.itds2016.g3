@@ -34,6 +34,6 @@ void QtView::render(double r, double g, double b) {
 	this->_window.render(r, g, b);
 }
 
-void QtView::render(std::vector<std::shared_ptr<PointCloud3d>>& cloud, ModelProperties& props) {
-	this->_window.render(cloud, props);
+void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, ModelProperties& props) {
+	this->_window.render(objects, props);
 }

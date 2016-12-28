@@ -24,7 +24,7 @@ public:
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
 	SettingsContainer getSettings() { return _settings; };
-	//void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
+	std::vector<std::string> getSelectedNames();
 
 private:
 	std::string _currFile;

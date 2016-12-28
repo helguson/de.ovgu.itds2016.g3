@@ -24,6 +24,7 @@ PointCloud3dRenderer::PointCloud3dRenderer()
 		"}");
 
 	this->_shaderProgram.link();
+		
 }
 
 PointCloud3dRenderer::~PointCloud3dRenderer()

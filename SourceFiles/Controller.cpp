@@ -41,15 +41,14 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	model.setRotationAngleAroundYAxis(0);
 
 	model.setRotationAngleAroundYAxis(0);
-	view.render(model.getVisibleClouds(), model.getModelProperties());
+	view.render(model.getVisibleObjects(view.getSelectedNames()), model.getModelProperties());
 	});
 	
 	view.setOnRequestPaintGL( 
 		[&view, &model]()->void { 
 			if (model.getNumberOfPointClouds() > 0) {
-				//view.render(model.getVisibleClouds(), model.getModelProperties());
+				view.render(model.getVisibleClouds(), model.getModelProperties());
 			}
-			view.render(0.5, 0.0, 0.0);
 		}
 	);
 
@@ -67,35 +66,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		view.render(model.getVisibleClouds(), model.getModelProperties());
 	}
 	);
-	/*std::function<void(double, double)> onScroll = [&model](double offsetX, double offsetY)->void {
-
-		double maxOffsetAccordingToObservations = 16;
-		double dMax = 0.1;
-		double factor = 1 + dMax*(offsetY / maxOffsetAccordingToObservations);
-
-		double oldFieldOfViewAngle = model.getProjectionModel().getFieldOfViewAngleInYDirection();
-		double newFieldOfViewAngle = oldFieldOfViewAngle * factor;
-
-		model.getProjectionModel().setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
-	};
-        this->_view.setOnScrollCallbackTo(onScroll)
-
-	std::function<void(GLFWwindow*, int, int, int, int)> onKey = [&model](GLFWwindow* windowPtr, int key, int scancode, int action, int mods)->void {
-
-		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-			
-			if (key == GLFW_KEY_LEFT) {
-				double oldAngle = model.getRotationAngleAroundYAxis();
-				model.setRotationAngleAroundYAxis(oldAngle + 1);
-			}
-
-			if (key == GLFW_KEY_RIGHT) {
-				double oldAngle = model.getRotationAngleAroundYAxis();
-				model.setRotationAngleAroundYAxis(oldAngle - 1);
-			}
-		}
-	};
-        this->_view.setOnKeyCallbackTo(onKey);*/
 }
 
 Controller::~Controller() {
