@@ -7,10 +7,9 @@ MainWindow::MainWindow()
 	_settings()
 {
 
-	QWidget* widgetPtr = new QWidget;
-	this->setCentralWidget(widgetPtr);
+	QWidget* widgetPtr = new QWidget(this);
 
-	this->_oglWidgetPtr = new OGLWidget;
+	this->_oglWidgetPtr = new OGLWidget(this);
 	this->_oglWidgetPtr->setSizePolicy(
 		QSizePolicy::Expanding,
 		QSizePolicy::Expanding
@@ -41,6 +40,9 @@ MainWindow::MainWindow()
 	layoutPtr->addLayout(settingsLayoutPtr);
 
 	widgetPtr->setLayout(layoutPtr);
+
+
+	this->setCentralWidget(_oglWidgetPtr);
 
 	this->_createActions();
 	this->_createMenus();
