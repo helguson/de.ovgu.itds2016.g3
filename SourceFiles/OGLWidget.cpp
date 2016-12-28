@@ -1,6 +1,7 @@
 #include "OGLWidget.h"
 
 #include <iostream>
+#include "PointCloud3dRenderer.h"
 
 OGLWidget::OGLWidget(QWidget *parentPtr)
 	:
@@ -38,7 +39,7 @@ void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElemen
 
 }
 
-void OGLWidget::render(int r, int g, int b)
+void OGLWidget::render(double r, double g, double b)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(r, g, b, 1.0f);   //clear background color
@@ -67,12 +68,14 @@ void OGLWidget::paintGL()
 
 void OGLWidget::resizeGL(int w ,int h)
 {
+	std::cout << "invoked resizeGL" << std::endl;
 	glViewport(0, 0, w,h);
 }
 
 void OGLWidget::initializeGL()
 {
-	initializeOpenGLFunctions();
+	std::cout << "invoked initializeGL" << std::endl;
+	this->initializeOpenGLFunctions();
 	
 	// clear image buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer

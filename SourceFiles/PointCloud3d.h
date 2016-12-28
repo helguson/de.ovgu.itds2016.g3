@@ -7,8 +7,9 @@
 #include <QColor>
 #include "Point3d.h"
 #include "ThreeDTree.h"
+#include "RenderableObjects.h"
 
-class PointCloud3d
+class PointCloud3d : RenderableObjects
 {
 public:
 	PointCloud3d(

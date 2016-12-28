@@ -35,6 +35,7 @@ public:
 	SettingsContainer getSettings() { return _settings; };
 	std::vector<int> getVisibleElementsIndices();
 	//void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
+	std::vector<std::string> getSelectedNames();
 
 private:
 	OGLWidget* _oglWidgetPtr;

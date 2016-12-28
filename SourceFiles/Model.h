@@ -15,8 +15,9 @@ public:
 	~Model();
 
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
-	size_t getNumberOfPointClouds() const;
-	PointCloud3d & getPointCloudAt(int index);
+	size_t getNumberOfRenderableObjects() const;
+	RenderableObjects& getRenderableObjectAt(int index);
+	std::vector<std::shared_ptr<RenderableObjects>>& getVisibleObjects(std::vector<std::string> names);
 	ModelProperties Model::getModelProperties();
 	//change CameraModel
 	void setWorldPositionTo(Point3d position);
@@ -31,7 +32,7 @@ public:
 
 private:
 	std::vector<std::shared_ptr<std::vector<Point3d>>> _pointDataSets;
-	std::vector<std::shared_ptr<PointCloud3d>> _pointClouds;
+	std::vector<std::shared_ptr<RenderableObjects>> _renderableObjects;
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
 };

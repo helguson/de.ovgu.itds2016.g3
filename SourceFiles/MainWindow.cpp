@@ -128,7 +128,7 @@ void MainWindow::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleEleme
 		//this->_pollInteractionsWithWindow();
 }
 
-void MainWindow::render(int r, int g, int b) {
+void MainWindow::render(double r, double g, double b) {
 
 	//send render info to widget
 	this->_oglWidgetPtr->render(r,g,b);

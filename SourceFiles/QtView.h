@@ -17,7 +17,7 @@ public:
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
 	void setOnRequestScroll(std::function<void(double, double) > callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
-	void render(std::vector<std::shared_ptr<PointCloud3d>>& cloud);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& objects, ModelProperties& props);
 	void render(double r, double g, double b);
 	void addVisibleElementToList();
 	void updateProjectionModelView(ModelProperties& props);
@@ -25,6 +25,9 @@ public:
 	void updateScrolling(ModelProperties & props);
 	SettingsContainer getSettings() { return _window.getSettings(); };
 	std::vector<int> getVisibleElementsIndicies() { return _window.getVisibleElementsIndices(); };
+
+	std::vector<std::string> getSelectedNames() { return _window.getSelectedNames(); };
+
 
 private:
 	QApplication _qApplication;

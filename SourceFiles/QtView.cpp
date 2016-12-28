@@ -48,7 +48,6 @@ void QtView::setOnRequestRotate(std::function<void(double, double, double, doubl
 void QtView::render(double r, double g, double b) {
 	this->_window.render(r, g, b);
 }
-
 void QtView::addVisibleElementToList()
 {
 	this->_window.addVisibleElementToList();
@@ -68,7 +67,6 @@ void QtView::updateScrolling(ModelProperties & props)
 	this->_window.updateScrolling(props);
 }
 
-
-void QtView::render(std::vector<std::shared_ptr<PointCloud3d>>& cloud) {
-	this->_window.render(cloud); 
+void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, ModelProperties& props) {
+	this->_window.render(objects, props);
 }
