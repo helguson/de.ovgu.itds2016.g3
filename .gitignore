@@ -11,6 +11,8 @@
 # 1.0 certain git files
 # 1.1 markdown files
 # 1.2 c++ files
+# 1.3 qt files
+# 1.4 glsl files
 # 2 nevertheless ignore ...
 # 2.0 all directories
 # 2.1 except the following directories
@@ -36,6 +38,9 @@
 ### 1.3 qt files
 !*.qrc
 !*.ui
+
+### 1.4 glsl files
+!*.glsl
 
 # 2 nevertheless ignore ...
 # 2.0 all directories

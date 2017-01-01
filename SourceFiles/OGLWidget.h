@@ -27,6 +27,7 @@ private:
 	void _rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
 	void _renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
 */	void _triggerOnRequestPaintGL();
+	void _test();
 
 	std::function<void()> _onRequestPaintGL;
 

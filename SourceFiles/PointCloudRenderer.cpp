@@ -1,28 +1,21 @@
 #include "PointCloud3dRenderer.h"
 
+#include <iostream>
 
-
-PointCloud3dRenderer::PointCloud3dRenderer()
+PointCloud3dRenderer::PointCloud3dRenderer(DrawArraysFunction drawArrays)
 	:_shaderProgram()
 {
-	this->_shaderProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
-		"attribute highp vec3 vextexXYZ;\n"
-		"attribute lowp vec3 vertexRGB;\n"
-		"uniform highp mat4 modelViewProjectionMatrix;\n"
-		"varying lowp vec3 fragmentRGB;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = modelViewProjectionMatrix*vec4(vextexXYZ, 1.0);\n"
-		"   fragmentRGB = vertexRGB;\n"
-		"}");
+	this->_drawArrays = drawArrays;
 
-	this->_shaderProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-		"varying lowp vec3 fragmentRGB;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_FragColor = vec4(fragmentRGB, 1.0);\n"
-		"}");
-
+	// initialize shader program
+	this->_shaderProgram.addShaderFromSourceFile(
+		QOpenGLShader::Vertex, 
+		"SourceFiles/VertexShader.glsl"
+	);
+	this->_shaderProgram.addShaderFromSourceFile(
+		QOpenGLShader::Fragment,
+		"SourceFiles/FragmentShader.glsl"
+	);
 	this->_shaderProgram.link();
 }
 
@@ -63,8 +56,9 @@ void PointCloud3dRenderer::render(/*sharedPointCloudPtr pointCloudPtr*/) {
 
 	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjectionMatrix);
 
+	
 	// draw using current shader program
-	glDrawArrays(GL_POINTS, 0, 3);
+	this->_drawArrays(GL_POINTS, 0, 3);
 
 	this->_shaderProgram.disableAttributeArray(vertexXYZLocation);
 	this->_shaderProgram.disableAttributeArray(vertexRGBLocation);

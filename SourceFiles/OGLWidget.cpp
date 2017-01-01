@@ -48,39 +48,68 @@ void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, 
 void OGLWidget::render(double r, double g, double b)
 {
 
-	glClearColor(r, g, b, 0.0f);   //clear background color
-	glClearDepth(1.0f);                     //clear depth buffer
+	//glClearColor(r, g, b, 0.0f);   //clear background color
+	//glClearDepth(1.0f);                     //clear depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	/*DrawArraysFunction drawArraysFunction = [this](GLenum mode, GLint first, GLsizei count)->void
+	{
+		this->glDrawArrays(mode, first, count);
+	};
+	PointCloud3dRenderer renderer(drawArraysFunction);
+	renderer.render();*/
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-
-	//glBegin(GL_POINTS);
-	//{
-	//	glColor3d(1.0, 1.0, 1.0);
-	//	glPointSize(5.0);
-
-	//	glVertex3d(+1.0, +1.0, +1.0);
-	//	glVertex3d(+0.0, +0.0, +1.0);
-	//	glVertex3d(+1.0, -1.0, +1.0);
-
-	//	glVertex3d(+1.0, +1.0, -1.0);
-	//	glVertex3d(+0.0, +0.0, +0.0);
-	//	glVertex3d(+1.0, -1.0, -1.0);
-	//	glVertex3d(-1.0, -1.0, -1.0);
-	//}
-	//glEnd();
-
-	// TODO: point array data
-
-	PointCloud3dRenderer renderer;
-	renderer.render();
-
+	this->_test();
 }
+
+void OGLWidget::_test()
+{
+	// create shader program
+	QOpenGLShaderProgram program;
+	program.addShaderFromSourceFile(
+		QOpenGLShader::Vertex,
+		"SourceFiles/VertexShader.glsl"
+	);
+	program.addShaderFromSourceFile(
+		QOpenGLShader::Fragment,
+		"SourceFiles/FragmentShader.glsl"
+	);
+	program.link();
+	program.bind();
+	int vertexXYZLocation = program.attributeLocation("vertexXYZ");
+	int vertexRGBLocation = program.attributeLocation("vertexRGB");
+	int modelViewProjectionMatrixLocation = program.attributeLocation("modelViewProjectionMatrix");
+
+	// bind data
+	const GLfloat vertexXYZs[] = {
+		-0.5f, -0.5f, +0.0f,
+		+0.5f, -0.5f, +0.0f,
+		+0.0f, +0.5f, +0.0f
+	};
+	const GLfloat vertexRGBs[] = {
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
+
+	size_t numberOfVertices = 3;
+	size_t numberOfComponentsInXYZ = 3;
+	size_t numberOfComponentsInRGB = 3;
+
+	QMatrix4x4 modelViewProjectionMatrix;
+	modelViewProjectionMatrix.setToIdentity();	// identity matrix
+
+	program.enableAttributeArray(vertexXYZLocation);
+	program.setAttributeArray(vertexXYZLocation, vertexXYZs, numberOfComponentsInXYZ);
+	program.enableAttributeArray(vertexRGBLocation);
+	program.setAttributeArray(vertexRGBLocation, vertexRGBs, numberOfComponentsInRGB);
+
+	program.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjectionMatrix);
+
+	// draw arrays
+	this->glDrawArrays(GL_TRIANGLES, 0, 3);	// draw lines using 3 vertices as well as additional attributes.
+}
+
 
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
 {
@@ -104,14 +133,14 @@ void OGLWidget::initializeGL()
 	std::cout << "invoked initializeGL" << std::endl;
 	this->initializeOpenGLFunctions();
 	
-	// clear image buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
-	glClearColor(0.0f, 0.5f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
+	// initial settings
+	glClearColor(0.0f, 0.5f, 0.0f, 0.0f);	// set fill colour for framebuffer for glClear
+	glClearDepth(1.0f);	// set fill value for depth buffer for glClear
 
-	// enable depth test
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LESS);	// "Depth test passes if the incoming depth value is less than the stored depth value."
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
 }
 
 void OGLWidget::_triggerOnRequestPaintGL() {
