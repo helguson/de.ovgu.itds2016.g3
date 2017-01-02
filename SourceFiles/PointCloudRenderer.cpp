@@ -28,12 +28,13 @@ void PointCloud3dRenderer::render(/*sharedPointCloudPtr pointCloudPtr*/) {
 
 	int vertexXYZLocation = this->_shaderProgram.attributeLocation("vertexXYZ");
 	int vertexRGBLocation = this->_shaderProgram.attributeLocation("vertexRGB");
-	int modelViewProjectionMatrixLocation = this->_shaderProgram.attributeLocation("modelViewProjectionMatrix");
+	int modelViewProjectionMatrixLocation = this->_shaderProgram.uniformLocation("modelViewProjectionMatrix");
+	int rasterizedSizeOfPointsLocation = this->_shaderProgram.uniformLocation("rasterizedSizeOfPoints");
 
 	// access data
 	const GLfloat vertexXYZs[] = {
-		-1.0f, +0.0f, +0.0f,
-		+1.0f, +0.0f, +0.0f,
+		-1.0f, -1.0f, +0.0f,
+		+1.0f, -1.0f, +0.0f,
 		+0.0f, +1.0f, +0.0f
 	};
 	const GLfloat vertexRGBs[] = {
@@ -56,7 +57,10 @@ void PointCloud3dRenderer::render(/*sharedPointCloudPtr pointCloudPtr*/) {
 
 	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjectionMatrix);
 
-	
+	float rasterizedSizeOfPoints = 30.f;
+	this->_shaderProgram.setUniformValue(rasterizedSizeOfPointsLocation, rasterizedSizeOfPoints);
+
+	// ---------------------------------
 	// draw using current shader program
 	this->_drawArrays(GL_POINTS, 0, 3);
 

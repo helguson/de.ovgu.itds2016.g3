@@ -30,19 +30,21 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 
 void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props, SettingsContainer& settings)
 {
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
-	//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
-	//glClearDepth(1.0f); //clear depth buffer
-	//
-	//if (pointClouds.empty()) return;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//_setProjektionMatrixAccordingTo(props);
-
 	//_setCameraTransformation(pointClouds, props);
-
 	//_rotateAroundAngle(pointClouds, props);
-
 	//_renderPoints(pointClouds);
+
+	// render point cloud
+	//renderer.render(
+	//	pointCloud,
+	//	modelViewProjectionMatrix,
+	//	pointColourSource,
+	//	rasterizedSizeOfPoints
+	//);
+
 }
 
 void OGLWidget::render(double r, double g, double b)
@@ -52,64 +54,13 @@ void OGLWidget::render(double r, double g, double b)
 	//glClearDepth(1.0f);                     //clear depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 
-	/*DrawArraysFunction drawArraysFunction = [this](GLenum mode, GLint first, GLsizei count)->void
+	DrawArraysFunction drawArraysFunction = [this](GLenum mode, GLint first, GLsizei count)->void
 	{
 		this->glDrawArrays(mode, first, count);
 	};
 	PointCloud3dRenderer renderer(drawArraysFunction);
-	renderer.render();*/
-
-	this->_test();
+	renderer.render();
 }
-
-void OGLWidget::_test()
-{
-	// create shader program
-	QOpenGLShaderProgram program;
-	program.addShaderFromSourceFile(
-		QOpenGLShader::Vertex,
-		"SourceFiles/VertexShader.glsl"
-	);
-	program.addShaderFromSourceFile(
-		QOpenGLShader::Fragment,
-		"SourceFiles/FragmentShader.glsl"
-	);
-	program.link();
-	program.bind();
-	int vertexXYZLocation = program.attributeLocation("vertexXYZ");
-	int vertexRGBLocation = program.attributeLocation("vertexRGB");
-	int modelViewProjectionMatrixLocation = program.attributeLocation("modelViewProjectionMatrix");
-
-	// bind data
-	const GLfloat vertexXYZs[] = {
-		-0.5f, -0.5f, +0.0f,
-		+0.5f, -0.5f, +0.0f,
-		+0.0f, +0.5f, +0.0f
-	};
-	const GLfloat vertexRGBs[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-	};
-
-	size_t numberOfVertices = 3;
-	size_t numberOfComponentsInXYZ = 3;
-	size_t numberOfComponentsInRGB = 3;
-
-	QMatrix4x4 modelViewProjectionMatrix;
-	modelViewProjectionMatrix.setToIdentity();	// identity matrix
-
-	program.enableAttributeArray(vertexXYZLocation);
-	program.setAttributeArray(vertexXYZLocation, vertexXYZs, numberOfComponentsInXYZ);
-	program.enableAttributeArray(vertexRGBLocation);
-	program.setAttributeArray(vertexRGBLocation, vertexRGBs, numberOfComponentsInRGB);
-
-	program.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjectionMatrix);
-
-	// draw arrays
-	this->glDrawArrays(GL_TRIANGLES, 0, 3);	// draw lines using 3 vertices as well as additional attributes.
-}
-
 
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
 {
