@@ -87,13 +87,6 @@ void MainWindow::render(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, 
 		//this->_pollInteractionsWithWindow();
 }
 
-void MainWindow::render(double r, double g, double b) {
-
-	//send render info to widget
-	this->_oglWidgetPtr->render(r,g,b);
-	//this->_pollInteractionsWithWindow();
-}
-
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)
 {
 	this->_onRequestLoadFile = callback;

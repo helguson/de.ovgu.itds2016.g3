@@ -6,7 +6,8 @@ varying lowp vec3 fragmentRGB;
 void main()
 {
 	gl_Position = modelViewProjectionMatrix*vec4(vertexXYZ, 1.0);
-	fragmentRGB = vertexRGB;
+	//fragmentRGB = vertexRGB;
+	fragmentRGB = vec3(1.0, 1.0, 1.0);
 
 	// rasterizer settings
 	gl_PointSize = rasterizedSizeOfPoints;

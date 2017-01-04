@@ -4,11 +4,12 @@
 #include "ModelProperties.h"
 #include "SettingsContainer.h"
 #include <functional>
+#include <memory>
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QMainWindow>
-//#include <gl\GL.h>
-//#include <gl\GLU.h>
+
+#include "PointCloud3dRenderer.h"
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -19,17 +20,16 @@ public:
 	void setOnRequestPaintGL(std::function<void()> callback);
 
 	void render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props, SettingsContainer& settings);
-	void render(double r, double g, double b);
 
 private:
-/*	void _setProjektionMatrixAccordingTo(ModelProperties& props);
-	void _setCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
-	void _rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
+	QMatrix4x4 _getProjektionMatrixAccordingTo(ModelProperties& props);
+	QMatrix4x4 _getCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
+/*	void _rotateAroundAngle(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
 	void _renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
 */	void _triggerOnRequestPaintGL();
-	void _test();
 
 	std::function<void()> _onRequestPaintGL;
+	std::unique_ptr<PointCloud3dRenderer> _pointCloud3dRendererPtr;
 
 protected:
 	void initializeGL();

@@ -22,48 +22,63 @@ PointCloud3dRenderer::PointCloud3dRenderer(DrawArraysFunction drawArrays)
 PointCloud3dRenderer::~PointCloud3dRenderer()
 {}
 
-void PointCloud3dRenderer::render(/*sharedPointCloudPtr pointCloudPtr*/) {
 
+void PointCloud3dRenderer::render(
+	SharedPointCloudPtr pointCloudPtr,
+	QMatrix4x4 modelViewProjection,
+	float rasterizedSizeOfPoints
+)
+{
 	this->_shaderProgram.bind();
 
 	int vertexXYZLocation = this->_shaderProgram.attributeLocation("vertexXYZ");
-	int vertexRGBLocation = this->_shaderProgram.attributeLocation("vertexRGB");
+//	int vertexRGBLocation = this->_shaderProgram.attributeLocation("vertexRGB");
 	int modelViewProjectionMatrixLocation = this->_shaderProgram.uniformLocation("modelViewProjectionMatrix");
 	int rasterizedSizeOfPointsLocation = this->_shaderProgram.uniformLocation("rasterizedSizeOfPoints");
 
 	// access data
-	const GLfloat vertexXYZs[] = {
-		-1.0f, -1.0f, +0.0f,
-		+1.0f, -1.0f, +0.0f,
-		+0.0f, +1.0f, +0.0f
-	};
-	const GLfloat vertexRGBs[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-	};
+	SharedVectorPtr<GLfloat> vertexXYZs = _createVectorOfPointComponents(pointCloudPtr);
 
-	size_t numberOfVertices = 3;
+//	const GLfloat vertexRGBs[] = {
+//		1.0f, 0.0f, 0.0f,
+//		0.0f, 1.0f, 0.0f,
+//		0.0f, 0.0f, 1.0f
+//	};
+
+	size_t numberOfVertices = pointCloudPtr->getNumberOfPoints();
 	size_t numberOfComponentsInXYZ = 3;
-	size_t numberOfComponentsInRGB = 3;
-
-	QMatrix4x4 modelViewProjectionMatrix;
-	modelViewProjectionMatrix.setToIdentity();	// identity matrix
+//	size_t numberOfComponentsInRGB = 3;
 
 	this->_shaderProgram.enableAttributeArray(vertexXYZLocation);
-	this->_shaderProgram.setAttributeArray(vertexXYZLocation, vertexXYZs, numberOfComponentsInXYZ);
-	this->_shaderProgram.enableAttributeArray(vertexRGBLocation);
-	this->_shaderProgram.setAttributeArray(vertexRGBLocation, vertexRGBs, numberOfComponentsInRGB);
+	this->_shaderProgram.setAttributeArray(vertexXYZLocation, vertexXYZs->data(), numberOfComponentsInXYZ);
+//	this->_shaderProgram.enableAttributeArray(vertexRGBLocation);
+//	this->_shaderProgram.setAttributeArray(vertexRGBLocation, vertexRGBs, numberOfComponentsInRGB);
 
-	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjectionMatrix);
-
-	float rasterizedSizeOfPoints = 30.f;
+	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjection);
 	this->_shaderProgram.setUniformValue(rasterizedSizeOfPointsLocation, rasterizedSizeOfPoints);
 
 	// ---------------------------------
 	// draw using current shader program
-	this->_drawArrays(GL_POINTS, 0, 3);
+	this->_drawArrays(GL_POINTS, 0, numberOfVertices);
 
 	this->_shaderProgram.disableAttributeArray(vertexXYZLocation);
-	this->_shaderProgram.disableAttributeArray(vertexRGBLocation);
+//	this->_shaderProgram.disableAttributeArray(vertexRGBLocation);
+}
+
+SharedVectorPtr<GLfloat> PointCloud3dRenderer::_createVectorOfPointComponents(SharedPointCloudPtr pointCloudPtr) 
+{
+	SharedVectorPtr<GLfloat> result = std::make_shared<std::vector<GLfloat>>();
+
+	size_t numberOfComponents = 3; // x, y, z
+	result->reserve(pointCloudPtr->getNumberOfPoints() * numberOfComponents);
+
+	pointCloudPtr->toEachPointApply(
+		[result](Point3d const * point)->void{
+			result->push_back(point->x);
+			result->push_back(point->y);
+			result->push_back(point->z);
+		}
+	);
+
+	return result;
 }

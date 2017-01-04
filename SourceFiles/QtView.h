@@ -15,7 +15,6 @@ public:
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
 	void render(std::vector<std::shared_ptr< PointCloud3d>>& cloud, ModelProperties& props);
-	void render(double r, double g, double b);
 
 	SettingsContainer getSettings() { return _window.getSettings(); };
 
