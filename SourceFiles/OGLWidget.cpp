@@ -1,4 +1,5 @@
 #include "OGLWidget.h"
+#include "BestFitLine.h"
 
 #include <iostream>
 
@@ -6,7 +7,8 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 	:
 	QOpenGLWidget(parentPtr),
 	_onRequestPaintGL(nullptr),
-	_pointCloud3dRendererPtr()	// initialisation takes place in initializeGL
+	_pointCloud3dRendererPtr(),	// initialisation takes place in initializeGL
+	_bestFitLineRendererPtr()	// initialisation takes place in initializeGL
 {
 }
 
@@ -51,6 +53,13 @@ void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, 
 			projectionViewModel,
 			rasterizedSizeOfPoints
 		);
+
+		//TODO: manage best fit object in model
+		BestFitLine line(*pointCloud);
+		this->_bestFitLineRendererPtr->render(
+			line,
+			projectionViewModel
+		);
 	}
 
 }
@@ -77,11 +86,16 @@ void OGLWidget::initializeGL()
 	std::cout << "invoked initializeGL" << std::endl;
 	this->initializeOpenGLFunctions();
 
+	DrawArraysFunction drawArrays = [this](GLenum mode, GLint first, GLsizei count)->void
+	{
+		this->glDrawArrays(mode, first, count);
+	};
+
 	this->_pointCloud3dRendererPtr = std::make_unique<PointCloud3dRenderer>(
-		[this](GLenum mode, GLint first, GLsizei count)->void
-		{
-			this->glDrawArrays(mode, first, count);
-		}
+		drawArrays
+	);
+	this->_bestFitLineRendererPtr = std::make_unique<BestFitLineRenderer>(
+		drawArrays
 	);
 	
 	// initial settings

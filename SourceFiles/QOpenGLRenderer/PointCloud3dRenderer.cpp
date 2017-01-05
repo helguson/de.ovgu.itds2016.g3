@@ -3,10 +3,9 @@
 #include <iostream>
 
 PointCloud3dRenderer::PointCloud3dRenderer(DrawArraysFunction drawArrays)
-	:_shaderProgram()
+	:_shaderProgram(),
+	_drawArrays(drawArrays)
 {
-	this->_drawArrays = drawArrays;
-
 	// initialize shader program
 	this->_shaderProgram.addShaderFromSourceFile(
 		QOpenGLShader::Vertex, 

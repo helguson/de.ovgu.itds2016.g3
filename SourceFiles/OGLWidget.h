@@ -10,6 +10,7 @@
 #include <QMainWindow>
 
 #include "QOpenGLRenderer/PointCloud3dRenderer.h"
+#include "QOpenGLRenderer/BestFitLineRenderer.h"
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -30,6 +31,7 @@ private:
 
 	std::function<void()> _onRequestPaintGL;
 	std::unique_ptr<PointCloud3dRenderer> _pointCloud3dRendererPtr;
+	std::unique_ptr<BestFitLineRenderer> _bestFitLineRendererPtr;
 
 protected:
 	void initializeGL();
