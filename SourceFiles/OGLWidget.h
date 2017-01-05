@@ -4,13 +4,17 @@
 #include "ModelProperties.h"
 #include "SettingsContainer.h"
 #include <functional>
-#include <typeinfo>
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QMainWindow>
 #include <QWheelEvent>
-#include <gl\GL.h>
-#include <gl\GLU.h>
+#include <memory>
+#include <QOpenGLFunctions>
+#include <QOpenGLWidget>
+#include <QMainWindow>
+
+#include "QOpenGLRenderer/PointCloud3dRenderer.h"
+#include "QOpenGLRenderer/BestFitLineRenderer.h"
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -28,7 +32,8 @@ public:
 	void render(int r, int g, int b);
 
 private:
-
+	QMatrix4x4 _getProjektionMatrixAccordingTo(ModelProperties& props);
+	QMatrix4x4 _getCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
 	void _renderPointCloud(std::shared_ptr<PointCloud3d>& pointClouds);
 	void _triggerOnRequestPaintGL();
 	void _setProjektionMatrixAccordingTo(ModelProperties& props);
@@ -37,6 +42,9 @@ private:
 	std::function<void()> _onRequestPaintGL;
 	std::function<void(double, double)> _onRequestScroll;
 	std::function<void(double, double, double, double, int, int) > _onRequestRotate;
+	std::unique_ptr<PointCloud3dRenderer> _pointCloud3dRendererPtr;
+	std::unique_ptr<BestFitLineRenderer> _bestFitLineRendererPtr;
+
 protected:
 	void initializeGL();
 	void paintGL();

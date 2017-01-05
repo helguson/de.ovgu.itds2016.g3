@@ -128,13 +128,6 @@ void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visible
 		//this->_pollInteractionsWithWindow();
 }
 
-void MainWindow::render(int r, int g, int b) {
-
-	//send render info to widget
-	this->_oglWidgetPtr->render(r,g,b);
-	//this->_pollInteractionsWithWindow();
-}
-
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)
 {
 	this->_onRequestLoadFile = callback;

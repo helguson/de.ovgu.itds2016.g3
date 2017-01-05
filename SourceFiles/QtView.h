@@ -23,6 +23,7 @@ public:
 	void updateProjectionModelView(ModelProperties& props);
 	void updateRotation(Point3d axis, Point3d center, double angle);
 	void updateScrolling(ModelProperties & props);
+	void render(std::vector<std::shared_ptr< PointCloud3d>>& cloud, ModelProperties& props);
 	SettingsContainer getSettings() { return _window.getSettings(); };
 	std::vector<int> getVisibleElementsIndicies() { return _window.getVisibleElementsIndices(); };
 

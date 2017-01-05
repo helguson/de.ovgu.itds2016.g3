@@ -1,4 +1,5 @@
 #include "OGLWidget.h"
+#include "BestFitLine.h"
 
 #include <iostream>
 #include "PointCloud3dRenderer.h"
@@ -6,12 +7,15 @@
 OGLWidget::OGLWidget(QWidget *parentPtr)
 	:
 	QOpenGLWidget(parentPtr),
-	_onRequestPaintGL(nullptr)
+	_onRequestPaintGL(nullptr),
+	_pointCloud3dRendererPtr(),	// initialisation takes place in initializeGL
+	_bestFitLineRendererPtr()	// initialisation takes place in initializeGL
 {
 }
 
 void OGLWidget::_renderPointCloud(std::shared_ptr<PointCloud3d>& cloud) 
 {
+<<<<<<< HEAD
 		 /* Drawing Points with VertexArrays */
 			glBegin(GL_POINTS);
 			glPointSize(2);
@@ -42,13 +46,36 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 
 		//TODO: render anything else
 
-	}
-}
 
-void OGLWidget::render(int r, int g, int b)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
-	glClearColor(r, g, b, 1.0f);   //clear background color
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//_setProjektionMatrixAccordingTo(props);
+	//_setCameraTransformation(pointClouds, props);
+	//_rotateAroundAngle(pointClouds, props);
+
+	QMatrix4x4 model;
+	QMatrix4x4 view = this->_getCameraTransformation(pointClouds, props);
+	QMatrix4x4 projection = this->_getProjektionMatrixAccordingTo(props);
+
+
+	QMatrix4x4 projectionViewModel = projection*view*model;
+	float rasterizedSizeOfPoints = 2;
+
+	for (std::shared_ptr<PointCloud3d> pointCloud : pointClouds) {
+
+		this->_pointCloud3dRendererPtr->render(
+			pointCloud,
+			projectionViewModel,
+			rasterizedSizeOfPoints
+		);
+
+		//TODO: manage best fit object in model
+		BestFitLine line(*pointCloud);
+		this->_bestFitLineRendererPtr->render(
+			line,
+			projectionViewModel
+		);
+	}
 }
 
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
@@ -82,10 +109,27 @@ void OGLWidget::initializeGL()
 {
 	std::cout << "invoked initializeGL" << std::endl;
 	this->initializeOpenGLFunctions();
+
+	DrawArraysFunction drawArrays = [this](GLenum mode, GLint first, GLsizei count)->void
+	{
+		this->glDrawArrays(mode, first, count);
+	};
+
+	this->_pointCloud3dRendererPtr = std::make_unique<PointCloud3dRenderer>(
+		drawArrays
+	);
+	this->_bestFitLineRendererPtr = std::make_unique<BestFitLineRenderer>(
+		drawArrays
+	);
 	
-	// clear image buffer
+	// initial settings
+	glClearColor(0.0f, 0.5f, 0.0f, 0.0f);	// set fill colour for framebuffer for glClear
+	glClearDepth(1.0f);	// set fill value for depth buffer for glClear
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);	// "Depth test passes if the incoming depth value is less than the stored depth value."
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear image buffer
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 void OGLWidget::_triggerOnRequestPaintGL() 
@@ -104,12 +148,27 @@ void OGLWidget::_setProjektionMatrixAccordingTo(ModelProperties& props)
 	double aspectRatio = (double)this->size().width() / (double)this->size().height();
 
 	gluPerspective(
-		props._fieldOfViewAngleInYDirection,
+	props._fieldOfViewAngleInYDirection,
 		aspectRatio,
 		props._nearClippingPlaneZ,
 		props._farClippingPlaneZ
 	);
 	glMatrixMode(GL_MODELVIEW);
+}
+QMatrix4x4 OGLWidget::_getProjektionMatrixAccordingTo(ModelProperties& props) {
+
+	QMatrix4x4 result;
+
+	double aspectRatio = (double)this->size().width() / (double)this->size().height();
+
+	result.perspective(
+		props._fieldOfViewAngleInYDirection,
+		aspectRatio,
+		props._nearClippingPlaneZ,
+		props._farClippingPlaneZ
+	);
+	
+	return result;
 }
 
 void OGLWidget::_setCameraTransformation(ModelProperties& props)
@@ -195,4 +254,30 @@ void OGLWidget::wheelEvent(QWheelEvent* event)
 {
 	this->_onRequestScroll(event->angleDelta().x(), event->angleDelta().y());
 	this->update();
+}
+
+
+QMatrix4x4 OGLWidget::_getCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, ModelProperties& props)
+{
+	QMatrix4x4 result;
+
+	std::function<QVector3D(Point3d const &)> toQVector3D = [](Point3d const & point)->QVector3D {
+		return QVector3D(point.x, point.y, point.z);
+	};
+
+	Point3d upVector(0, 1, 0);
+
+	Point3d pointCloudCenter(0, 0, 0);
+	for each(std::shared_ptr<PointCloud3d> cloud in pointClouds)
+		pointCloudCenter += cloud->getCenter();
+
+	Point3d cameraPosition = props._worldPosition;
+
+	result.lookAt(
+		toQVector3D(cameraPosition),
+		toQVector3D(pointCloudCenter),
+		toQVector3D(upVector)
+	);
+
+	return result;
 }
