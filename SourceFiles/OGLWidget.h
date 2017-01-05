@@ -4,6 +4,7 @@
 #include "ModelProperties.h"
 #include "SettingsContainer.h"
 #include <functional>
+#include <typeinfo>
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QMainWindow>
@@ -23,12 +24,12 @@ public:
 	void updateProjectionModelView(ModelProperties& props);
 	void updateRotation(Point3d axis, Point3d center, double angle);
 	void updateScrolling(ModelProperties& props);
-	void render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds);
 	void render(int r, int g, int b);
 
 private:
 
-	void _renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds);
+	void _renderPointCloud(std::shared_ptr<PointCloud3d>& pointClouds);
 	void _triggerOnRequestPaintGL();
 	void _setProjektionMatrixAccordingTo(ModelProperties& props);
 	void _setCameraTransformation(ModelProperties& props);

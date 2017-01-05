@@ -5,12 +5,10 @@ PointCloud3d::PointCloud3d(
 	std::function<void(std::shared_ptr<std::vector<Point3d>>)> storeCreatedPointData,
 	std::vector<Point3d*> const & pointData
 )
-	:_storeCreatedPointData(storeCreatedPointData),
+	:RenderableObjects(),
+	_storeCreatedPointData(storeCreatedPointData),
 	_tree(pointData),
-	_sceneCenter(),
-	_sceneRadius(),
 	_minMax(),
-	_type("pc"),
 	_color(255,255,255)
 {
 
@@ -30,16 +28,6 @@ void PointCloud3d::setPointDataTo(std::vector<Point3d*> const & pointData) {
 	this->_computeRadius();
 }
 
-void PointCloud3d::setType(std::string type)
-{
-	this->_type = type;
-}
-
-std::string PointCloud3d::getType() const
-{
-	return this->_type;
-}
-
 void PointCloud3d::setColor(QColor color)
 {
 	this->_color = color;
@@ -50,25 +38,17 @@ QColor PointCloud3d::getColor() const
 	return this->_color;
 }
 
-Point3d PointCloud3d::getCenter() const {
-
-	return this->_sceneCenter;
-}
-
-double PointCloud3d::getRadius() const {
-
-	return this->_sceneRadius;
-}
-
-void PointCloud3d::_computeCenter() {
+void PointCloud3d::_computeCenter() 
+{
 		
 	// compute center of scene
-	this->_sceneCenter = (this->_minMax.first + this->_minMax.second) * 0.5;
+	
+	this->_center = this->_minMax.first + this->_minMax.second * 0.5;
 }
 
-void PointCloud3d::_computeRadius()
+void PointCloud3d::_computeRadius() 
 {
-	this->_sceneRadius = distance3d(_minMax.second, this->_sceneCenter);
+	this->_radius = distance3d(_minMax.second, this->_center);
 }
 
 void PointCloud3d::_computeBoundingBox()
@@ -171,7 +151,7 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeSmoothedVersionWith(double ra
 	this->_storeCreatedPointData(smoothedPoints);
 	std::shared_ptr<std::vector<Point3d*>> smoothedPointPtrs = util::computePointPtrVectorFrom(*smoothedPoints);
 	std::shared_ptr<PointCloud3d> smoothedCloud = std::make_shared<PointCloud3d>(this->_storeCreatedPointData, *smoothedPointPtrs);
-	smoothedCloud->setType("sc");
+	smoothedCloud->setName("sc");
 	return smoothedCloud;
 }
 
@@ -204,6 +184,6 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeThinnedVersionWith(double thi
 
 	tree.unhideAllNodes();
 	std::shared_ptr<PointCloud3d> thinnedCloud = std::make_shared<PointCloud3d>(this->_storeCreatedPointData, remainingPointPtrs);
-	thinnedCloud->setType("tc");
+	thinnedCloud->setName("tc");
 	return thinnedCloud;
 }

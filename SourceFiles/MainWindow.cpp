@@ -121,14 +121,14 @@ void MainWindow::smoothCloud() {
 	this->_onRequestSmoothCloud();
 }
 
-void MainWindow::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElements) {
+void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements) {
 
 		//send render info to widget
 		this->_oglWidgetPtr->render(visibleElements);
 		//this->_pollInteractionsWithWindow();
 }
 
-void MainWindow::render(double r, double g, double b) {
+void MainWindow::render(int r, int g, int b) {
 
 	//send render info to widget
 	this->_oglWidgetPtr->render(r,g,b);
@@ -170,7 +170,7 @@ void MainWindow::addVisibleElementToList()
 	QListWidgetItem* newListWidgetPtr = new QListWidgetItem(this->_visibleElementsScrollWidgetPtr);
 	newListWidgetPtr->setFlags(newListWidgetPtr->flags() | Qt::ItemIsUserCheckable);
 	newListWidgetPtr->setCheckState(Qt::Unchecked);
-	QString text = QString("PointCloud %1").arg(this->_visibleElementsScrollWidgetPtr->count());
+	QString text = QString("Element %1").arg(this->_visibleElementsScrollWidgetPtr->count());
 	newListWidgetPtr->setText(text);
 	this->_visibleElementsScrollWidgetPtr->addItem(newListWidgetPtr);
 }
@@ -251,12 +251,5 @@ void MainWindow::_createMenus() {
 	this->settingsMenu = this->menuBar()->addMenu(tr("&Settings"));
 	this->settingsMenu->addAction(this->editSettingsAction);
 }
-
-//
-//void MainWindow::setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback) {
-//
-//	this->_callbackAdapter.setOnKeyCallbackTo(callback);
-//}
-//
 
 

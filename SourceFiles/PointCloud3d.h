@@ -9,7 +9,7 @@
 #include "ThreeDTree.h"
 #include "RenderableObjects.h"
 
-class PointCloud3d : RenderableObjects
+class PointCloud3d : public RenderableObjects
 {
 public:
 	PointCloud3d(
@@ -19,15 +19,11 @@ public:
 	~PointCloud3d();
 
 	void setPointDataTo(std::vector<Point3d*> const & pointData);	// TODO: needed in public?
-	void setType(std::string type);
 	void setColor(QColor color);
 	bool isEmpty() const;
 	size_t getNumberOfPoints() const;
 	void toEachPointApply(std::function<void(Point3d*)> functor) const;
 
-	Point3d getCenter() const;
-	double getRadius() const;
-	std::string getType() const;
 	QColor getColor() const;
 	std::shared_ptr<std::vector<Point3d*>> query(Point3d const & referencePoint, double maximumDistance) const;
 	std::shared_ptr<PointCloud3d> computeSmoothedVersionWith(double radius);
@@ -38,12 +34,9 @@ private:
 	std::function<void(std::shared_ptr<std::vector<Point3d>>)> _storeCreatedPointData;
 	ThreeDTree _tree;
 	std::pair<Point3d, Point3d> _minMax;
-	Point3d _sceneCenter;
-	double _sceneRadius;
-	std::string _type;
 	QColor _color;
 
-	void _computeCenter();
-	void _computeRadius();
+	virtual void _computeCenter() ;
+	virtual void _computeRadius() ;
 	void _computeBoundingBox();
 };

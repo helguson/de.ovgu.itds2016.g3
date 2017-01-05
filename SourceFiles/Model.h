@@ -16,8 +16,7 @@ public:
 
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
 	size_t getNumberOfRenderableObjects() const;
-	RenderableObjects& getRenderableObjectAt(int index);
-	std::vector<std::shared_ptr<RenderableObjects>>& getVisibleObjects(std::vector<std::string> names);
+	std::shared_ptr<RenderableObjects> getRenderableObjectAt(int index);
 	ModelProperties Model::getModelProperties();
 	//change CameraModel
 	void setWorldPositionTo(Point3d position);
@@ -26,8 +25,9 @@ public:
 	void setNearClippingPlaneZTo(double z);
 	void setFarClippingPlaneZTo(double z);
 	void setSceneCenterTo(Point3d position);
-	void smoothVisibleCloud(int index, double smoothFactor);
-	void thinVisibleCloud(int index, double smoothFactor);
+
+	bool smoothVisibleCloud(int index, double smoothFactor);
+	bool thinVisibleCloud(int index, double smoothFactor);
 	void addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet);
 
 private:

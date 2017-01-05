@@ -10,10 +10,8 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 {
 }
 
-void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds) 
+void OGLWidget::_renderPointCloud(std::shared_ptr<PointCloud3d>& cloud) 
 {
-	for each(std::shared_ptr<PointCloud3d> cloud in  pointClouds) {
-
 		 /* Drawing Points with VertexArrays */
 			glBegin(GL_POINTS);
 			glPointSize(2);
@@ -25,21 +23,29 @@ void OGLWidget::_renderPoints(std::vector<std::shared_ptr<PointCloud3d>>& pointC
 			}
 			);
 			glEnd();
-	}
-
 }
 
-void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElements)
+void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
 
 	if (visibleElements.empty()) return;
-	_renderPoints(visibleElements);
+	for (int index = 0; index < visibleElements.size(); index++) {
 
+		// render clouds
+		if (std::dynamic_pointer_cast<PointCloud3d>(visibleElements.at(index)))
+		{
+			std::shared_ptr<PointCloud3d> cloud = std::dynamic_pointer_cast<PointCloud3d>(visibleElements.at(index));
+			_renderPointCloud(cloud);
+		}
+
+		//TODO: render anything else
+
+	}
 }
 
-void OGLWidget::render(double r, double g, double b)
+void OGLWidget::render(int r, int g, int b)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(r, g, b, 1.0f);   //clear background color

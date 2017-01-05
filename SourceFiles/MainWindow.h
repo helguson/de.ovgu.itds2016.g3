@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-	void render(std::vector<std::shared_ptr<PointCloud3d>>& visibleElements);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements);
 	void render(int r, int g, int b);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
@@ -34,8 +34,6 @@ public:
 	void updateScrolling(ModelProperties & props);
 	SettingsContainer getSettings() { return _settings; };
 	std::vector<int> getVisibleElementsIndices();
-	//void setOnKeyCallbackTo(std::function<void(GLFWwindow*, int, int, int, int)> callback);
-	std::vector<std::string> getSelectedNames();
 
 private:
 	OGLWidget* _oglWidgetPtr;
@@ -94,5 +92,4 @@ private slots:
 	void changeSmoothFactor(double value);
 	void changeThinRadius(double value);
 	void repaintOGLWidget(QListWidgetItem* sender);
-	//void setOnScrollCallbackTo(std::function<void(double, double)> callback);
 	};

@@ -16,7 +16,7 @@ Model::~Model()
 }
 
 void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
-	this->_renderableObjects.push_back((std::static_pointer_cast<RenderableObjects>(pointCloudPtr)));
+	this->_renderableObjects.push_back(pointCloudPtr);
 }
 
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
@@ -27,22 +27,10 @@ size_t Model::getNumberOfRenderableObjects() const {
 	return this->_renderableObjects.size();
 }
 
-RenderableObjects& Model::getRenderableObjectAt(int index) {
-	return *(this->_renderableObjects[index]);
+std::shared_ptr<RenderableObjects> Model::getRenderableObjectAt(int index) {
+	return this->_renderableObjects.at(index);
 }
-std::vector<std::shared_ptr<RenderableObjects>>& Model::getVisibleObjects(std::vector<std::string> names)
-{
-	std::vector<std::shared_ptr<RenderableObjects>> visibleObjects = std::vector<std::shared_ptr<RenderableObjects>>(names.size());
-	for(int nameIndex = 0; nameIndex < names.size(); nameIndex++)
-	{
-		for(int objIndex = 0; objIndex < this->_renderableObjects.size(); objIndex++)
-		{
-			if (this->_renderableObjects.at(objIndex)->getName() == names.at(nameIndex))
-				visibleObjects.at(nameIndex) = this->_renderableObjects.at(objIndex);
-		}
-	}
-	return visibleObjects;
-}
+
 
 ModelProperties Model::getModelProperties() {
 	return ModelProperties(
@@ -78,10 +66,20 @@ void Model::setSceneCenterTo(Point3d position)
 	this->_cameraModel.setSceneCenterTo(position);
 }
 
-void Model::smoothVisibleCloud(int index, double smoothFactor) {
-		this->add(this->_pointClouds.at(index).get()->computeSmoothedVersionWith(smoothFactor));
+bool Model::smoothVisibleCloud(int index, double smoothFactor) {
+	std::shared_ptr<PointCloud3d> cloudPtr = std::dynamic_pointer_cast<PointCloud3d>(this->_renderableObjects.at(index));
+	if (cloudPtr) {
+		this->add(cloudPtr->computeSmoothedVersionWith(smoothFactor));
+		return true;
+	}
+	return false;
 }
 
-void Model::thinVisibleCloud(int index, double thinningRadius) {
-		this->add(this->_pointClouds.at(index).get()->computeThinnedVersionWith(thinningRadius));
+bool Model::thinVisibleCloud(int index, double thinningRadius) {
+	std::shared_ptr<PointCloud3d> cloudPtr = std::dynamic_pointer_cast<PointCloud3d>(this->_renderableObjects.at(index));
+	if (cloudPtr) {
+		this->add(cloudPtr->computeThinnedVersionWith(thinningRadius));
+		return true;
+	}
+	return false;
 }

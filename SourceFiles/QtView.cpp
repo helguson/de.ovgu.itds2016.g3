@@ -67,6 +67,6 @@ void QtView::updateScrolling(ModelProperties & props)
 	this->_window.updateScrolling(props);
 }
 
-void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, ModelProperties& props) {
-	this->_window.render(objects, props);
+void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects) {
+	this->_window.render(objects);
 }

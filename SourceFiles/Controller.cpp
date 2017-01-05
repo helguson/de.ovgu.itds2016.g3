@@ -38,15 +38,11 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	//function for rendering loop
 	view.setOnRequestPaintGL( 
 		[&view, &model]()->void { 
-			std::vector<std::shared_ptr<PointCloud3d>> visibleClouds; 
+			std::vector<std::shared_ptr<RenderableObjects>> visibleObjects; 
 			for each (int index in view.getVisibleElementsIndicies()) {
-				std::shared_ptr<PointCloud3d> cloud = std::make_shared<PointCloud3d>(model.getPointCloudAt(index));
-				if (cloud->getType() == "pc") cloud->setColor(view.getSettings().PCColor);
-				if (cloud->getType() == "sc") cloud->setColor(view.getSettings().SCColor);
-				if (cloud->getType() == "tc") cloud->setColor(view.getSettings().TCColor);
-				visibleClouds.push_back(cloud);
+				visibleObjects.push_back(model.getRenderableObjectAt(index));
 			}
-			view.render(visibleClouds);
+			view.render(visibleObjects);
 		}
 	);
 
@@ -62,8 +58,8 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	view.setOnRequestSmoothCloud(
 		[this, &view, &model]()->void {
 		for each (int index in view.getVisibleElementsIndicies()) {
-			model.smoothVisibleCloud(index, view.getSettings().smoothFactor);
-			view.addVisibleElementToList();
+			if(model.smoothVisibleCloud(index, view.getSettings().smoothFactor));
+				view.addVisibleElementToList();
 		}
 		this->_updateModelProperties();
 	}
@@ -73,8 +69,8 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	view.setOnRequestThinCloud(
 		[this, &view, &model]()->void {
 		for each (int index in view.getVisibleElementsIndicies()) {
-			model.thinVisibleCloud(index, view.getSettings().thinRadius);
-			view.addVisibleElementToList();
+			if(model.thinVisibleCloud(index, view.getSettings().thinRadius));
+				view.addVisibleElementToList();
 		}
 		this->_updateModelProperties();
 	}
@@ -134,6 +130,7 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		Point3d axisCS = crossProduct(lastPos3d, currPos3d);
 		double  angle = acos(dotProduct(lastPos3d, currPos3d));
 		double fov = model.getModelProperties()._fieldOfViewAngleInYDirection;
+
 		model.setFieldOfViewAngleInYDirectionTo(45);
 		view.updateScrolling(model.getModelProperties());
 		view.updateRotation(axisCS, model.getModelProperties()._sceneCenter, angle); 
@@ -166,7 +163,7 @@ void Controller::_updateModelProperties() {
 	Point3d sceneCenter = Point3d(0, 0, 0);
 	for each (int index in this->_view.getVisibleElementsIndicies())
 	{
-		sceneCenter += this->_model.getPointCloudAt(index).getCenter();
+		sceneCenter += this->_model.getRenderableObjectAt(index)->getCenter();
 	}
 	this->_model.setSceneCenterTo(sceneCenter * (1.0 / this->_view.getVisibleElementsIndicies().size()));
 
@@ -174,7 +171,7 @@ void Controller::_updateModelProperties() {
 	double sceneRadius = 0;
 	for each (int index in this->_view.getVisibleElementsIndicies())
 	{
-		double tmpRadius = distance3d(this->_model.getPointCloudAt(index).getCenter(), sceneCenter) + this->_model.getPointCloudAt(index).getRadius();
+		double tmpRadius = distance3d(this->_model.getRenderableObjectAt(index)->getCenter(), sceneCenter) + this->_model.getRenderableObjectAt(index)->getRadius();
 		if (tmpRadius > sceneRadius) sceneRadius = tmpRadius;
 	}
 
