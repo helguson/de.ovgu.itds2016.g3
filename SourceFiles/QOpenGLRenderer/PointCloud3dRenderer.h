@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PointCloud3d.h"
+#include "../PointCloud3d.h"
 #include <memory>
 #include <functional>
 #include <QOpenGLShaderProgram>

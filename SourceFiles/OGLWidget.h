@@ -9,7 +9,7 @@
 #include <QOpenGLWidget>
 #include <QMainWindow>
 
-#include "PointCloud3dRenderer.h"
+#include "QOpenGLRenderer/PointCloud3dRenderer.h"
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {

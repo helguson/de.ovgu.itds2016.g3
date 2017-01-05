@@ -47,5 +47,7 @@
 **/
 
 # 2.1 except the following directories
+# SourceFiles/ and zero or more subdirectories
 !SourceFiles/
+!SourceFiles/**/
 !/
