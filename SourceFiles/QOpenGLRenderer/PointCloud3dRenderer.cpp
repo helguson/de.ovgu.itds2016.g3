@@ -10,11 +10,11 @@ PointCloud3dRenderer::PointCloud3dRenderer(DrawArraysFunction drawArrays)
 	// initialize shader program
 	this->_shaderProgram.addShaderFromSourceFile(
 		QOpenGLShader::Vertex, 
-		"SourceFiles/QOpenGLRenderer/VertexShader.glsl"
+		"SourceFiles/QOpenGLRenderer/PointCloud3dRendererVertexShader.glsl"
 	);
 	this->_shaderProgram.addShaderFromSourceFile(
 		QOpenGLShader::Fragment,
-		"SourceFiles/QOpenGLRenderer/FragmentShader.glsl"
+		"SourceFiles/QOpenGLRenderer/PointCloud3dRendererFragmentShader.glsl"
 	);
 	this->_shaderProgram.link();
 }
