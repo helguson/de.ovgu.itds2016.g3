@@ -8,7 +8,8 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 	QOpenGLWidget(parentPtr),
 	_onRequestPaintGL(nullptr),
 	_pointCloud3dRendererPtr(),	// initialisation takes place in initializeGL
-	_bestFitLineRendererPtr()	// initialisation takes place in initializeGL
+	_bestFitLineRendererPtr(),	// initialisation takes place in initializeGL
+	_bestFitPlaneRendererPtr()	// initialisation takes place in initializeGL
 {
 }
 
@@ -60,6 +61,11 @@ void OGLWidget::render(std::vector<std::shared_ptr<PointCloud3d>>& pointClouds, 
 			line,
 			projectionViewModel
 		);
+		BestFitPlane plane(*pointCloud);
+		this->_bestFitPlaneRendererPtr->render(
+			plane,
+			projectionViewModel
+		);
 	}
 
 }
@@ -95,6 +101,9 @@ void OGLWidget::initializeGL()
 		drawArrays
 	);
 	this->_bestFitLineRendererPtr = std::make_unique<BestFitLineRenderer>(
+		drawArrays
+	);
+	this->_bestFitPlaneRendererPtr = std::make_unique<BestFitPlaneRenderer>(
 		drawArrays
 	);
 	
