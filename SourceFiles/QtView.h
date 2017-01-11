@@ -21,7 +21,7 @@ public:
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 transformation);
 	void addVisibleElementToList();
-	void repaint();
+	void repaintOGL();
 	SettingsContainer getSettings() { return _window.getSettings(); };
 	std::vector<int> getVisibleElementsIndicies() { return _window.getVisibleElementsIndices(); };
 

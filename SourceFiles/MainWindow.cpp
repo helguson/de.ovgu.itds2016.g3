@@ -157,6 +157,11 @@ void MainWindow::addVisibleElementToList()
 	this->_visibleElementsScrollWidgetPtr->addItem(newListWidgetPtr);
 }
 
+void MainWindow::repaintOGL()
+{
+	this->_oglWidgetPtr->update();
+}
+
 std::vector<int> MainWindow::getVisibleElementsIndices()
 {
 	std::vector<int> indicesVector;

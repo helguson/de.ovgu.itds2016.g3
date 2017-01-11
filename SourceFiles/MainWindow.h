@@ -29,6 +29,7 @@ public:
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void addVisibleElementToList();
+	void repaintOGL();
 	SettingsContainer getSettings() { return _settings; };
 	std::vector<int> getVisibleElementsIndices();
 
