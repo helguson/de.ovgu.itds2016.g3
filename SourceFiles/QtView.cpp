@@ -30,6 +30,21 @@ void QtView::setOnRequestSmoothCloud(std::function<void()> callback)
 	this->_window.setOnRequestSmoothCloud(callback);
 }
 
+void QtView::setOnRequestBFLine(std::function<void(int)> callback)
+{
+	this->_window.setOnRequestBFLine(callback);
+}
+
+void QtView::setOnRequestBFPlane(std::function<void(int)> callback)
+{
+	this->_window.setOnRequestBFPlane(callback);
+}
+
+void QtView::setOnRequestBFSphere(std::function<void(int)> callback)
+{
+	this->_window.setOnRequestBFSphere(callback);
+}
+
 void QtView::setOnRequestUpdateOGLWidget(std::function<void()> callback)
 {
 	this->_window.setOnRequestUpdateOGLWidget(callback);

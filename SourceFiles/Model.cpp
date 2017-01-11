@@ -19,6 +19,10 @@ void Model::add(std::shared_ptr<PointCloud3d> pointCloudPtr) {
 	this->_renderableObjects.push_back(pointCloudPtr);
 }
 
+void Model::add(std::shared_ptr<BestFitLine> bfLinePtr) {
+	this->_renderableObjects.push_back(bfLinePtr);
+}
+
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
 	this->_pointDataSets.push_back(pointDataSet);
 }
@@ -89,6 +93,16 @@ bool Model::thinVisibleCloud(int index, double thinningRadius) {
 	std::shared_ptr<PointCloud3d> cloudPtr = std::dynamic_pointer_cast<PointCloud3d>(this->_renderableObjects.at(index));
 	if (cloudPtr) {
 		this->add(cloudPtr->computeThinnedVersionWith(thinningRadius));
+		return true;
+	}
+	return false;
+}
+
+bool Model::bfLine(int index) {
+	std::shared_ptr<PointCloud3d> cloudPtr = std::dynamic_pointer_cast<PointCloud3d>(this->_renderableObjects.at(index));
+	if (cloudPtr) {
+		std::shared_ptr<BestFitLine> line = std::make_shared<BestFitLine>(*cloudPtr);
+		this->add(line);
 		return true;
 	}
 	return false;

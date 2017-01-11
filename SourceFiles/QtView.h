@@ -15,6 +15,9 @@ public:
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
+	void setOnRequestBFLine(std::function<void(int) > callback);
+	void setOnRequestBFPlane(std::function<void(int) > callback);
+	void setOnRequestBFSphere(std::function<void(int) > callback);
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
 	void setOnRequestScroll(std::function<void(double, double) > callback);
 	void setOnRequestResizeWindow(std::function<void(double, double) > callback);

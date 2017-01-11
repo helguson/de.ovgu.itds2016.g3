@@ -28,6 +28,9 @@ public:
 	void setOnRequestScroll(std::function<void(double, double)> callback);
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
+	void setOnRequestBFLine(std::function<void(int) > callback);
+	void setOnRequestBFPlane(std::function<void(int) > callback);
+	void setOnRequestBFSphere(std::function<void(int) > callback);
 	void addVisibleElementToList();
 	SettingsContainer getSettings() { return _settings; };
 	std::vector<int> getVisibleElementsIndices();
@@ -39,6 +42,9 @@ private:
 	// buttons 
 	QPushButton* _smoothBtPtr;
 	QPushButton* _thinBtPtr;
+	QPushButton* _bestFitLinePtr;
+	QPushButton* _bestFitPlanePtr;
+	QPushButton* _bestFitSphere;
 
 	// SpinnBoxes
 	QDoubleSpinBox* _smoothFactorSbPtr;
@@ -54,6 +60,9 @@ private:
 	std::function<void()> _onRequestUpdateOGLWidget;
 	std::function<void()> _onRequestScroll;
 	std::function<void()> _onRequestRotate;
+	std::function<void(int)> _onRequestBFLine;
+	std::function<void(int)> _onRequestBFPlane;
+	std::function<void(int)> _onRequestBFSphere;
 
 	void _createActions();
 	void _createMenus();
@@ -69,10 +78,6 @@ private:
 	QAction* loadFileAction;
 	QAction* closeApplicationAction;
 
-	//buttons actions
-	QAction* smoothAction;
-	QAction* thinAction;
-
 	//settings actions
 	QAction* editSettingsAction;
 
@@ -87,6 +92,9 @@ private slots:
 	void closeApplication();
 	void thinCloud();
 	void smoothCloud();
+	void bestFitLine();
+	void bestFitPlane();
+	void bestFitSphere();
 	void changeSmoothFactor(double value);
 	void changeThinRadius(double value);
 	void repaintOGLWidget(QListWidgetItem* sender);

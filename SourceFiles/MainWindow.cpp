@@ -30,6 +30,24 @@ MainWindow::MainWindow()
 	this->_thinBtPtr->setMaximumWidth(120);
 	QObject::connect(this->_thinBtPtr, SIGNAL(clicked()), this, SLOT(thinCloud()));
 
+	this->_bestFitLinePtr = new QPushButton;
+	this->_bestFitLinePtr->setText(tr("Bestfit Line"));
+	this->_bestFitLinePtr->setMaximumHeight(30);
+	this->_bestFitLinePtr->setMaximumWidth(120);
+	QObject::connect(this->_bestFitLinePtr, SIGNAL(clicked()), this, SLOT(bestFitLine()));
+
+	this->_bestFitPlanePtr = new QPushButton;
+	this->_bestFitPlanePtr->setText(tr("Bestfit Plane"));
+	this->_bestFitPlanePtr->setMaximumHeight(30);
+	this->_bestFitPlanePtr->setMaximumWidth(120);
+	QObject::connect(this->_bestFitPlanePtr, SIGNAL(clicked()), this, SLOT(bestFitPlane()));
+
+	this->_bestFitSphere = new QPushButton;
+	this->_bestFitSphere->setText(tr("Bestfit Sphere"));
+	this->_bestFitSphere->setMaximumHeight(30);
+	this->_bestFitSphere->setMaximumWidth(120);
+	QObject::connect(this->_bestFitSphere, SIGNAL(clicked()), this, SLOT(bestFitSphere()));
+
 
 	//SpinBoxes
 	this->_smoothFactorSbPtr = new QDoubleSpinBox;
@@ -50,6 +68,9 @@ MainWindow::MainWindow()
 	settingsLayoutPtr->addWidget(this->_thinBtPtr);
 	settingsLayoutPtr->addWidget(this->_smoothFactorSbPtr);
 	settingsLayoutPtr->addWidget(this->_smoothBtPtr);
+	settingsLayoutPtr->addWidget(this->_bestFitLinePtr);
+	settingsLayoutPtr->addWidget(this->_bestFitPlanePtr);
+	settingsLayoutPtr->addWidget(this->_bestFitSphere);
 	settingsLayoutPtr->addWidget(this->_visibleElementsScrollWidgetPtr);
 
 	QHBoxLayout* layoutPtr = new QHBoxLayout;
@@ -107,6 +128,22 @@ void MainWindow::smoothCloud() {
 	this->_onRequestSmoothCloud();
 }
 
+void MainWindow::bestFitLine()
+{
+	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
+	this->_onRequestBFLine(selectedIndex);
+}
+
+void MainWindow::bestFitPlane()
+{
+	this->_onRequestBFPlane(0);
+}
+
+void MainWindow::bestFitSphere()
+{
+	this->_onRequestBFSphere(0);
+}
+
 void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation) {
 		//send render info to widget
 		this->_oglWidgetPtr->render(visibleElements, transformation);
@@ -150,6 +187,21 @@ void MainWindow::setOnRequestResizeWindow(std::function<void(double, double)> ca
 void MainWindow::setOnRequestRotate(std::function<void(double, double, double, double, int, int)> callback)
 {
 	this->_oglWidgetPtr->setOnRequestRotate(callback);
+}
+
+void MainWindow::setOnRequestBFLine(std::function<void(int)> callback)
+{
+	this->_onRequestBFLine = callback;
+}
+
+void MainWindow::setOnRequestBFPlane(std::function<void(int)> callback)
+{
+	this->_onRequestBFPlane = callback;
+}
+
+void MainWindow::setOnRequestBFSphere(std::function<void(int)> callback)
+{
+	this->_onRequestBFSphere = callback;
 }
 
 void MainWindow::addVisibleElementToList()

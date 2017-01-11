@@ -5,6 +5,7 @@
 #include "ProjectionModel.h"
 #include "ThreeDTree.h"
 #include "ModelProperties.h"
+#include "BestFitLine.h"
 #include <memory>
 #include <vector>
 #include <qmatrix4x4.h>
@@ -16,6 +17,7 @@ public:
 	~Model();
 
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
+	void add(std::shared_ptr<BestFitLine> bfLinePtr);
 	size_t getNumberOfRenderableObjects() const;
 	std::shared_ptr<RenderableObjects> getRenderableObjectAt(int index);
 	double getFieldOfViewAngleInYDirection();
@@ -34,6 +36,9 @@ public:
 
 	bool smoothVisibleCloud(int index, double smoothFactor);
 	bool thinVisibleCloud(int index, double smoothFactor);
+	bool bfLine(int selectedIndex);
+	bool bfPlane(int selectedIndex);
+	bool bfSphere(int selectedIndex);
 	void addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet);
 
 private:

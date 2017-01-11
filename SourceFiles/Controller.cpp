@@ -65,6 +65,26 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	}
 	);
 
+	//function to thin clouds
+	view.setOnRequestBFLine(
+		[&view, &model](int selectedIndex)->void {
+		if(model.bfLine(selectedIndex))
+			view.addVisibleElementToList();
+	}
+	);
+	//function to thin clouds
+	view.setOnRequestBFPlane(
+		[&view, &model](int selectedIndex)->void {
+		
+	}
+	);
+	//function to thin clouds
+	view.setOnRequestBFSphere(
+		[&view, &model](int selectedIndex)->void {
+		
+	}
+	);
+
 	//#############################
 	//### setup ui mouse events ###
 	//#############################
