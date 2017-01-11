@@ -31,14 +31,14 @@ std::shared_ptr<RenderableObjects> Model::getRenderableObjectAt(int index) {
 	return this->_renderableObjects.at(index);
 }
 
+double Model::getFieldOfViewAngleInYDirection()
+{
+	return this->_projectionModel.getFieldOfViewAngleInYDirection();
+}
 
-ModelProperties Model::getModelProperties() {
-	return ModelProperties(
-		this->_projectionModel.getFieldOfViewAngleInYDirection(),
-		this->_projectionModel.getFarClippingPlaneZ(),
-		this->_projectionModel.getNearClippingPlaneZ(),
-		this->_cameraModel.getWorldPosition(),
-		this->_cameraModel.getSceneCenter());
+
+QMatrix4x4 Model::getTransformationMatrix() {
+	return this->_projectionModel.getProjektionMatrix()*this->_cameraModel.getCameraTransformation();
 }
 
 void Model::setWorldPositionTo(Point3d position)
@@ -61,9 +61,19 @@ void Model::setFarClippingPlaneZTo(double z)
 	this->_projectionModel.setFarClippingPlaneZTo(z);
 }
 
+void Model::setWindowSize(double width, double height)
+{
+	this->_projectionModel.setWindowSize(width, height);
+}
+
 void Model::setSceneCenterTo(Point3d position)
 {
 	this->_cameraModel.setSceneCenterTo(position);
+}
+
+void Model::rotateCamera(Point3d axis, double angle)
+{
+	this->_cameraModel.rotate(axis, angle);
 }
 
 bool Model::smoothVisibleCloud(int index, double smoothFactor) {

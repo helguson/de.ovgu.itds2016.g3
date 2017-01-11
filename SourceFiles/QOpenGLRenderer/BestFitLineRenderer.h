@@ -1,6 +1,8 @@
 #pragma once
-
-#include "../BestFitLine.h"
+#include "BestFitLine.h"
+#include "Point3d.h"
+#include <functional>
+#include <vector> 
 #include <QOpenGLShaderProgram>
 
 template <typename T>
@@ -14,10 +16,7 @@ public:
 	BestFitLineRenderer(DrawArraysFunction drawArrays);
 	~BestFitLineRenderer();
 
-	void render(
-		BestFitLine const & line,
-		QMatrix4x4 modelViewProjection
-	);
+	void render(BestFitLine const & line, QMatrix4x4 transformation);
 
 private:
 	QOpenGLShaderProgram _shaderProgram;

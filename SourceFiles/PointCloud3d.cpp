@@ -183,12 +183,8 @@ std::shared_ptr<PointCloud3d> PointCloud3d::computeThinnedVersionWith(double thi
 	);
 
 	tree.unhideAllNodes();
-<<<<<<< HEAD
 	std::shared_ptr<PointCloud3d> thinnedCloud = std::make_shared<PointCloud3d>(this->_storeCreatedPointData, remainingPointPtrs);
 	thinnedCloud->setName("tc");
 	return thinnedCloud;
 }
-=======
-	return std::make_shared<PointCloud3d>(this->_storeCreatedPointData, remainingPointPtrs);
-}
->>>>>>> bestFit
+

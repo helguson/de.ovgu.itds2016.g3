@@ -25,22 +25,15 @@ public:
 	void setOnRequestPaintGL(std::function<void()> callback);
 	void setOnRequestScroll(std::function<void(double, double)> callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
-	void updateProjectionModelView(ModelProperties& props);
-	void updateRotation(Point3d axis, Point3d center, double angle);
-	void updateScrolling(ModelProperties& props);
-	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds);
-	void render(int r, int g, int b);
+	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds, QMatrix4x4 transformation);
 
 private:
-	QMatrix4x4 _getProjektionMatrixAccordingTo(ModelProperties& props);
-	QMatrix4x4 _getCameraTransformation(std::vector<std::shared_ptr<PointCloud3d>>& pointCloud, ModelProperties& props);
-	void _renderPointCloud(std::shared_ptr<PointCloud3d>& pointClouds);
 	void _triggerOnRequestPaintGL();
-	void _setProjektionMatrixAccordingTo(ModelProperties& props);
-	void _setCameraTransformation(ModelProperties& props);
 	QPoint lastMousePosition;
 	std::function<void()> _onRequestPaintGL;
 	std::function<void(double, double)> _onRequestScroll;
+	std::function<void(double, double)> _onRequestResizeWindow;
 	std::function<void(double, double, double, double, int, int) > _onRequestRotate;
 	std::unique_ptr<PointCloud3dRenderer> _pointCloud3dRendererPtr;
 	std::unique_ptr<BestFitLineRenderer> _bestFitLineRendererPtr;

@@ -1,7 +1,5 @@
 #include "BestFitLineRenderer.h"
 
-
-
 BestFitLineRenderer::BestFitLineRenderer(DrawArraysFunction drawArrays)
 	:_shaderProgram(),
 	_drawArrays(drawArrays)
@@ -21,10 +19,7 @@ BestFitLineRenderer::BestFitLineRenderer(DrawArraysFunction drawArrays)
 BestFitLineRenderer::~BestFitLineRenderer()
 {}
 
-void BestFitLineRenderer::render(
-	BestFitLine const & line,
-	QMatrix4x4 modelViewProjection
-)
+void BestFitLineRenderer::render(BestFitLine const & line, QMatrix4x4 transformation)
 {
 	this->_shaderProgram.bind();
 
@@ -39,7 +34,7 @@ void BestFitLineRenderer::render(
 
 	this->_shaderProgram.enableAttributeArray(vertexXYZLocation);
 	this->_shaderProgram.setAttributeArray(vertexXYZLocation, vertexXYZs->data(), numberOfComponentsInVertexXYZ);
-	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjection);
+	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, transformation);
 
 	// ---------------------------------
 	// draw using current shader program

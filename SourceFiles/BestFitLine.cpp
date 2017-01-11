@@ -1,8 +1,8 @@
 #include "BestFitLine.h"
-#include "Algorithms.h"
-#include "SVD.h"
 
-BestFitLine::BestFitLine(PointCloud3d const & referencePointCloud) {
+BestFitLine::BestFitLine(PointCloud3d const & referencePointCloud)
+	:	RenderableObjects()
+{
 
 	std::vector<Point3d> points;
 	points.reserve(referencePointCloud.getNumberOfPoints());
@@ -16,7 +16,11 @@ BestFitLine::BestFitLine(PointCloud3d const & referencePointCloud) {
 
 	this->_computeDefiningVectorsAccordingTo(points);
 	this->_computeRepresentativePointsAccordingTo(points);
+	this->_computeCenter();
+	this->_computeRadius();
 }
+
+BestFitLine::~BestFitLine(){}
 
 double BestFitLine::computeDistanceTo(Point3d const & point) const {
 	return distancePt2Line(point, this->_positionVector, this->_directionVector);
@@ -45,4 +49,14 @@ void BestFitLine::_computeDefiningVectorsAccordingTo(std::vector<Point3d> const 
 void BestFitLine::_computeRepresentativePointsAccordingTo(std::vector<Point3d> const & points) {
 
 	computeBestFitLine(points, this->_representativePoints, this->_positionVector, this->_directionVector);
+}
+
+void BestFitLine::_computeRadius()
+{
+	this->_radius = distance3d(this->_representativePoints[0], this->_representativePoints[1] ) / 2;
+}
+
+void BestFitLine::_computeCenter()
+{
+	this->_center = this->_positionVector;
 }

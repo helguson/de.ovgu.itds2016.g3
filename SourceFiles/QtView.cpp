@@ -40,33 +40,26 @@ void QtView::setOnRequestScroll(std::function<void(double , double )> callback)
 	this->_window.setOnRequestScroll(callback);
 }
 
+void QtView::setOnRequestResizeWindow(std::function<void(double, double)> callback)
+{
+	this->_window.setOnRequestResizeWindow(callback);
+}
+
 void QtView::setOnRequestRotate(std::function<void(double, double, double, double, int, int)> callback)
 {
 	this->_window.setOnRequestRotate(callback);
 }
 
-void QtView::render(double r, double g, double b) {
-	this->_window.render(r, g, b);
-}
 void QtView::addVisibleElementToList()
 {
 	this->_window.addVisibleElementToList();
 }
 
-void QtView::updateProjectionModelView(ModelProperties& props) {
-	this->_window.updateProjectionModelView(props);
-}
-
-void QtView::updateRotation(Point3d axis, Point3d center, double angle)
+void QtView::repaint()
 {
-	this->_window.updateRotation(axis, center, angle);
+	this->_window.update();
 }
 
-void QtView::updateScrolling(ModelProperties & props)
-{
-	this->_window.updateScrolling(props);
-}
-
-void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects) {
-	this->_window.render(objects);
+void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 transformation) {
+	this->_window.render(objects, transformation);
 }

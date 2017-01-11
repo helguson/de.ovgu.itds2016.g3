@@ -1,9 +1,5 @@
 #include "Controller.h"
 
-#include <functional>
-#include <iostream>
-#include "util.h"
-
 Controller::Controller(int numberOfArguments, char** arguments)
 	:
 	_view(numberOfArguments, arguments),
@@ -12,8 +8,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	//Initialize Model and View
 	QtView& view = this->_view;
 	Model& model = this->_model;
-	model.setFieldOfViewAngleInYDirectionTo(45);
-	model.setNearClippingPlaneZTo(0.001);
 
 	//################################
 	//### setup ui event callbacks ###
@@ -32,7 +26,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	model.add(pointCloudPtr);
 	view.addVisibleElementToList();
 	this->_updateModelProperties();
-	view.updateProjectionModelView(model.getModelProperties());
 	});
 	
 	//function for rendering loop
@@ -42,7 +35,7 @@ Controller::Controller(int numberOfArguments, char** arguments)
 			for each (int index in view.getVisibleElementsIndicies()) {
 				visibleObjects.push_back(model.getRenderableObjectAt(index));
 			}
-			view.render(visibleObjects);
+			view.render(visibleObjects, model.getTransformationMatrix());
 		}
 	);
 
@@ -50,29 +43,28 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	view.setOnRequestUpdateOGLWidget(
 		[this, &view, &model]()->void {
 		this->_updateModelProperties();
-		view.updateProjectionModelView(model.getModelProperties());
 		}
 	);
 
 	//function to smooth clouds
 	view.setOnRequestSmoothCloud(
-		[this, &view, &model]()->void {
+		[&view, &model]()->void {
 		for each (int index in view.getVisibleElementsIndicies()) {
 			if(model.smoothVisibleCloud(index, view.getSettings().smoothFactor));
 				view.addVisibleElementToList();
 		}
-		this->_updateModelProperties();
+		view.repaint();
 	}
 	);
 
 	//function to thin clouds
 	view.setOnRequestThinCloud(
-		[this, &view, &model]()->void {
+		[&view, &model]()->void {
 		for each (int index in view.getVisibleElementsIndicies()) {
 			if(model.thinVisibleCloud(index, view.getSettings().thinRadius));
 				view.addVisibleElementToList();
 		}
-		this->_updateModelProperties();
+		view.repaint();
 	}
 	);
 
@@ -87,16 +79,16 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		double dMax = 0.1;
 		double factor = 1 + dMax*(offsetY / maxOffsetAccordingToObservations);
 
-		double oldFieldOfViewAngle = model.getModelProperties()._fieldOfViewAngleInYDirection;
+		double oldFieldOfViewAngle = model.getFieldOfViewAngleInYDirection();
 		double newFieldOfViewAngle = oldFieldOfViewAngle * factor;
 
 		model.setFieldOfViewAngleInYDirectionTo(newFieldOfViewAngle);
-		view.updateScrolling(model.getModelProperties());
 		}
 	);
 
 	view.setOnRequestRotate(
-		[&view, &model](double x1, double y1, double x2, double y2, int height, int width)->void {
+		[&view, &model](double x1, double y1, double x2, double y2, int height, int width)->void 
+		{
 		//The center of our virtual rotation ball is in the center of the screen
 		const double x0 = width / 2.0;
 		const double y0 = height / 2.0;
@@ -129,13 +121,16 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		//the current mouse interaction results in this 3d rotation in camera space (unit sphere) 
 		Point3d axisCS = crossProduct(lastPos3d, currPos3d);
 		double  angle = acos(dotProduct(lastPos3d, currPos3d));
-		double fov = model.getModelProperties()._fieldOfViewAngleInYDirection;
+		double fov = model.getFieldOfViewAngleInYDirection();
 
-		model.setFieldOfViewAngleInYDirectionTo(45);
-		view.updateScrolling(model.getModelProperties());
-		view.updateRotation(axisCS, model.getModelProperties()._sceneCenter, angle); 
+		model.rotateCamera(axisCS, angle);
 		model.setFieldOfViewAngleInYDirectionTo(fov);
-		view.updateScrolling(model.getModelProperties());
+		}
+	);
+
+	view.setOnRequestResizeWindow(
+		[&view, &model](double width, double height)->void {
+		model.setWindowSize(width, height);
 	}
 	);
 	
@@ -175,10 +170,11 @@ void Controller::_updateModelProperties() {
 		if (tmpRadius > sceneRadius) sceneRadius = tmpRadius;
 	}
 
-	double overviewDistance = sceneRadius / tan((3.1415 / 180.0) * (this->_model.getModelProperties()._fieldOfViewAngleInYDirection / 2));
+	double overviewDistance = sceneRadius / tan((3.1415 / 180.0) * (this->_model.getFieldOfViewAngleInYDirection() / 2));
 
 	this->_model.setFarClippingPlaneZTo(overviewDistance + 3 * sceneRadius);
 
 	Point3d cameraPosition = sceneCenter + Point3d(0, 0, overviewDistance);
 	this->_model.setWorldPositionTo(cameraPosition);
+	this->_view.repaint();
 }

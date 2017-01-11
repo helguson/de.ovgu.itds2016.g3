@@ -24,7 +24,7 @@ PointCloud3dRenderer::~PointCloud3dRenderer()
 
 void PointCloud3dRenderer::render(
 	SharedPointCloudPtr pointCloudPtr,
-	QMatrix4x4 modelViewProjection,
+	QMatrix4x4 transformation,
 	float rasterizedSizeOfPoints
 )
 {
@@ -53,7 +53,7 @@ void PointCloud3dRenderer::render(
 //	this->_shaderProgram.enableAttributeArray(vertexRGBLocation);
 //	this->_shaderProgram.setAttributeArray(vertexRGBLocation, vertexRGBs, numberOfComponentsInRGB);
 
-	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, modelViewProjection);
+	this->_shaderProgram.setUniformValue(modelViewProjectionMatrixLocation, transformation);
 	this->_shaderProgram.setUniformValue(rasterizedSizeOfPointsLocation, rasterizedSizeOfPoints);
 
 	// ---------------------------------

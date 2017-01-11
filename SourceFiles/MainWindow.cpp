@@ -98,21 +98,6 @@ void MainWindow::repaintOGLWidget(QListWidgetItem* sender) {
 	this->_onRequestUpdateOGLWidget();
 }
 
-void MainWindow::updateProjectionModelView(ModelProperties& props) {
-	this->_oglWidgetPtr->updateProjectionModelView(props);
-	this->_oglWidgetPtr->update();
-}
-
-void MainWindow::updateRotation(Point3d axis, Point3d center, double angle)
-{
-	this->_oglWidgetPtr->updateRotation(axis, center, angle);
-}
-
-void MainWindow::updateScrolling(ModelProperties & props)
-{
-	this->_oglWidgetPtr->updateScrolling(props);
-}
-
 void MainWindow::thinCloud(){
 	this->_onRequestThinCloud();
 }
@@ -121,11 +106,10 @@ void MainWindow::smoothCloud() {
 	this->_onRequestSmoothCloud();
 }
 
-void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements) {
+void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation) {
 
 		//send render info to widget
-		this->_oglWidgetPtr->render(visibleElements);
-		//this->_pollInteractionsWithWindow();
+		this->_oglWidgetPtr->render(visibleElements, transformation);
 }
 
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)
@@ -151,6 +135,11 @@ void MainWindow::setOnRequestUpdateOGLWidget(std::function<void()> callback)
 void MainWindow::setOnRequestScroll(std::function<void(double, double)> callback)
 {
 	this->_oglWidgetPtr->setOnRequestScroll(callback);
+}
+
+void MainWindow::setOnRequestResizeWindow(std::function<void(double, double)> callback)
+{
+	this->_oglWidgetPtr->setOnRequestResizeWindow(callback);
 }
 
 void MainWindow::setOnRequestRotate(std::function<void(double, double, double, double, int, int)> callback)

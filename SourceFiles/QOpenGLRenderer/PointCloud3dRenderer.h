@@ -21,14 +21,16 @@ public:
 
 	void render(
 		SharedPointCloudPtr pointCloudPtr,
-		QMatrix4x4 modelViewProjection,
+		QMatrix4x4 transformation,
 		float rasterizedSizeOfPoints
 	);
 
 private:
 	QOpenGLShaderProgram _shaderProgram;
 	DrawArraysFunction _drawArrays;
-	
+	QMatrix4x4 _modelMatrix;
+	QMatrix4x4 _projectionMatrix;
+	QMatrix4x4 _viewMatrix;
 	static SharedVectorPtr<GLfloat> _createVectorOfPointComponents(SharedPointCloudPtr pointCloudPtr);	// returns vector of components for all represented point (x1, y1, z1, ... xn, yn, zn)
 	static SharedVectorPtr<GLfloat> _createVectorOfPointColourComponents(SharedPointCloudPtr pointCloudPtr); // returns vector of colour components for all represented points (r1, g1, b1, ... rn, gn, bn)
 };

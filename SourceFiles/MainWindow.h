@@ -19,19 +19,16 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements);
-	void render(int r, int g, int b);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
 	void setOnRequestScroll(std::function<void(double, double)> callback);
+	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void addVisibleElementToList();
-	void updateProjectionModelView(ModelProperties& props);
-	void updateRotation(Point3d axis, Point3d center, double angle);
-	void updateScrolling(ModelProperties & props);
 	SettingsContainer getSettings() { return _settings; };
 	std::vector<int> getVisibleElementsIndices();
 
@@ -55,7 +52,8 @@ private:
 	std::function<void()> _onRequestSmoothCloud;
 	std::function<void()> _onRequestThinCloud;
 	std::function<void()> _onRequestUpdateOGLWidget;
-	//void _pollInteractionsWithWindow();
+	std::function<void()> _onRequestScroll;
+	std::function<void()> _onRequestRotate;
 
 	void _createActions();
 	void _createMenus();

@@ -4,8 +4,11 @@
 #include "FileLoader.h"
 #include "MainWindow.h"
 #include "QtView.h"
+#include "util.h"
+
 #include <functional>
 #include <iostream>
+
 
 class Controller
 {
