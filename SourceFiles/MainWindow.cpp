@@ -96,6 +96,7 @@ void MainWindow::loadFile()
 
 void MainWindow::repaintOGLWidget(QListWidgetItem* sender) {
 	this->_onRequestUpdateOGLWidget();
+	this->_oglWidgetPtr->update();
 }
 
 void MainWindow::thinCloud(){
@@ -107,7 +108,6 @@ void MainWindow::smoothCloud() {
 }
 
 void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation) {
-
 		//send render info to widget
 		this->_oglWidgetPtr->render(visibleElements, transformation);
 }
@@ -115,6 +115,11 @@ void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visible
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)
 {
 	this->_onRequestLoadFile = callback;
+}
+
+void MainWindow::setOnRequestPaintGL(std::function<void()> callback)
+{
+	this->_oglWidgetPtr->setOnRequestPaintGL(callback);
 }
 
 void MainWindow::setOnRequestThinCloud(std::function<void()> callback)
@@ -157,11 +162,6 @@ void MainWindow::addVisibleElementToList()
 	this->_visibleElementsScrollWidgetPtr->addItem(newListWidgetPtr);
 }
 
-void MainWindow::repaintOGL()
-{
-	this->_oglWidgetPtr->update();
-}
-
 std::vector<int> MainWindow::getVisibleElementsIndices()
 {
 	std::vector<int> indicesVector;
@@ -172,11 +172,6 @@ std::vector<int> MainWindow::getVisibleElementsIndices()
 		}
 	}
 	return indicesVector;
-}
-
-void MainWindow::setOnRequestPaintGL(std::function<void()> callback)
-{
-	this->_oglWidgetPtr->setOnRequestPaintGL(callback);
 }
 
 void MainWindow::closeApplication() {

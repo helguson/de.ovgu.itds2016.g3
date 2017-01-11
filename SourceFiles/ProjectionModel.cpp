@@ -42,6 +42,5 @@ QMatrix4x4 ProjectionModel::getProjektionMatrix()
 {
 	QMatrix4x4 tmp;
 	tmp.perspective(this->_fieldOfViewAngleInYDirection, this->_width/this->_height, this->_nearClippingPlaneZ, this->_farClippingPlaneZ);
-	tmp.viewport(0, 0, _width, _height);
 	return tmp;
 }

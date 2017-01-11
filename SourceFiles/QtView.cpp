@@ -55,11 +55,6 @@ void QtView::addVisibleElementToList()
 	this->_window.addVisibleElementToList();
 }
 
-void QtView::repaintOGL()
-{
-	this->_window.repaintOGL();
-}
-
 void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 transformation) {
 	this->_window.render(objects, transformation);
 }

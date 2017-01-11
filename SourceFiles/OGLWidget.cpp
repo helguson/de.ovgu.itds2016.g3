@@ -69,6 +69,7 @@ void OGLWidget::resizeGL(int w ,int h)
 {
 	std::cout << "invoked resizeGL" << std::endl;
 	_onRequestResizeWindow(w, h);
+	this->update();
 }
 
 void OGLWidget::initializeGL()

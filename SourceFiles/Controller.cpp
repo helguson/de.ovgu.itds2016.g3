@@ -25,7 +25,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	);
 	model.add(pointCloudPtr);
 	view.addVisibleElementToList();
-	this->_updateModelProperties();
 	});
 	
 	//function for rendering loop
@@ -53,7 +52,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 			if(model.smoothVisibleCloud(index, view.getSettings().smoothFactor));
 				view.addVisibleElementToList();
 		}
-		view.repaintOGL();
 	}
 	);
 
@@ -64,7 +62,6 @@ Controller::Controller(int numberOfArguments, char** arguments)
 			if(model.thinVisibleCloud(index, view.getSettings().thinRadius));
 				view.addVisibleElementToList();
 		}
-		view.repaintOGL();
 	}
 	);
 
@@ -176,5 +173,4 @@ void Controller::_updateModelProperties() {
 
 	Point3d cameraPosition = sceneCenter + Point3d(0, 0, overviewDistance);
 	this->_model.setWorldPositionTo(cameraPosition);
-	this->_view.repaintOGL();
 }
