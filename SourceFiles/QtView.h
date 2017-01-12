@@ -23,6 +23,7 @@ public:
 	void setOnRequestResizeWindow(std::function<void(double, double) > callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 transformation);
+	void render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
 	void addVisibleElementToList();
 	SettingsContainer getSettings() { return _window.getSettings(); };
 	std::vector<int> getVisibleElementsIndicies() { return _window.getVisibleElementsIndices(); };

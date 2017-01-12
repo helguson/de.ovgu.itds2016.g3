@@ -20,6 +20,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation);
+	void render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
 	void setOnRequestThinCloud(std::function<void() > callback);

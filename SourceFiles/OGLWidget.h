@@ -28,6 +28,7 @@ public:
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
 	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds, QMatrix4x4 transformation);
+	void render(std::shared_ptr<PointCloud3d>& pointCloud,std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
 
 private:
 	void _triggerOnRequestPaintGL();

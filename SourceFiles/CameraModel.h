@@ -15,6 +15,7 @@ public:
 	Point3d getUpVector();
 	QMatrix4x4 CameraModel::getCameraTransformation();
 	void rotate(Point3d axis, double angle);
+	void translate(Point3d point);
 	// TODO: getters and setters for remaining properties
 private: 
 	Point3d _worldPosition;

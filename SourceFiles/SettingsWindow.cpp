@@ -36,6 +36,11 @@ void SettingsWindow::setShowQuery(int state)
 	this->_container.showQuery = state > 0;
 }
 
+void SettingsWindow::setShowDistance(int state)
+{
+	this->_container.showDistanceToPlane = state > 0;
+}
+
 void SettingsWindow::setNNColor() {
 	this->_container.NNColor = QColorDialog::getColor();
 	QString qss = QString("background-color: %1").arg(this->_container.NNColor.name());

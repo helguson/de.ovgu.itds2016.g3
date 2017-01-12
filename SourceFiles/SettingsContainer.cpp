@@ -14,9 +14,10 @@ SettingsContainer::SettingsContainer()
 {
 }
 
-SettingsContainer::SettingsContainer(bool sQ, QColor nn, QColor pc, QColor sc, QColor tc )
+SettingsContainer::SettingsContainer(bool sQ, bool sdt, QColor nn, QColor pc, QColor sc, QColor tc )
 	:
-	showQuery(false),
+	showQuery(sQ),
+	showDistanceToPlane(sdt),
 	smoothFactor(0.0),
 	thinRadius(0.0),
 	NNColor(nn),

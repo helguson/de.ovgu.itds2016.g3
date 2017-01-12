@@ -131,24 +131,32 @@ void MainWindow::smoothCloud() {
 void MainWindow::bestFitLine()
 {
 	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
-	this->_onRequestBFLine(selectedIndex);
+	if(selectedIndex!=-1)
+		this->_onRequestBFLine(selectedIndex);
 }
 
 void MainWindow::bestFitPlane()
 {
 	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
-	this->_onRequestBFPlane(selectedIndex);
+	if (selectedIndex != -1)
+		this->_onRequestBFPlane(selectedIndex);
 }
 
 void MainWindow::bestFitSphere()
 {
 	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
-	this->_onRequestBFSphere(selectedIndex);
+	if (selectedIndex != -1)
+		this->_onRequestBFSphere(selectedIndex);
 }
 
 void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation) {
 		//send render info to widget
 		this->_oglWidgetPtr->render(visibleElements, transformation);
+}
+
+void MainWindow::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
+{
+	this->_oglWidgetPtr->render(pointCloud, plane, transformation);
 }
 
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)

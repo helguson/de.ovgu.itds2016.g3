@@ -34,7 +34,26 @@ Controller::Controller(int numberOfArguments, char** arguments)
 			for each (int index in view.getVisibleElementsIndicies()) {
 				visibleObjects.push_back(model.getRenderableObjectAt(index));
 			}
-			view.render(visibleObjects, model.getTransformationMatrix());
+			if (view.getSettings().showDistanceToPlane && visibleObjects.size() == 2)
+			{
+				std::shared_ptr<PointCloud3d> pcPtr1 = std::dynamic_pointer_cast<PointCloud3d>(visibleObjects.at(0));
+				std::shared_ptr<PointCloud3d> pcPtr2 = std::dynamic_pointer_cast<PointCloud3d>(visibleObjects.at(1));
+				std::shared_ptr<BestFitPlane> bfpPtr1 = std::dynamic_pointer_cast<BestFitPlane>(visibleObjects.at(0));
+				std::shared_ptr<BestFitPlane> bfpPtr2 = std::dynamic_pointer_cast<BestFitPlane>(visibleObjects.at(1));
+
+				if (pcPtr1) {
+					if(bfpPtr2) view.render(pcPtr1, bfpPtr2, model.getTransformationMatrix());
+					else view.render(visibleObjects, model.getTransformationMatrix());
+				}
+
+				else if (pcPtr2) {
+					if (bfpPtr1) view.render(pcPtr2, bfpPtr1, model.getTransformationMatrix());
+					else view.render(visibleObjects, model.getTransformationMatrix());
+				}
+				else 
+					view.render(visibleObjects, model.getTransformationMatrix());
+			}
+			else view.render(visibleObjects, model.getTransformationMatrix());
 		}
 	);
 
@@ -137,12 +156,20 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		normalizeVector(currPos3d); //make unit normal vector
 
 		//the current mouse interaction results in this 3d rotation in camera space (unit sphere) 
-		Point3d axisCS = crossProduct(lastPos3d, currPos3d);
+		Point3d axisCs = crossProduct(lastPos3d, currPos3d);
 		double  angle = acos(dotProduct(lastPos3d, currPos3d));
 		double fov = model.getFieldOfViewAngleInYDirection();
 
-		model.rotateCamera(axisCS, angle);
-		model.setFieldOfViewAngleInYDirectionTo(fov);
+		QMatrix4x4 T = model.getTransformationMatrix();
+
+		//We now multiply our current rotation axis (in camera space) with the global world transform Matrix
+		//and get a new rotation axis which is now in the frame of the global transform
+		Point3d axisWS;
+		axisWS.x = (T(0,0) * axisCs.x) + (T(1,0) * axisCs.y) + (T(2,0) * axisCs.z);
+		axisWS.y = (T(0,1) * axisCs.x) + (T(1,1) * axisCs.y) + (T(2,1) * axisCs.z);
+		axisWS.z = (T(0,2) * axisCs.x) + (T(1,2) * axisCs.y) + (T(2,2) * axisCs.z);
+
+		model.rotateCamera(axisWS, angle);
 		}
 	);
 

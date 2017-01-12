@@ -73,3 +73,8 @@ void QtView::addVisibleElementToList()
 void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 transformation) {
 	this->_window.render(objects, transformation);
 }
+
+void QtView::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
+{
+	this->_window.render(pointCloud, plane, transformation);
+}

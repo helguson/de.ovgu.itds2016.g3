@@ -24,10 +24,28 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="NNcb">
        <property name="layoutDirection">
         <enum>Qt::RightToLeft</enum>
        </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Show Distance to BFPlane:</string>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignRight">
+      <widget class="QCheckBox" name="Distcb">
        <property name="text">
         <string/>
        </property>
@@ -113,14 +131,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>checkBox</sender>
+   <sender>NNcb</sender>
    <signal>stateChanged(int)</signal>
    <receiver>SettingsWindow</receiver>
    <slot>setShowQuery(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>428</x>
-     <y>45</y>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -135,8 +153,8 @@
    <slot>setNNColor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>321</x>
-     <y>103</y>
+     <x>428</x>
+     <y>159</y>
     </hint>
     <hint type="destinationlabel">
      <x>269</x>
@@ -151,8 +169,8 @@
    <slot>setPCColor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>351</x>
-     <y>182</y>
+     <x>428</x>
+     <y>216</y>
     </hint>
     <hint type="destinationlabel">
      <x>441</x>
@@ -167,8 +185,8 @@
    <slot>setSCColor()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>339</x>
-     <y>245</y>
+     <x>428</x>
+     <y>273</y>
     </hint>
     <hint type="destinationlabel">
      <x>201</x>
@@ -192,6 +210,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>Distcb</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>setShowDistance(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>setShowQuery(int)</slot>
@@ -199,5 +233,6 @@
   <slot>setPCColor()</slot>
   <slot>setSCColor()</slot>
   <slot>setTCColor()</slot>
+  <slot>setShowDistance(int)</slot>
  </slots>
 </ui>

@@ -23,5 +23,6 @@ private slots:
 	void setSCColor();
 	void setTCColor();
 	void setShowQuery(int state);
+	void setShowDistance(int state);
 
 };

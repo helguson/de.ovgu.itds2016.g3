@@ -55,7 +55,14 @@ QMatrix4x4 CameraModel::getCameraTransformation()
 
 void CameraModel::rotate(Point3d axis, double angle)
 {
-	this->_sceneTransformationMatrix.rotate(angle, QVector3D(axis.x, axis.y, axis.z));
+	this->_sceneTransformationMatrix.translate(QVector3D(this->_sceneCenter.x, this->_sceneCenter.y, this->_sceneCenter.z));
+	this->_sceneTransformationMatrix.rotate(2 * angle * 180.0 / 3.1415, QVector3D(axis.x, axis.y, axis.z));
+	this->_sceneTransformationMatrix.translate(QVector3D(-this->_sceneCenter.x, -this->_sceneCenter.y, -this->_sceneCenter.z));
+}
+
+void CameraModel::translate(Point3d point)
+{
+	this->_sceneTransformationMatrix.translate(QVector3D(point.x, point.y, point.z));
 }
 
 
