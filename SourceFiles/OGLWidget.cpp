@@ -63,6 +63,9 @@ void OGLWidget::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_pt
 		rasterizedSizeOfPoints
 	);
 
+	this->_bestFitPlaneRendererPtr->render(
+		*plane, transformation);
+
 } 
 
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)

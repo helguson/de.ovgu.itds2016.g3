@@ -51,7 +51,9 @@ MainWindow::MainWindow()
 
 	//SpinBoxes
 	this->_smoothFactorSbPtr = new QDoubleSpinBox;
+	this->_smoothFactorSbPtr->setSingleStep(0.1);
 	this->_thinRadiusSbPtr = new QDoubleSpinBox;
+	this->_thinRadiusSbPtr->setSingleStep(0.1);
 	QObject::connect(this->_smoothFactorSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeSmoothFactor(double)));
 	QObject::connect(this->_thinRadiusSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeThinRadius(double)));
 

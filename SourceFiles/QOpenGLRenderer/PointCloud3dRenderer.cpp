@@ -128,8 +128,6 @@ SharedVectorPtr<GLfloat> PointCloud3dRenderer::_createVectorOfPointColourCompone
 	return result;
 }
 
-SharedVectorPtr<GLfloat> hsv2rgb(double h);
-
 SharedVectorPtr<GLfloat> PointCloud3dRenderer::_createVectorOfPointColourComponents(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr)
 {
 	SharedVectorPtr<GLfloat> result = std::make_shared<std::vector<GLfloat>>();
@@ -146,62 +144,13 @@ SharedVectorPtr<GLfloat> PointCloud3dRenderer::_createVectorOfPointColourCompone
 
 	pointCloudPtr->toEachPointApply(
 		[maxDistance, planePtr, result](Point3d const * point)->void {
-		SharedVectorPtr<GLfloat> color = hsv2rgb(planePtr->computeDistanceTo(*point) / *maxDistance);
-		result->push_back(color->at(0));
-		result->push_back(color->at(1));
-		result->push_back(color->at(2));
+		QColor color;
+		color.setHsvF(planePtr->computeDistanceTo(*point) / *maxDistance, 1.0, 1.0);
+		result->push_back(color.redF());
+		result->push_back(color.greenF());
+		result->push_back(color.blueF());
 	}
 	);
 
 	return result;
-}
-SharedVectorPtr<GLfloat> hsv2rgb(double h) {
-	double      hh, p, q, t, ff;
-	long        i;
-	SharedVectorPtr<GLfloat> out = std::make_shared<std::vector<GLfloat>>();
-
-	hh = h;
-	if (hh >= 360.0) hh = 0.0;
-	hh /= 60.0;
-	i = (long)hh;
-	ff = hh - i;
-	p = (1.0 - 1.0);
-	q = (1.0 - (1.0 * ff));
-	t = (1.0 - (1.0 * (1.0 - ff)));
-
-	switch (i) {
-	case 0:
-		out->push_back(1.0);
-		out->push_back(t);
-		out->push_back(p);
-		break;
-	case 1:
-		out->push_back(q);
-		out->push_back(1.0);
-		out->push_back(p);
-		break;
-	case 2:
-		out->push_back(p);
-		out->push_back(1.0);
-		out->push_back(t);
-		break;
-
-	case 3:
-		out->push_back(p);
-		out->push_back(q);
-		out->push_back(1.0);
-		break;
-	case 4:
-		out->push_back(t);
-		out->push_back(p);
-		out->push_back(1.0);
-		break;
-	case 5:
-	default:
-		out->push_back(1.0);
-		out->push_back(p);
-		out->push_back(q);
-		break;
-	}
-	return out;
 }
