@@ -2,9 +2,10 @@
 
 #include "PointCloud3d.h"
 #include "Point3d.h"
+#include "RenderableObjects.h"
 #include <vector>
 
-class BestFitPlane
+class BestFitPlane : public RenderableObjects
 {
 public:
 	BestFitPlane(PointCloud3d const & referencePointCloud);
@@ -19,5 +20,8 @@ private:
 
 	void _computeDefiningVectorsAccordingTo(std::vector<Point3d> const & points);
 	void _computeRepresentativePointsAccordingTo(std::vector<Point3d> const & points);
+
+	virtual void _computeRadius();
+	virtual void _computeCenter();
 };
 

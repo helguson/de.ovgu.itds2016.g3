@@ -2,7 +2,8 @@
 #include "Algorithms.h"
 #include "SVD.h"
 
-BestFitPlane::BestFitPlane(PointCloud3d const & referencePointCloud)
+BestFitPlane::BestFitPlane(PointCloud3d const & referencePointCloud):
+	RenderableObjects()
 {
 	std::vector<Point3d> points;
 	points.reserve(referencePointCloud.getNumberOfPoints());
@@ -47,4 +48,18 @@ void BestFitPlane::_computeDefiningVectorsAccordingTo(std::vector<Point3d> const
 void BestFitPlane::_computeRepresentativePointsAccordingTo(std::vector<Point3d> const & points) 
 {
 	computeBestFitPlane(points, this->_representativePoints);
+}
+
+void BestFitPlane::_computeRadius()
+{
+	for each(Point3d corner in this->_representativePoints) {
+		double distanceToCorner = distance3d(this->_center, corner);
+		if (this->_radius < distanceToCorner)
+			this->_radius = distanceToCorner;
+	}
+}
+
+void BestFitPlane::_computeCenter()
+{
+	this->_center = this->_positionVector;
 }

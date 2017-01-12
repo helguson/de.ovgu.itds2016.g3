@@ -23,6 +23,10 @@ void Model::add(std::shared_ptr<BestFitLine> bfLinePtr) {
 	this->_renderableObjects.push_back(bfLinePtr);
 }
 
+void Model::add(std::shared_ptr<BestFitPlane> bfPlanePtr) {
+	this->_renderableObjects.push_back(bfPlanePtr);
+}
+
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
 	this->_pointDataSets.push_back(pointDataSet);
 }
@@ -103,6 +107,16 @@ bool Model::bfLine(int index) {
 	if (cloudPtr) {
 		std::shared_ptr<BestFitLine> line = std::make_shared<BestFitLine>(*cloudPtr);
 		this->add(line);
+		return true;
+	}
+	return false;
+}
+
+bool Model::bfPlane(int index) {
+	std::shared_ptr<PointCloud3d> cloudPtr = std::dynamic_pointer_cast<PointCloud3d>(this->_renderableObjects.at(index));
+	if (cloudPtr) {
+		std::shared_ptr<BestFitPlane> plane = std::make_shared<BestFitPlane>(*cloudPtr);
+		this->add(plane);
 		return true;
 	}
 	return false;

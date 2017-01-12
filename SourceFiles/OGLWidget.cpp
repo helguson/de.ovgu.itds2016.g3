@@ -35,14 +35,19 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 		else if (std::dynamic_pointer_cast<BestFitLine>(visibleElements.at(index))) 
 		{
 			std::shared_ptr<BestFitLine> line = std::dynamic_pointer_cast<BestFitLine>(visibleElements.at(index));
-			this->_bestFitLineRendererPtr->render(*line, transformation);
+			this->_bestFitLineRendererPtr->render(
+				*line, 
+				transformation
+			);
 		}
+		else if (std::dynamic_pointer_cast<BestFitPlane>(visibleElements.at(index))) {
 
-		BestFitPlane plane(*pointCloud);
-		this->_bestFitPlaneRendererPtr->render(
-			plane,
-			projectionViewModel
-		);
+			std::shared_ptr<BestFitPlane> plane = std::dynamic_pointer_cast<BestFitPlane>(visibleElements.at(index));
+			this->_bestFitPlaneRendererPtr->render(
+				*plane,
+				transformation
+			);
+		}
 	}
 }
 

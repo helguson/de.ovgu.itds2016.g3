@@ -8,6 +8,7 @@ public:
 	~SettingsContainer();
 
 	bool showQuery;
+	bool showDistanceToPlane;
 	double smoothFactor;
 	double thinRadius;
 	QColor NNColor;

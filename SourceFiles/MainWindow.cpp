@@ -136,12 +136,14 @@ void MainWindow::bestFitLine()
 
 void MainWindow::bestFitPlane()
 {
-	this->_onRequestBFPlane(0);
+	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
+	this->_onRequestBFPlane(selectedIndex);
 }
 
 void MainWindow::bestFitSphere()
 {
-	this->_onRequestBFSphere(0);
+	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
+	this->_onRequestBFSphere(selectedIndex);
 }
 
 void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation) {
