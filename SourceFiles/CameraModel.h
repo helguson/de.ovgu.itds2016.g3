@@ -21,7 +21,8 @@ private:
 	Point3d _worldPosition;
 	Point3d _sceneCenter;
 	Point3d _upVector;
-	QMatrix4x4 _sceneTransformationMatrix;
+	QMatrix4x4 _sceneRotationMatrix;
+	QMatrix4x4 _sceneTranslationMatrix;
 	// TODO: Vector3d _worldViewDirection;
 	// TODO: Vector3d _worldUpDirection;
 	// TODO: PerspectiveIdentifier _perspective;

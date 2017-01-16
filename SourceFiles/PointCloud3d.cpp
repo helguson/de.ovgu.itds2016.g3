@@ -43,7 +43,7 @@ void PointCloud3d::_computeCenter()
 		
 	// compute center of scene
 	
-	this->_center = this->_minMax.first + this->_minMax.second * 0.5;
+	this->_center = (this->_minMax.first + this->_minMax.second) * 0.5;
 }
 
 void PointCloud3d::_computeRadius() 

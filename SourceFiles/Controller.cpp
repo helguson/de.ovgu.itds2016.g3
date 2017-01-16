@@ -173,6 +173,37 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		}
 	);
 
+	view.setOnRequestTranslate(
+		[&view, &model](double x1, double y1, double x2, double y2)->void
+	{
+
+		double lastposX = x1;
+		double lastposY = y1;
+		double currposX = x2;
+		double currposY = y2;
+
+		Point3d lastPos3d(lastposX, lastposY, 0);
+		Point3d currPos3d(currposX, currposY, 0);
+
+		normalizeVector(lastPos3d); //make unit normal vector
+		normalizeVector(currPos3d); //make unit normal vector
+
+		//the current mouse interaction results in this 3d rotation in camera space (unit sphere) 
+		Point3d axisCs = lastPos3d-currPos3d;
+
+		QMatrix4x4 T = model.getTransformationMatrix();
+
+		//We now multiply our current rotation axis (in camera space) with the global world transform Matrix
+		//and get a new rotation axis which is now in the frame of the global transform
+		Point3d axisWS;
+		axisWS.x = (T(0, 0) * axisCs.x) + (T(1, 0) * axisCs.y) + (T(2, 0) * axisCs.z);
+		axisWS.y = (T(0, 1) * axisCs.x) + (T(1, 1) * axisCs.y) + (T(2, 1) * axisCs.z);
+		axisWS.z = (T(0, 2) * axisCs.x) + (T(1, 2) * axisCs.y) + (T(2, 2) * axisCs.z);
+
+		model.translateCamera(axisWS);
+	}
+	);
+
 	view.setOnRequestResizeWindow(
 		[&view, &model](double width, double height)->void {
 		model.setWindowSize(width, height);

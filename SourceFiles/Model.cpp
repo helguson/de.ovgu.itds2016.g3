@@ -84,6 +84,11 @@ void Model::rotateCamera(Point3d axis, double angle)
 	this->_cameraModel.rotate(axis, angle);
 }
 
+void Model::translateCamera(Point3d axis)
+{
+	this->_cameraModel.translate(axis);
+}
+
 bool Model::smoothVisibleCloud(int index, double smoothFactor) {
 	std::shared_ptr<PointCloud3d> cloudPtr = std::dynamic_pointer_cast<PointCloud3d>(this->_renderableObjects.at(index));
 	if (cloudPtr) {

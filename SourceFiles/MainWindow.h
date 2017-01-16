@@ -29,6 +29,7 @@ public:
 	void setOnRequestScroll(std::function<void(double, double)> callback);
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
+	void setOnRequestTranslate(std::function<void(double, double, double, double)> callback);
 	void setOnRequestBFLine(std::function<void(int) > callback);
 	void setOnRequestBFPlane(std::function<void(int) > callback);
 	void setOnRequestBFSphere(std::function<void(int) > callback);

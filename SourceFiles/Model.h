@@ -29,6 +29,7 @@ public:
 	void setWorldPositionTo(Point3d position);
 	void setSceneCenterTo(Point3d position);
 	void rotateCamera(Point3d axis, double angle);
+	void translateCamera(Point3d axis);
 	//change ProjectionModel
 	void setFieldOfViewAngleInYDirectionTo(double angle);
 	void setNearClippingPlaneZTo(double z);

@@ -65,6 +65,11 @@ void QtView::setOnRequestRotate(std::function<void(double, double, double, doubl
 	this->_window.setOnRequestRotate(callback);
 }
 
+void QtView::setOnRequestTranslate(std::function<void(double, double, double, double)> callback)
+{
+	this->_window.setOnRequestTranslate(callback);
+}
+
 void QtView::addVisibleElementToList()
 {
 	this->_window.addVisibleElementToList();
