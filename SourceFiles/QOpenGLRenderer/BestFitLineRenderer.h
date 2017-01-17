@@ -1,6 +1,6 @@
 #pragma once
-#include "BestFitLine.h"
-#include "Point3d.h"
+#include "../BestFitLine.h"
+#include "../Point3d.h"
 #include <functional>
 #include <vector> 
 #include <QOpenGLShaderProgram>
