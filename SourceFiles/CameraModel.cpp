@@ -2,11 +2,10 @@
 
 CameraModel::CameraModel()
 	:
-	_worldPosition(),
+	_cameraPosition(),
 	_sceneCenter(),
 	_upVector(0,1,0),
-	_sceneTranslationMatrix(),
-	_sceneRotationMatrix()
+	_viewMatrix()
 {
 }
 
@@ -14,14 +13,22 @@ CameraModel::~CameraModel() {
 
 }
 
-void CameraModel::setWorldPositionTo(Point3d position) {
-
-	this->_worldPosition = position;
+void CameraModel::reinitialize() {
+	this->_viewMatrix.setToIdentity();
+	QVector3D camera(this->_cameraPosition.x, this->_cameraPosition.y, this->_cameraPosition.z);
+	QVector3D scene(this->_sceneCenter.x, this->_sceneCenter.y, this->_sceneCenter.z);
+	QVector3D upVec(this->_upVector.x, this->_upVector.y, this->_upVector.z);
+	this->_viewMatrix.lookAt(camera, scene, upVec);
 }
 
-Point3d CameraModel::getWorldPosition() {
+void CameraModel::setCameraPositionTo(Point3d position) {
+
+	this->_cameraPosition = position;
+}
+
+Point3d CameraModel::getCameraPosition() {
 	
-	return this->_worldPosition;
+	return this->_cameraPosition;
 }
 
 void CameraModel::setSceneCenterTo(Point3d position) {
@@ -44,26 +51,21 @@ Point3d CameraModel::getUpVector()
 	return this->_upVector;
 }
 
-QMatrix4x4 CameraModel::getCameraTransformation()
+QMatrix4x4 CameraModel::getViewMatrix()
 {
-		QMatrix4x4 tmp;
-		QVector3D camera(this->_worldPosition.x, this->_worldPosition.y, this->_worldPosition.z);
-		QVector3D scene(this->_sceneCenter.x, this->_sceneCenter.y, this->_sceneCenter.z);
-		QVector3D upVec(this->_upVector.x, this->_upVector.y, this->_upVector.z);
-		tmp.lookAt(camera, scene, upVec);
-		return tmp*this->_sceneRotationMatrix*this->_sceneTranslationMatrix;
+	return this->_viewMatrix;
 }
 
 void CameraModel::rotate(Point3d axis, double angle)
 {
-	this->_sceneRotationMatrix.translate(QVector3D(this->_sceneCenter.x, this->_sceneCenter.y, this->_sceneCenter.z));
-	this->_sceneRotationMatrix.rotate(2 * angle * 180.0 / 3.1415, QVector3D(axis.x, axis.y, axis.z));
-	this->_sceneRotationMatrix.translate(QVector3D(-this->_sceneCenter.x, -this->_sceneCenter.y, -this->_sceneCenter.z));
+	this->_viewMatrix.translate(QVector3D(this->_sceneCenter.x, this->_sceneCenter.y, this->_sceneCenter.z));
+	this->_viewMatrix.rotate(-2 * angle * 180.0 / 3.1415, QVector3D(axis.x, axis.y, axis.z));
+	this->_viewMatrix.translate(QVector3D(-this->_sceneCenter.x, -this->_sceneCenter.y, -this->_sceneCenter.z));
 }
 
 void CameraModel::translate(Point3d point)
 {
-	this->_sceneTranslationMatrix.translate(QVector3D(-point.x, -point.y, -point.z));
+	this->_viewMatrix.translate(QVector3D(point.x, point.y, point.z));
 }
 
 

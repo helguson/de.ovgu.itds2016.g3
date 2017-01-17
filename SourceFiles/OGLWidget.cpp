@@ -78,7 +78,7 @@ void OGLWidget::setOnRequestRotate(std::function<void(double, double, double, do
 	this->_onRequestRotate = callback;
 }
 
-void OGLWidget::setOnRequestTranslate(std::function<void(double, double, double, double)> callback)
+void OGLWidget::setOnRequestTranslate(std::function<void(double, double, double, double, int , int)> callback)
 {
 	this->_onRequestTranslate = callback;
 }
@@ -163,10 +163,11 @@ void OGLWidget::mouseMoveEvent(QMouseEvent * event)
 	if (y<0 || y >= height()) { return; }
 
 	if (lastMousePosition == event->pos()) return;
+
 	if (event->buttons() == Qt::LeftButton)
 		this->_onRequestRotate(lastMousePosition.x(), lastMousePosition.y(), x, y, this->height(), this->width());
 	else if (event->buttons() == Qt::RightButton)
-		this->_onRequestTranslate(lastMousePosition.x(), lastMousePosition.y(), x, y);
+		this->_onRequestTranslate(lastMousePosition.x(), lastMousePosition.y(), x, y, this->height(), this->width());
 
 	this->update();
 	lastMousePosition = event->pos();

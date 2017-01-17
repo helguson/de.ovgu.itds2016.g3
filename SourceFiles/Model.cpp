@@ -44,14 +44,27 @@ double Model::getFieldOfViewAngleInYDirection()
 	return this->_projectionModel.getFieldOfViewAngleInYDirection();
 }
 
-
-QMatrix4x4 Model::getTransformationMatrix() {
-	return this->_projectionModel.getProjektionMatrix()*this->_cameraModel.getCameraTransformation();
+Point3d Model::getSceneCenter()
+{
+	return this->_cameraModel.getSceneCenter();
 }
 
-void Model::setWorldPositionTo(Point3d position)
+QMatrix4x4 Model::getModelViewProjectionMatrix() {
+	return this->_projectionModel.getProjektionMatrix()*this->_cameraModel.getViewMatrix()*this->_modelMatrix;
+}
+
+QMatrix4x4 Model::getModelViewMatrix() {
+	return this->_cameraModel.getViewMatrix()*this->_modelMatrix;
+}
+
+void Model::reinitializeCamera()
 {
-	this->_cameraModel.setWorldPositionTo(position);
+	this->_cameraModel.reinitialize();
+}
+
+void Model::setCameraPositionTo(Point3d position)
+{
+	this->_cameraModel.setCameraPositionTo(position);
 }
 
 void Model::setFieldOfViewAngleInYDirectionTo(double angle)

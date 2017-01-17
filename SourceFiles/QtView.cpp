@@ -65,7 +65,7 @@ void QtView::setOnRequestRotate(std::function<void(double, double, double, doubl
 	this->_window.setOnRequestRotate(callback);
 }
 
-void QtView::setOnRequestTranslate(std::function<void(double, double, double, double)> callback)
+void QtView::setOnRequestTranslate(std::function<void(double, double, double, double, int, int)> callback)
 {
 	this->_window.setOnRequestTranslate(callback);
 }

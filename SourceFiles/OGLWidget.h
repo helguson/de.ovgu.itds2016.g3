@@ -26,7 +26,7 @@ public:
 	void setOnRequestPaintGL(std::function<void()> callback);
 	void setOnRequestScroll(std::function<void(double, double)> callback);
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
-	void setOnRequestTranslate(std::function<void(double, double, double, double) > callback);
+	void setOnRequestTranslate(std::function<void(double, double, double, double, int, int) > callback);
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
 	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds, QMatrix4x4 transformation);
 	void render(std::shared_ptr<PointCloud3d>& pointCloud,std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
@@ -38,7 +38,7 @@ private:
 	std::function<void(double, double)> _onRequestScroll;
 	std::function<void(double, double)> _onRequestResizeWindow;
 	std::function<void(double, double, double, double, int, int) > _onRequestRotate;
-	std::function<void(double, double, double, double) > _onRequestTranslate;
+	std::function<void(double, double, double, double, int, int) > _onRequestTranslate;
 	std::unique_ptr<PointCloud3dRenderer> _pointCloud3dRendererPtr;
 	std::unique_ptr<BestFitLineRenderer> _bestFitLineRendererPtr;
 	std::unique_ptr<BestFitPlaneRenderer> _bestFitPlaneRendererPtr;

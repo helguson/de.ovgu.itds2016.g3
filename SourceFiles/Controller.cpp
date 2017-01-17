@@ -42,18 +42,18 @@ Controller::Controller(int numberOfArguments, char** arguments)
 				std::shared_ptr<BestFitPlane> bfpPtr2 = std::dynamic_pointer_cast<BestFitPlane>(visibleObjects.at(1));
 
 				if (pcPtr1) {
-					if(bfpPtr2) view.render(pcPtr1, bfpPtr2, model.getTransformationMatrix());
-					else view.render(visibleObjects, model.getTransformationMatrix());
+					if(bfpPtr2) view.render(pcPtr1, bfpPtr2, model.getModelViewProjectionMatrix());
+					else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 				}
 
 				else if (pcPtr2) {
-					if (bfpPtr1) view.render(pcPtr2, bfpPtr1, model.getTransformationMatrix());
-					else view.render(visibleObjects, model.getTransformationMatrix());
+					if (bfpPtr1) view.render(pcPtr2, bfpPtr1, model.getModelViewProjectionMatrix());
+					else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 				}
 				else 
-					view.render(visibleObjects, model.getTransformationMatrix());
+					view.render(visibleObjects, model.getModelViewProjectionMatrix());
 			}
-			else view.render(visibleObjects, model.getTransformationMatrix());
+			else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 		}
 	);
 
@@ -158,9 +158,8 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		//the current mouse interaction results in this 3d rotation in camera space (unit sphere) 
 		Point3d axisCs = crossProduct(lastPos3d, currPos3d);
 		double  angle = acos(dotProduct(lastPos3d, currPos3d));
-		double fov = model.getFieldOfViewAngleInYDirection();
 
-		QMatrix4x4 T = model.getTransformationMatrix();
+		QMatrix4x4 T = model.getModelViewMatrix();
 
 		//We now multiply our current rotation axis (in camera space) with the global world transform Matrix
 		//and get a new rotation axis which is now in the frame of the global transform
@@ -174,27 +173,35 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	);
 
 	view.setOnRequestTranslate(
-		[&view, &model](double x1, double y1, double x2, double y2)->void
+		[&view, &model](double x1, double y1, double x2, double y2, int height, int width)->void
 	{
 
 		double lastposX = x1;
-		double lastposY = y1;
+		double lastposY = -y1;
 		double currposX = x2;
-		double currposY = y2;
+		double currposY = -y2;
 
 		Point3d lastPos3d(lastposX, lastposY, 0);
 		Point3d currPos3d(currposX, currposY, 0);
+		double screenRadius = height / 2;
+		double zoomFactor = model.getFieldOfViewAngleInYDirection() / 45;
 
-		normalizeVector(lastPos3d); //make unit normal vector
-		normalizeVector(currPos3d); //make unit normal vector
+		//compute radius of whole scene
+		double sceneRadius = 0;
+		for each (int index in view.getVisibleElementsIndicies())
+		{
+			double tmpRadius = distance3d(model.getRenderableObjectAt(index)->getCenter(), model.getSceneCenter()) + model.getRenderableObjectAt(index)->getRadius();
+			if (tmpRadius > sceneRadius) sceneRadius = tmpRadius;
+		}
+		double ratio = sceneRadius / screenRadius / zoomFactor;
 
-		//the current mouse interaction results in this 3d rotation in camera space (unit sphere) 
-		Point3d axisCs = lastPos3d-currPos3d;
+		//the current mouse interaction results in this 3d direction in camera space (unit sphere) 
+		Point3d axisCs = (currPos3d-lastPos3d)* ratio;
 
-		QMatrix4x4 T = model.getTransformationMatrix();
+		QMatrix4x4 T = model.getModelViewMatrix();
 
-		//We now multiply our current rotation axis (in camera space) with the global world transform Matrix
-		//and get a new rotation axis which is now in the frame of the global transform
+		//We now multiply our current direction (in camera space) with the global world transform Matrix
+		//and get a new direction which is now in the frame of the global transform
 		Point3d axisWS;
 		axisWS.x = (T(0, 0) * axisCs.x) + (T(1, 0) * axisCs.y) + (T(2, 0) * axisCs.z);
 		axisWS.y = (T(0, 1) * axisCs.x) + (T(1, 1) * axisCs.y) + (T(2, 1) * axisCs.z);
@@ -232,11 +239,15 @@ void Controller::_updateModelProperties() {
 
 	//compute average of cloud centers
 	Point3d sceneCenter = Point3d(0, 0, 0);
+	int pointCloudCounter = 0;
 	for each (int index in this->_view.getVisibleElementsIndicies())
 	{
-		sceneCenter += this->_model.getRenderableObjectAt(index)->getCenter();
+		if (std::dynamic_pointer_cast<PointCloud3d>(this->_model.getRenderableObjectAt(index))) {
+			sceneCenter += this->_model.getRenderableObjectAt(index)->getCenter();
+			pointCloudCounter++;
+		}
 	}
-	this->_model.setSceneCenterTo(sceneCenter * (1.0 / this->_view.getVisibleElementsIndicies().size()));
+	this->_model.setSceneCenterTo(sceneCenter * (1.0 / pointCloudCounter));
 
 	//compute radius of whole scene
 	double sceneRadius = 0;
@@ -251,5 +262,6 @@ void Controller::_updateModelProperties() {
 	this->_model.setFarClippingPlaneZTo(overviewDistance + 3 * sceneRadius);
 
 	Point3d cameraPosition = sceneCenter + Point3d(0, 0, overviewDistance);
-	this->_model.setWorldPositionTo(cameraPosition);
+	this->_model.setCameraPositionTo(cameraPosition);
+	this->_model.reinitializeCamera();
 }

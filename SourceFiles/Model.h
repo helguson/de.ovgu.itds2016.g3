@@ -23,10 +23,13 @@ public:
 	size_t getNumberOfRenderableObjects() const;
 	std::shared_ptr<RenderableObjects> getRenderableObjectAt(int index);
 	double getFieldOfViewAngleInYDirection();
-	QMatrix4x4 Model::getTransformationMatrix();
+	Point3d getSceneCenter();
+	QMatrix4x4 getModelViewProjectionMatrix();
+	QMatrix4x4 getModelViewMatrix();
 
 	//change CameraModel
-	void setWorldPositionTo(Point3d position);
+	void reinitializeCamera();
+	void setCameraPositionTo(Point3d position);
 	void setSceneCenterTo(Point3d position);
 	void rotateCamera(Point3d axis, double angle);
 	void translateCamera(Point3d axis);

@@ -138,14 +138,14 @@ SharedVectorPtr<GLfloat> PointCloud3dRenderer::_createVectorOfPointColourCompone
 
 	pointCloudPtr->toEachPointApply(
 		[maxDistance, planePtr](Point3d const * point)->void {
-		if (*maxDistance < planePtr->computeDistanceTo(*point)) *maxDistance = planePtr->computeDistanceTo(*point);
+		if (*maxDistance < abs(planePtr->computeDistanceTo(*point))) *maxDistance = abs(planePtr->computeDistanceTo(*point));
 	}
 	);
 
 	pointCloudPtr->toEachPointApply(
 		[maxDistance, planePtr, result](Point3d const * point)->void {
 		QColor color;
-		color.setHsvF(planePtr->computeDistanceTo(*point) / *maxDistance, 1.0, 1.0);
+		color.setHsvF(0.75 - (abs(planePtr->computeDistanceTo(*point)) * 0.75 / *maxDistance), 1.0, 1.0);
 		result->push_back(color.redF());
 		result->push_back(color.greenF());
 		result->push_back(color.blueF());

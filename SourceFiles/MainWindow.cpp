@@ -201,7 +201,7 @@ void MainWindow::setOnRequestRotate(std::function<void(double, double, double, d
 	this->_oglWidgetPtr->setOnRequestRotate(callback);
 }
 
-void MainWindow::setOnRequestTranslate(std::function<void(double, double, double, double)> callback)
+void MainWindow::setOnRequestTranslate(std::function<void(double, double, double, double, int ,int )> callback)
 {
 	this->_oglWidgetPtr->setOnRequestTranslate(callback);
 }

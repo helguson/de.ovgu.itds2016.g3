@@ -29,6 +29,9 @@ void SettingsWindow::loadCurrent(SettingsContainer container)
 	
 	qss = QString("background-color: %1").arg(this->_container.TCColor.name());
 	ui.pBTCColor->setStyleSheet(qss);
+
+	ui.Distcb->setChecked(this->_container.showDistanceToPlane);
+	ui.NNcb->setChecked(this->_container.showQuery);
 }
 
 void SettingsWindow::setShowQuery(int state)
