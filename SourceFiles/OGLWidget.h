@@ -16,6 +16,7 @@
 #include "QOpenGLRenderer/PointCloud3dRenderer.h"
 #include "QOpenGLRenderer/BestFitLineRenderer.h"
 #include "QOpenGLRenderer/BestFitPlaneRenderer.h"
+#include "QOpenGLRenderer/BestFitSphereRenderer.h"
 
 class OGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -43,6 +44,7 @@ private:
 	std::unique_ptr<PointCloud3dRenderer> _pointCloud3dRendererPtr;
 	std::unique_ptr<BestFitLineRenderer> _bestFitLineRendererPtr;
 	std::unique_ptr<BestFitPlaneRenderer> _bestFitPlaneRendererPtr;
+	std::unique_ptr<BestFitSphereRenderer> _bestFitSphereRendererPtr;
 
 protected:
 	void initializeGL();

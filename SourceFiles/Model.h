@@ -7,6 +7,7 @@
 #include "ModelProperties.h"
 #include "BestFitLine.h"
 #include "BestFitPlane.h"
+#include "BestFitSphere.h"
 #include <memory>
 #include <vector>
 #include <qmatrix4x4.h>
@@ -21,6 +22,7 @@ public:
 	void add(std::shared_ptr<BestFitLine> bfLinePtr);
 	void add(std::shared_ptr<BestFitPlane> bfPlanePtr);
 	void addNormals(std::shared_ptr<PointCloud3d> pointCloudPtr, double radius);
+	void add(std::shared_ptr<BestFitSphere> bfSpherePtr);
 	size_t getNumberOfRenderableObjects() const;
 	std::shared_ptr<RenderableObjects> getRenderableObjectAt(int index);
 	double getFieldOfViewAngleInYDirection();

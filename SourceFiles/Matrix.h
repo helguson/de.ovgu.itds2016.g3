@@ -24,12 +24,23 @@ class Matrix
           double& operator[] (size_t index)      { return m_data[index]; }
     const double& operator[] (size_t index)const { return m_data[index]; }
 
+	//matrix matrix multiplication
+	Matrix operator* (Matrix const & right) const;
+	Matrix transpose() const;
+	// A(m*n)X(n*o) = B(m*o); A this; B given; returns X
+	Matrix solveFor(Matrix const & B) const;
+	Matrix calculatePseudoInverse() const;
+	// component wise addition
+	Matrix operator+ (Matrix const & right) const;
+
+	static void runTest();
+
   private:
     size_t m_M, m_N;            ///< dimensions of the matrix 
     std::vector<double> m_data; ///< storage for the matrix elements
 };
 
-
+Matrix operator*(double scalar, Matrix const & A);
 
 
 #endif //MY_MATRIX_H

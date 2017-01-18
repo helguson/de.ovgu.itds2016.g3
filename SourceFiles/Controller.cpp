@@ -108,11 +108,12 @@ Controller::Controller(int numberOfArguments, char** arguments)
 			view.addVisibleElementToList();
 	}
 	);
-	//function to thin clouds
+	//function create best fit sphere
 	view.setOnRequestBFSphere(
 		[&view, &model](int selectedIndex)->void {
-		
-	}
+		if (model.bfSphere(selectedIndex))
+			view.addVisibleElementToList();
+		}
 	);
 
 	//#############################

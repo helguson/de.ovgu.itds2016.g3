@@ -1,5 +1,5 @@
 #pragma once
-#include "../BestFitLine.h"
+#include "../BestFitSphere.h"
 #include "../Point3d.h"
 #include <functional>
 #include <vector> 
@@ -10,18 +10,18 @@ using SharedVectorPtr = std::shared_ptr<std::vector<T>>;
 
 using DrawArraysFunction = std::function<void(GLenum mode, GLint first, GLsizei cout)>;
 
-class BestFitLineRenderer
+class BestFitSphereRenderer
 {
 public:
-	BestFitLineRenderer(DrawArraysFunction drawArrays);
-	~BestFitLineRenderer();
+	BestFitSphereRenderer(DrawArraysFunction drawArrays);
+	~BestFitSphereRenderer();
 
-	void render(BestFitLine const & line, QMatrix4x4 transformation);
+	void render(BestFitSphere const & sphere, QMatrix4x4 transformation);
 
 private:
 	QOpenGLShaderProgram _shaderProgram;
 	DrawArraysFunction _drawArrays;
 
-	static SharedVectorPtr<GLfloat> _createVectorOfPointComponents(BestFitLine const & line);	// returns vector of components for all representative points
+	static SharedVectorPtr<GLfloat> _createVectorOfPointComponents(BestFitSphere const & line);	// returns vector of components for all representative points
 };
 

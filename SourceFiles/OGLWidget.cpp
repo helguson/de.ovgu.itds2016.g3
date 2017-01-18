@@ -1,5 +1,5 @@
 #include "OGLWidget.h"
-#include "BestFitLine.h"
+#include "BestFitSphere.h"
 #include <iostream>
 
 OGLWidget::OGLWidget(QWidget *parentPtr)
@@ -8,7 +8,8 @@ OGLWidget::OGLWidget(QWidget *parentPtr)
 	_onRequestPaintGL(nullptr),
 	_pointCloud3dRendererPtr(),	// initialisation takes place in initializeGL
 	_bestFitLineRendererPtr(),	// initialisation takes place in initializeGL
-	_bestFitPlaneRendererPtr()	// initialisation takes place in initializeGL
+	_bestFitPlaneRendererPtr(),	// initialisation takes place in initializeGL
+	_bestFitSphereRendererPtr()	// initialisation takes place in initializeGL
 {
 }
 
@@ -28,7 +29,8 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 			this->_pointCloud3dRendererPtr->render(
 				cloud,
 				transformation,
-				rasterizedSizeOfPoints);
+				rasterizedSizeOfPoints
+			);
 		}
 
 		else if (std::dynamic_pointer_cast<BestFitLine>(visibleElements.at(index))) 
@@ -44,6 +46,14 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 			std::shared_ptr<BestFitPlane> plane = std::dynamic_pointer_cast<BestFitPlane>(visibleElements.at(index));
 			this->_bestFitPlaneRendererPtr->render(
 				*plane,
+				transformation
+			);
+		}
+		else if (std::dynamic_pointer_cast<BestFitSphere>(visibleElements.at(index))) {
+
+			std::shared_ptr<BestFitSphere> sphere = std::dynamic_pointer_cast<BestFitSphere>(visibleElements.at(index));
+			this->_bestFitSphereRendererPtr->render(
+				*sphere,
 				transformation
 			);
 		}
@@ -136,6 +146,9 @@ void OGLWidget::initializeGL()
 		drawArrays
 	);
 	this->_bestFitPlaneRendererPtr = std::make_unique<BestFitPlaneRenderer>(
+		drawArrays
+	);
+	this->_bestFitSphereRendererPtr = std::make_unique<BestFitSphereRenderer>(
 		drawArrays
 	);
 	
