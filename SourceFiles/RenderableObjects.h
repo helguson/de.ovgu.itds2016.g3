@@ -13,8 +13,8 @@ public:
 	bool getVisibility();
 	void setName(std::string name);
 	std::string getName();
-	Point3d getCenter();
-	double getRadius();
+	Point3d getCenter() const;
+	double getRadius() const;
 
 	virtual void _computeCenter() = 0;
 	virtual void _computeRadius() = 0;

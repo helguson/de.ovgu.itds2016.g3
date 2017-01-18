@@ -81,6 +81,47 @@ Matrix Matrix::calculatePseudoInverse() const {
 	return V*S_1*Ut;
 }
 
+Matrix Matrix::operator+ (Matrix const & right) const {
+	Matrix const & L = *this;
+	Matrix const & R = right;
+
+	size_t m = L.M();
+	size_t n = L.N();
+	size_t m2 = R.M();
+	size_t n2 = R.N();
+
+	if (m != m2 || n != n2) {
+		throw std::invalid_argument("matrix dimensions do not match");
+	}
+	else {
+
+		Matrix result(m, n);
+
+		for (size_t iM = 0; iM < m; iM++) {
+			for (size_t iN = 0; iN < n; iN++) {
+				result(iM, iN) = L(iM, iN) + R(iM, iN);
+			}
+		}
+
+		return result;
+	}
+}
+
+Matrix operator*(double scalar, Matrix const & A) 
+{
+	size_t m = A.M();
+	size_t n = A.N();
+	Matrix result(m, n);
+
+	for (size_t iM = 0; iM < m; iM++) {
+		for (size_t iN = 0; iN < n; iN++) {
+			result(iM, iN) = scalar*A(iM, iN);
+		}
+	}
+
+	return result;
+}
+
 void Matrix::runTest() {
 
 	Matrix A(2, 2);

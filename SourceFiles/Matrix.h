@@ -30,6 +30,8 @@ class Matrix
 	// A(m*n)X(n*o) = B(m*o); A this; B given; returns X
 	Matrix solveFor(Matrix const & B) const;
 	Matrix calculatePseudoInverse() const;
+	// component wise addition
+	Matrix operator+ (Matrix const & right) const;
 
 	static void runTest();
 
@@ -38,7 +40,7 @@ class Matrix
     std::vector<double> m_data; ///< storage for the matrix elements
 };
 
-
+Matrix operator*(double scalar, Matrix const & A);
 
 
 #endif //MY_MATRIX_H

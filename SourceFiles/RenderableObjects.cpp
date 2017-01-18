@@ -32,12 +32,12 @@ std::string RenderableObjects::getName()
 	return this->_name;
 }
 
-Point3d RenderableObjects::getCenter()
+Point3d RenderableObjects::getCenter() const
 {
 	return this->_center;
 }
 
-double RenderableObjects::getRadius()
+double RenderableObjects::getRadius() const
 {
 	return this->_radius;
 }
