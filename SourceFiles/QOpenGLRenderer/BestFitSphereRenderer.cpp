@@ -38,7 +38,7 @@ void BestFitSphereRenderer::render(BestFitSphere const & sphere, QMatrix4x4 tran
 
 	// ---------------------------------
 	// draw using current shader program
-	this->_drawArrays(GL_LINE_STRIP, 0, numberOfVertices);
+	this->_drawArrays(GL_TRIANGLES, 0, numberOfVertices);
 
 	this->_shaderProgram.disableAttributeArray(vertexXYZLocation);
 }

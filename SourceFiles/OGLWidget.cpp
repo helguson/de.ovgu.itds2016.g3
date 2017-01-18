@@ -29,12 +29,7 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 			this->_pointCloud3dRendererPtr->render(
 				cloud,
 				transformation,
-				rasterizedSizeOfPoints);
-
-			BestFitSphere sphere(*cloud);
-			this->_bestFitSphereRendererPtr->render(
-				sphere,
-				transformation
+				rasterizedSizeOfPoints
 			);
 		}
 
@@ -51,6 +46,14 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 			std::shared_ptr<BestFitPlane> plane = std::dynamic_pointer_cast<BestFitPlane>(visibleElements.at(index));
 			this->_bestFitPlaneRendererPtr->render(
 				*plane,
+				transformation
+			);
+		}
+		else if (std::dynamic_pointer_cast<BestFitSphere>(visibleElements.at(index))) {
+
+			std::shared_ptr<BestFitSphere> sphere = std::dynamic_pointer_cast<BestFitSphere>(visibleElements.at(index));
+			this->_bestFitSphereRendererPtr->render(
+				*sphere,
 				transformation
 			);
 		}

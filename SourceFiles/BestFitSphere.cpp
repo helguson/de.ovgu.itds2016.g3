@@ -1,7 +1,7 @@
 #include "BestFitSphere.h"
 #include "Matrix.h"
 
-BestFitSphere::BestFitSphere(PointCloud3d const & referencePointCloud, size_t numberOfRepresentingRings, size_t numberOfRepresentingRingElements)
+BestFitSphere::BestFitSphere(PointCloud3d const & referencePointCloud, size_t numberOfRepresentingStripes, size_t numberOfRepresentingRingElements)
 	:	RenderableObjects()
 {
 
@@ -16,7 +16,7 @@ BestFitSphere::BestFitSphere(PointCloud3d const & referencePointCloud, size_t nu
 	);
 
 	this->_computeDefiningAttributesAccordingTo(points, referencePointCloud.getCenter(), referencePointCloud.getRadius());
-	this->_computeRepresentativePointsAccordingTo(numberOfRepresentingRings, numberOfRepresentingRingElements);
+	this->_computeRepresentativePointsAccordingTo(numberOfRepresentingStripes, numberOfRepresentingRingElements);
 	this->_computeCenter();
 	this->_computeRadius();
 }
@@ -77,7 +77,7 @@ void BestFitSphere::_computeDefiningAttributesAccordingTo(std::vector<Point3d> c
 	p[3] = radius;
 
 	// descend along gradient
-	size_t const MAXIMUM_NUMBER_OF_ITERATIONS = 0;
+	size_t const MAXIMUM_NUMBER_OF_ITERATIONS = 10;
 	size_t numberOfFinishedIterations = 0;
 
 	while (numberOfFinishedIterations < MAXIMUM_NUMBER_OF_ITERATIONS) {
@@ -99,19 +99,14 @@ void BestFitSphere::_computeDefiningAttributesAccordingTo(std::vector<Point3d> c
 	this->_radius = p[3];
 }
 
-
-
-// TODO
 // assume that center and radius are computed
-void BestFitSphere::_computeRepresentativePointsAccordingTo(size_t numberOfRepresentingRings, size_t numberOfRepresentingRingElements) {
-
-	size_t numberOfStripes = numberOfRepresentingRings + 1;
+void BestFitSphere::_computeRepresentativePointsAccordingTo(size_t numberOfRepresentingStripes, size_t numberOfRepresentingRingElements) {
 
 	double const PI = 3.14159;
-	double const dAlpha = PI / numberOfStripes;
+	double const dAlpha = PI / numberOfRepresentingStripes;
 	double const dBeta = 2 * PI / numberOfRepresentingRingElements;
 
-	for (size_t iStripe = 0; iStripe < numberOfStripes; iStripe++) {
+	for (size_t iStripe = 0; iStripe < numberOfRepresentingStripes; iStripe++) {
 		double alpha = iStripe*dAlpha;
 		double radius1 = sin(alpha)*this->_radius;
 		double radius2 = sin(alpha+dAlpha)*this->_radius;
@@ -134,16 +129,16 @@ void BestFitSphere::_computeRepresentativePointsAccordingTo(size_t numberOfRepre
 			// | /
 			// 2
 
-			this->_representativePoints.push_back(p1);
-			this->_representativePoints.push_back(p2);
-			this->_representativePoints.push_back(p4);
+			this->_representativePoints.push_back(this->_center + p1);
+			this->_representativePoints.push_back(this->_center + p2);
+			this->_representativePoints.push_back(this->_center + p4);
 
 			//     4
 			//   / |
 			// 2---3
-			this->_representativePoints.push_back(p2);
-			this->_representativePoints.push_back(p3);
-			this->_representativePoints.push_back(p4);
+			this->_representativePoints.push_back(this->_center + p2);
+			this->_representativePoints.push_back(this->_center + p3);
+			this->_representativePoints.push_back(this->_center + p4);
 		}
 	}
 }
