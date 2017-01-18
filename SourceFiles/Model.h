@@ -20,10 +20,12 @@ public:
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
 	void add(std::shared_ptr<BestFitLine> bfLinePtr);
 	void add(std::shared_ptr<BestFitPlane> bfPlanePtr);
+	void addNormals(std::shared_ptr<PointCloud3d> pointCloudPtr, double radius);
 	size_t getNumberOfRenderableObjects() const;
 	std::shared_ptr<RenderableObjects> getRenderableObjectAt(int index);
 	double getFieldOfViewAngleInYDirection();
 	Point3d getSceneCenter();
+	Point3d getCameraPosition();
 	QMatrix4x4 getModelViewProjectionMatrix();
 	QMatrix4x4 getModelViewMatrix();
 
@@ -50,6 +52,7 @@ public:
 private:
 	std::vector<std::shared_ptr<std::vector<Point3d>>> _pointDataSets;
 	std::vector<std::shared_ptr<RenderableObjects>> _renderableObjects;
+	std::vector<std::shared_ptr<std::vector<Point3d>>> _normalVectorSets;
 	CameraModel _cameraModel;
 	ProjectionModel _projectionModel;
 	

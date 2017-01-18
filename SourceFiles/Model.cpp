@@ -27,6 +27,13 @@ void Model::add(std::shared_ptr<BestFitPlane> bfPlanePtr) {
 	this->_renderableObjects.push_back(bfPlanePtr);
 }
 
+void Model::addNormals(std::shared_ptr<PointCloud3d> pointCloudPtr, double radius)
+{
+	std::shared_ptr<std::vector<Point3d>> normals = computeNormalVectors(pointCloudPtr, radius);
+	this->_normalVectorSets.push_back(normals);
+	pointCloudPtr->setNormalDataTo(this->_normalVectorSets.back());
+}
+
 void Model::addPointDataSet(std::shared_ptr<std::vector<Point3d>> pointDataSet) {
 	this->_pointDataSets.push_back(pointDataSet);
 }
@@ -39,6 +46,7 @@ std::shared_ptr<RenderableObjects> Model::getRenderableObjectAt(int index) {
 	return this->_renderableObjects.at(index);
 }
 
+
 double Model::getFieldOfViewAngleInYDirection()
 {
 	return this->_projectionModel.getFieldOfViewAngleInYDirection();
@@ -47,6 +55,11 @@ double Model::getFieldOfViewAngleInYDirection()
 Point3d Model::getSceneCenter()
 {
 	return this->_cameraModel.getSceneCenter();
+}
+
+Point3d Model::getCameraPosition()
+{
+	return this->_cameraModel.getCameraPosition();
 }
 
 QMatrix4x4 Model::getModelViewProjectionMatrix() {

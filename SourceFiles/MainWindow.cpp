@@ -42,20 +42,32 @@ MainWindow::MainWindow()
 	this->_bestFitPlanePtr->setMaximumWidth(120);
 	QObject::connect(this->_bestFitPlanePtr, SIGNAL(clicked()), this, SLOT(bestFitPlane()));
 
-	this->_bestFitSphere = new QPushButton;
-	this->_bestFitSphere->setText(tr("Bestfit Sphere"));
-	this->_bestFitSphere->setMaximumHeight(30);
-	this->_bestFitSphere->setMaximumWidth(120);
-	QObject::connect(this->_bestFitSphere, SIGNAL(clicked()), this, SLOT(bestFitSphere()));
+	this->_bestFitSpherePtr = new QPushButton;
+	this->_bestFitSpherePtr->setText(tr("Bestfit Sphere"));
+	this->_bestFitSpherePtr->setMaximumHeight(30);
+	this->_bestFitSpherePtr->setMaximumWidth(120);
+	QObject::connect(this->_bestFitSpherePtr, SIGNAL(clicked()), this, SLOT(bestFitSphere()));
+
+	this->_computeNormalsPtr = new QPushButton;
+	this->_computeNormalsPtr->setText(tr("Compute Normal Vectors"));
+	this->_computeNormalsPtr->setMaximumHeight(30);
+	this->_computeNormalsPtr->setMaximumWidth(120);
+	QObject::connect(this->_computeNormalsPtr, SIGNAL(clicked()), this, SLOT(computeNormals()));
 
 
 	//SpinBoxes
 	this->_smoothFactorSbPtr = new QDoubleSpinBox;
+	this->_smoothFactorSbPtr->setDecimals(3);
 	this->_smoothFactorSbPtr->setSingleStep(0.1);
 	this->_thinRadiusSbPtr = new QDoubleSpinBox;
+	this->_thinRadiusSbPtr->setDecimals(3);
 	this->_thinRadiusSbPtr->setSingleStep(0.1);
+	this->_normalFactorSbPtr = new QDoubleSpinBox;
+	this->_normalFactorSbPtr->setDecimals(3);
+	this->_normalFactorSbPtr->setSingleStep(0.1);
 	QObject::connect(this->_smoothFactorSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeSmoothFactor(double)));
 	QObject::connect(this->_thinRadiusSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeThinRadius(double)));
+	QObject::connect(this->_normalFactorSbPtr, SIGNAL(valueChanged(double)), this, SLOT(changeNormalFactor(double)));
 
 
 	//ListView of visible Data
@@ -70,9 +82,11 @@ MainWindow::MainWindow()
 	settingsLayoutPtr->addWidget(this->_thinBtPtr);
 	settingsLayoutPtr->addWidget(this->_smoothFactorSbPtr);
 	settingsLayoutPtr->addWidget(this->_smoothBtPtr);
+	settingsLayoutPtr->addWidget(this->_normalFactorSbPtr);
+	settingsLayoutPtr->addWidget(this->_computeNormalsPtr);
 	settingsLayoutPtr->addWidget(this->_bestFitLinePtr);
 	settingsLayoutPtr->addWidget(this->_bestFitPlanePtr);
-	settingsLayoutPtr->addWidget(this->_bestFitSphere);
+	settingsLayoutPtr->addWidget(this->_bestFitSpherePtr);
 	settingsLayoutPtr->addWidget(this->_visibleElementsScrollWidgetPtr);
 
 	QHBoxLayout* layoutPtr = new QHBoxLayout;
@@ -97,6 +111,10 @@ void MainWindow::changeSmoothFactor(double value) {
 
 void MainWindow::changeThinRadius(double value) {
 	this->_settings.thinRadius = value;
+}
+
+void MainWindow::changeNormalFactor(double value) {
+	this->_settings.normalFactor = value;
 }
 
 void MainWindow::editSettings()
@@ -130,6 +148,10 @@ void MainWindow::smoothCloud() {
 	this->_onRequestSmoothCloud();
 }
 
+void MainWindow::computeNormals() {
+	this->_onRequestComputeNormals();
+}
+
 void MainWindow::bestFitLine()
 {
 	int selectedIndex = this->_visibleElementsScrollWidgetPtr->currentIndex().row();
@@ -152,13 +174,18 @@ void MainWindow::bestFitSphere()
 }
 
 void MainWindow::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation) {
-		//send render info to widget
-		this->_oglWidgetPtr->render(visibleElements, transformation);
+	//send render info to widget
+	this->_oglWidgetPtr->render(visibleElements, transformation);
 }
 
-void MainWindow::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
+void MainWindow::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
 {
-	this->_oglWidgetPtr->render(pointCloud, plane, transformation);
+	this->_oglWidgetPtr->renderColouring(pointCloud, plane, transformation);
+}
+
+void MainWindow::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation)
+{
+	this->_oglWidgetPtr->renderShading(pointCloud, transformation);
 }
 
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)
@@ -252,7 +279,6 @@ void MainWindow::_createActions() {
 	this->_createLoadFileAction();
 	this->_createCloseApplicationAction();
 	this->_createEditSettingsAction();
-
 }
 
 void MainWindow::_createLoadFileAction() {

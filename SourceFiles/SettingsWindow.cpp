@@ -32,6 +32,8 @@ void SettingsWindow::loadCurrent(SettingsContainer container)
 
 	ui.Distcb->setChecked(this->_container.showDistanceToPlane);
 	ui.NNcb->setChecked(this->_container.showQuery);
+	ui.shcb->setChecked(this->_container.showShading);
+
 }
 
 void SettingsWindow::setShowQuery(int state)
@@ -42,6 +44,10 @@ void SettingsWindow::setShowQuery(int state)
 void SettingsWindow::setShowDistance(int state)
 {
 	this->_container.showDistanceToPlane = state > 0;
+}
+
+void SettingsWindow::setShowShading(int state) {
+	this->_container.showShading = state > 0;
 }
 
 void SettingsWindow::setNNColor() {

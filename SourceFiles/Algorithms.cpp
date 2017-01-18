@@ -168,6 +168,32 @@ void computeBestFitPlane(const std::vector<Point3d>& points, std::vector<Point3d
   corners.push_back(corner4);
 }
 
+std::shared_ptr<std::vector<Point3d>> computeNormalVectors(const std::shared_ptr<PointCloud3d> pointCloud, const double radius)
+{
+	std::shared_ptr<std::vector<Point3d>> normalVectors = std::make_shared<std::vector<Point3d>>();
+	std::shared_ptr<std::vector<Point3d>> pointCloudPoints = std::make_shared<std::vector<Point3d>>();
+
+	normalVectors->resize(pointCloud->getNumberOfPoints());
+
+	pointCloud->toEachPointApply([pointCloudPoints](Point3d const* point)->void{
+		pointCloudPoints->push_back(*point);
+	});
+	
+	#pragma omp parallel for
+	for (int index = 0; index < pointCloudPoints->size(); index++) {
+		std::shared_ptr<std::vector<Point3d*>> nearestNeighborPtr = pointCloud->query(pointCloudPoints->at(index), radius);
+		std::vector<Point3d> nearestNeighbor = std::vector<Point3d>();
+
+		Matrix M = Matrix();
+		computeCovarianceMatrix3x3(nearestNeighbor, M);
+		SVD::computeSymmetricEigenvectors(M);
+		normalVectors->at(index) = Point3d(M(0, 2), M(1, 2), M(2, 2));
+	}
+
+	return normalVectors;
+}
+
+
 /** @brief Computes the distance of a point to a 3D line.
     @param point         point 
     @param pointOnLine   a point on the line (e.g. "center" point)

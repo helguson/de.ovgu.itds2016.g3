@@ -59,7 +59,7 @@ void PointCloud3dRenderer::render(
 	this->_shaderProgram.disableAttributeArray(vertexRGBLocation);
 }
 
-void PointCloud3dRenderer::render(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr, QMatrix4x4 transformation, float rasterizedSizeOfPoints)
+void PointCloud3dRenderer::renderColouring(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr, QMatrix4x4 transformation, float rasterizedSizeOfPoints)
 {
 	this->_shaderProgram.bind();
 
@@ -90,6 +90,11 @@ void PointCloud3dRenderer::render(SharedPointCloudPtr pointCloudPtr, SharedBestF
 
 	this->_shaderProgram.disableAttributeArray(vertexXYZLocation);
 	this->_shaderProgram.disableAttributeArray(vertexRGBLocation);
+}
+
+void PointCloud3dRenderer::renderShading(SharedPointCloudPtr pointCloudPtr,  QMatrix4x4 transformation, float rasterizedSizeOfPoints)
+{
+	
 }
 
 SharedVectorPtr<GLfloat> PointCloud3dRenderer::_createVectorOfPointComponents(SharedPointCloudPtr pointCloudPtr) 

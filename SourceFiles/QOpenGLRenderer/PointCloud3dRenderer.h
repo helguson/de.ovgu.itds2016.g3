@@ -27,12 +27,8 @@ public:
 		float rasterizedSizeOfPoints
 	);
 
-	void render(
-		SharedPointCloudPtr pointCloudPtr,
-		SharedBestFitPlanePtr planePtr,
-		QMatrix4x4 transformation,
-		float rasterizedSizeOfPoints
-	);
+	void renderColouring(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr, QMatrix4x4 transformation, float rasterizedSizeOfPoints);
+	void PointCloud3dRenderer::renderShading(SharedPointCloudPtr pointCloudPtr, QMatrix4x4 transformation, float rasterizedSizeOfPoints);
 
 private:
 	QOpenGLShaderProgram _shaderProgram;

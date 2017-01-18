@@ -50,13 +50,13 @@ void OGLWidget::render(std::vector<std::shared_ptr<RenderableObjects>>& visibleE
 	}
 }
 
-void OGLWidget::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
+void OGLWidget::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
 	float rasterizedSizeOfPoints = 2;
 
-	this->_pointCloud3dRendererPtr->render(
+	this->_pointCloud3dRendererPtr->renderColouring(
 		pointCloud, 
 		plane,
 		transformation,
@@ -66,7 +66,20 @@ void OGLWidget::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_pt
 	this->_bestFitPlaneRendererPtr->render(
 		*plane, transformation);
 
-} 
+}
+
+void OGLWidget::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation)
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
+	float rasterizedSizeOfPoints = 2;
+
+	this->_pointCloud3dRendererPtr->renderShading(
+		pointCloud,
+		transformation,
+		rasterizedSizeOfPoints
+	);
+}
 
 void OGLWidget::setOnRequestPaintGL(std::function<void()> callback)
 {

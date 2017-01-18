@@ -42,16 +42,26 @@ Controller::Controller(int numberOfArguments, char** arguments)
 				std::shared_ptr<BestFitPlane> bfpPtr2 = std::dynamic_pointer_cast<BestFitPlane>(visibleObjects.at(1));
 
 				if (pcPtr1) {
-					if(bfpPtr2) view.render(pcPtr1, bfpPtr2, model.getModelViewProjectionMatrix());
+					if(bfpPtr2) view.renderColouring(pcPtr1, bfpPtr2, model.getModelViewProjectionMatrix());
 					else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 				}
 
 				else if (pcPtr2) {
-					if (bfpPtr1) view.render(pcPtr2, bfpPtr1, model.getModelViewProjectionMatrix());
+					if (bfpPtr1) view.renderColouring(pcPtr2, bfpPtr1, model.getModelViewProjectionMatrix());
 					else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 				}
 				else 
 					view.render(visibleObjects, model.getModelViewProjectionMatrix());
+			}
+			else if (view.getSettings().showShading && visibleObjects.size() == 1)
+			{
+				std::shared_ptr<PointCloud3d> pcPtr = std::dynamic_pointer_cast<PointCloud3d>(visibleObjects.at(0));
+				
+				#pragma omp parallel for
+				for (int index = 0; index < pcPtr->getNormals()->size(); index++) {
+					if (dotProduct(model.getSceneCenter() - model.getCameraPosition(), pcPtr->getNormals()->at(index)) < 0) pcPtr->getNormals()->at(index) = pcPtr->getNormals()->at(index)*-1;
+				}
+				view.renderShading(pcPtr, model.getModelViewProjectionMatrix());
 			}
 			else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 		}

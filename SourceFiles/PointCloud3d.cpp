@@ -7,6 +7,7 @@ PointCloud3d::PointCloud3d(
 )
 	:RenderableObjects(),
 	_storeCreatedPointData(storeCreatedPointData),
+	_normalVectorsPtr(std::make_shared<std::vector<Point3d>>()),
 	_tree(pointData),
 	_minMax(),
 	_color(255,255,255)
@@ -28,6 +29,11 @@ void PointCloud3d::setPointDataTo(std::vector<Point3d*> const & pointData) {
 	this->_computeRadius();
 }
 
+void PointCloud3d::setNormalDataTo(std::shared_ptr<std::vector<Point3d>> const & normalData)
+{
+	this->_normalVectorsPtr = normalData;
+}
+
 void PointCloud3d::setColor(QColor color)
 {
 	this->_color = color;
@@ -36,6 +42,11 @@ void PointCloud3d::setColor(QColor color)
 QColor PointCloud3d::getColor() const
 {
 	return this->_color;
+}
+
+std::shared_ptr<std::vector<Point3d>> PointCloud3d::getNormals()
+{
+	return this->_normalVectorsPtr;
 }
 
 void PointCloud3d::_computeCenter() 

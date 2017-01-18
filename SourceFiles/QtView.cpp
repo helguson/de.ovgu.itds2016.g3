@@ -79,7 +79,12 @@ void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QM
 	this->_window.render(objects, transformation);
 }
 
-void QtView::render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
+void QtView::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
 {
-	this->_window.render(pointCloud, plane, transformation);
+	this->_window.renderColouring(pointCloud, plane, transformation);
+}
+
+void QtView::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation)
+{
+	this->_window.renderShading(pointCloud, transformation);
 }

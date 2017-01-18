@@ -20,7 +20,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
 	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation);
-	void render(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
+	void renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
+	void renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
@@ -46,11 +47,13 @@ private:
 	QPushButton* _thinBtPtr;
 	QPushButton* _bestFitLinePtr;
 	QPushButton* _bestFitPlanePtr;
-	QPushButton* _bestFitSphere;
+	QPushButton* _bestFitSpherePtr;
+	QPushButton* _computeNormalsPtr;
 
 	// SpinnBoxes
 	QDoubleSpinBox* _smoothFactorSbPtr;
 	QDoubleSpinBox* _thinRadiusSbPtr;
+	QDoubleSpinBox* _normalFactorSbPtr;
 
 	//List of visible Elements
 	QListWidget* _visibleElementsScrollWidgetPtr;
@@ -59,6 +62,7 @@ private:
 	std::function<void(std::string)> _onRequestLoadFile;
 	std::function<void()> _onRequestSmoothCloud;
 	std::function<void()> _onRequestThinCloud;
+	std::function<void()> _onRequestComputeNormals;
 	std::function<void()> _onRequestUpdateOGLWidget;
 	std::function<void()> _onRequestScroll;
 	std::function<void()> _onRequestRotate;
@@ -94,10 +98,12 @@ private slots:
 	void closeApplication();
 	void thinCloud();
 	void smoothCloud();
+	void computeNormals();
 	void bestFitLine();
 	void bestFitPlane();
 	void bestFitSphere();
 	void changeSmoothFactor(double value);
 	void changeThinRadius(double value);
+	void changeNormalFactor(double value);
 	void repaintOGLWidget(QListWidgetItem* sender);
 	};

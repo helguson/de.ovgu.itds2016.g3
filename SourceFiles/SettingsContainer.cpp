@@ -14,10 +14,11 @@ SettingsContainer::SettingsContainer()
 {
 }
 
-SettingsContainer::SettingsContainer(bool sQ, bool sdt, QColor nn, QColor pc, QColor sc, QColor tc )
+SettingsContainer::SettingsContainer(bool sQ, bool sdt, bool ssh, QColor nn, QColor pc, QColor sc, QColor tc )
 	:
 	showQuery(sQ),
 	showDistanceToPlane(sdt),
+	showShading(ssh),
 	smoothFactor(0.0),
 	thinRadius(0.0),
 	NNColor(nn),

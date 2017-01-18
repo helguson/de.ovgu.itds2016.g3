@@ -24,5 +24,6 @@ private slots:
 	void setTCColor();
 	void setShowQuery(int state);
 	void setShowDistance(int state);
+	void setShowShading(int state);
 
 };

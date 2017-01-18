@@ -54,6 +54,24 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Shading:</string>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignRight">
+      <widget class="QCheckBox" name="shcb">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QLabel" name="label_4">
@@ -138,7 +156,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>428</x>
-     <y>40</y>
+     <y>36</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -154,7 +172,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>428</x>
-     <y>159</y>
+     <y>187</y>
     </hint>
     <hint type="destinationlabel">
      <x>269</x>
@@ -217,12 +235,28 @@
    <slot>setShowDistance(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>422</x>
-     <y>90</y>
+     <x>428</x>
+     <y>85</y>
     </hint>
     <hint type="destinationlabel">
      <x>440</x>
      <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>shcb</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>SettingsWindow</receiver>
+   <slot>setShowShading(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>421</x>
+     <y>125</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>97</y>
     </hint>
    </hints>
   </connection>
@@ -234,5 +268,6 @@
   <slot>setSCColor()</slot>
   <slot>setTCColor()</slot>
   <slot>setShowDistance(int)</slot>
+  <slot>setShowShading(int)</slot>
  </slots>
 </ui>

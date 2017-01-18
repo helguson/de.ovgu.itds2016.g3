@@ -19,12 +19,14 @@ public:
 	~PointCloud3d();
 
 	void setPointDataTo(std::vector<Point3d*> const & pointData);	// TODO: needed in public?
+	void setNormalDataTo(std::shared_ptr<std::vector<Point3d>> const & normalData);
 	void setColor(QColor color);
 	bool isEmpty() const;
 	size_t getNumberOfPoints() const;
 	void toEachPointApply(std::function<void(Point3d*)> functor) const;
 
 	QColor getColor() const;
+	std::shared_ptr<std::vector<Point3d>> getNormals();
 	std::shared_ptr<std::vector<Point3d*>> query(Point3d const & referencePoint, double maximumDistance) const;
 	std::shared_ptr<PointCloud3d> computeSmoothedVersionWith(double radius);
 	std::shared_ptr<PointCloud3d> computeThinnedVersionWith(double thinningRadius);
@@ -32,6 +34,7 @@ public:
 
 private:
 	std::function<void(std::shared_ptr<std::vector<Point3d>>)> _storeCreatedPointData;
+	std::shared_ptr<std::vector<Point3d>> _normalVectorsPtr;
 	ThreeDTree _tree;
 	std::pair<Point3d, Point3d> _minMax;
 	QColor _color;
