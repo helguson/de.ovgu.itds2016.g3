@@ -44,7 +44,7 @@ QColor PointCloud3d::getColor() const
 	return this->_color;
 }
 
-std::shared_ptr<std::vector<Point3d>> PointCloud3d::getNormals()
+std::shared_ptr<std::vector<Point3d>> PointCloud3d::getNormals() const
 {
 	return this->_normalVectorsPtr;
 }

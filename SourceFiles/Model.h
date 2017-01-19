@@ -21,7 +21,7 @@ public:
 	void add(std::shared_ptr<PointCloud3d> pointCloudPtr);
 	void add(std::shared_ptr<BestFitLine> bfLinePtr);
 	void add(std::shared_ptr<BestFitPlane> bfPlanePtr);
-	void addNormals(std::shared_ptr<PointCloud3d> pointCloudPtr, double radius);
+	void addNormals(std::shared_ptr<PointCloud3d>& pointCloudPtr, double radius);
 	void add(std::shared_ptr<BestFitSphere> bfSpherePtr);
 	size_t getNumberOfRenderableObjects() const;
 	std::shared_ptr<RenderableObjects> getRenderableObjectAt(int index);

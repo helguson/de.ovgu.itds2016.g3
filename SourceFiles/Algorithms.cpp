@@ -187,7 +187,9 @@ std::shared_ptr<std::vector<Point3d>> computeNormalVectors(const std::shared_ptr
 		Matrix M = Matrix();
 		computeCovarianceMatrix3x3(nearestNeighbor, M);
 		SVD::computeSymmetricEigenvectors(M);
-		normalVectors->at(index) = Point3d(M(0, 2), M(1, 2), M(2, 2));
+		Point3d normal = Point3d(M(0, 2), M(1, 2), M(2, 2));
+		normalizeVector(normal);
+		normalVectors->at(index) = normal;
 	}
 
 	return normalVectors;

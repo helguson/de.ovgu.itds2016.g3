@@ -56,12 +56,8 @@ Controller::Controller(int numberOfArguments, char** arguments)
 			else if (view.getSettings().showShading && visibleObjects.size() == 1)
 			{
 				std::shared_ptr<PointCloud3d> pcPtr = std::dynamic_pointer_cast<PointCloud3d>(visibleObjects.at(0));
-				
-				#pragma omp parallel for
-				for (int index = 0; index < pcPtr->getNormals()->size(); index++) {
-					if (dotProduct(model.getSceneCenter() - model.getCameraPosition(), pcPtr->getNormals()->at(index)) < 0) pcPtr->getNormals()->at(index) = pcPtr->getNormals()->at(index)*-1;
-				}
-				view.renderShading(pcPtr, model.getModelViewProjectionMatrix());
+
+				view.renderShading(pcPtr, model.getModelViewProjectionMatrix(), model.getModelViewMatrix());
 			}
 			else view.render(visibleObjects, model.getModelViewProjectionMatrix());
 		}
@@ -94,14 +90,24 @@ Controller::Controller(int numberOfArguments, char** arguments)
 	}
 	);
 
-	//function to thin clouds
+	view.setOnRequestComputeNormals(
+		[&view, &model]()->void {
+		for each (int index in view.getVisibleElementsIndicies()) {
+			std::shared_ptr<PointCloud3d> pcPtr = std::dynamic_pointer_cast<PointCloud3d>(model.getRenderableObjectAt(index));
+			if (pcPtr)
+				model.addNormals(pcPtr, view.getSettings().thinRadius);
+		}
+	}
+	);
+
+	//function to create best fit line
 	view.setOnRequestBFLine(
 		[&view, &model](int selectedIndex)->void {
 		if(model.bfLine(selectedIndex))
 			view.addVisibleElementToList();
 	}
 	);
-	//function to thin clouds
+	//function to create best fit plane
 	view.setOnRequestBFPlane(
 		[&view, &model](int selectedIndex)->void {
 		if (model.bfPlane(selectedIndex))

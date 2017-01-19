@@ -78,15 +78,15 @@ MainWindow::MainWindow()
 	//Layouts
 	QVBoxLayout* settingsLayoutPtr = new QVBoxLayout;
 	settingsLayoutPtr->setAlignment(Qt::AlignTop);
+	settingsLayoutPtr->addWidget(this->_bestFitLinePtr);
+	settingsLayoutPtr->addWidget(this->_bestFitPlanePtr);
+	settingsLayoutPtr->addWidget(this->_bestFitSpherePtr);
 	settingsLayoutPtr->addWidget(this->_thinRadiusSbPtr);
 	settingsLayoutPtr->addWidget(this->_thinBtPtr);
 	settingsLayoutPtr->addWidget(this->_smoothFactorSbPtr);
 	settingsLayoutPtr->addWidget(this->_smoothBtPtr);
 	settingsLayoutPtr->addWidget(this->_normalFactorSbPtr);
 	settingsLayoutPtr->addWidget(this->_computeNormalsPtr);
-	settingsLayoutPtr->addWidget(this->_bestFitLinePtr);
-	settingsLayoutPtr->addWidget(this->_bestFitPlanePtr);
-	settingsLayoutPtr->addWidget(this->_bestFitSpherePtr);
 	settingsLayoutPtr->addWidget(this->_visibleElementsScrollWidgetPtr);
 
 	QHBoxLayout* layoutPtr = new QHBoxLayout;
@@ -183,9 +183,9 @@ void MainWindow::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std:
 	this->_oglWidgetPtr->renderColouring(pointCloud, plane, transformation);
 }
 
-void MainWindow::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation)
+void MainWindow::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 modelViewProjectionMatrix, QMatrix4x4 modelViewMatrix)
 {
-	this->_oglWidgetPtr->renderShading(pointCloud, transformation);
+	this->_oglWidgetPtr->renderShading(pointCloud, modelViewProjectionMatrix, modelViewMatrix);
 }
 
 void MainWindow::setOnRequestLoadFile(std::function<void(std::string)> callback)
@@ -206,6 +206,11 @@ void MainWindow::setOnRequestThinCloud(std::function<void()> callback)
 void MainWindow::setOnRequestSmoothCloud(std::function<void()> callback)
 {
 	this->_onRequestSmoothCloud = callback;
+}
+
+void MainWindow::setOnRequestComputeNormals(std::function<void()> callback)
+{
+	this->_onRequestComputeNormals = callback;
 }
 
 void MainWindow::setOnRequestUpdateOGLWidget(std::function<void()> callback)

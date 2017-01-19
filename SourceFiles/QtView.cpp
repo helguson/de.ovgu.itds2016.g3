@@ -30,6 +30,11 @@ void QtView::setOnRequestSmoothCloud(std::function<void()> callback)
 	this->_window.setOnRequestSmoothCloud(callback);
 }
 
+void QtView::setOnRequestComputeNormals(std::function<void()> callback)
+{
+	this->_window.setOnRequestComputeNormals(callback);
+}
+
 void QtView::setOnRequestBFLine(std::function<void(int)> callback)
 {
 	this->_window.setOnRequestBFLine(callback);
@@ -75,16 +80,16 @@ void QtView::addVisibleElementToList()
 	this->_window.addVisibleElementToList();
 }
 
-void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 transformation) {
-	this->_window.render(objects, transformation);
+void QtView::render(std::vector<std::shared_ptr<RenderableObjects>>& objects, QMatrix4x4 modelViewProjectionMatrix) {
+	this->_window.render(objects, modelViewProjectionMatrix);
 }
 
-void QtView::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation)
+void QtView::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 modelViewProjectionMatrix)
 {
-	this->_window.renderColouring(pointCloud, plane, transformation);
+	this->_window.renderColouring(pointCloud, plane, modelViewProjectionMatrix);
 }
 
-void QtView::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation)
+void QtView::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 modelViewProjectionMatrix, QMatrix4x4 modelViewMatrix)
 {
-	this->_window.renderShading(pointCloud, transformation);
+	this->_window.renderShading(pointCloud, modelViewProjectionMatrix, modelViewMatrix);
 }

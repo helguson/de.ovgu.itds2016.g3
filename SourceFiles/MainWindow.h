@@ -19,13 +19,14 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 transformation);
-	void renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
-	void renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& visibleElements, QMatrix4x4 modelViewProjectionMatrix);
+	void renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 modelViewProjectionMatrix);
+	void renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 modelViewProjectionMatrix, QMatrix4x4 modelViewMatrix);
 	void setOnRequestLoadFile(std::function<void(std::string)> callback);
 	void setOnRequestPaintGL(std::function<void() > callback);
 	void setOnRequestThinCloud(std::function<void() > callback);
 	void setOnRequestSmoothCloud(std::function<void() > callback);
+	void setOnRequestComputeNormals(std::function<void()> callback);
 	void setOnRequestUpdateOGLWidget(std::function<void() > callback);
 	void setOnRequestScroll(std::function<void(double, double)> callback);
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);

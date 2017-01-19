@@ -23,17 +23,18 @@ public:
 
 	void render(
 		SharedPointCloudPtr pointCloudPtr,
-		QMatrix4x4 transformation,
+		QMatrix4x4 modelViewProjectionMatrix,
 		float rasterizedSizeOfPoints
 	);
 
-	void renderColouring(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr, QMatrix4x4 transformation, float rasterizedSizeOfPoints);
-	void PointCloud3dRenderer::renderShading(SharedPointCloudPtr pointCloudPtr, QMatrix4x4 transformation, float rasterizedSizeOfPoints);
+	void renderColouring(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr, QMatrix4x4 modelViewProjectionMatrix, float rasterizedSizeOfPoints);
+	void PointCloud3dRenderer::renderShading(SharedPointCloudPtr pointCloudPtr, QMatrix4x4 modelViewProjectionMatrix, QMatrix4x4 modelViewMatrix, float rasterizedSizeOfPoints);
 
 private:
 	QOpenGLShaderProgram _shaderProgram;
 	DrawArraysFunction _drawArrays;
 	static SharedVectorPtr<GLfloat> _createVectorOfPointComponents(SharedPointCloudPtr pointCloudPtr);	// returns vector of components for all represented point (x1, y1, z1, ... xn, yn, zn)
+	static SharedVectorPtr<GLfloat> _createVectorOfNormalPointComponents(SharedPointCloudPtr pointCloudPtr);
 	static SharedVectorPtr<GLfloat> _createVectorOfPointColourComponents(SharedPointCloudPtr pointCloudPtr); // returns vector of colour components for all represented points (r1, g1, b1, ... rn, gn, bn)
 	static SharedVectorPtr<GLfloat> _createVectorOfPointColourComponents(SharedPointCloudPtr pointCloudPtr, SharedBestFitPlanePtr planePtr); // returns vector of colour components for all represented points wrt distance to plane(r1, g1, b1, ... rn, gn, bn)
 };

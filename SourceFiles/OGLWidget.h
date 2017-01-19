@@ -29,9 +29,9 @@ public:
 	void setOnRequestRotate(std::function<void(double, double, double, double, int, int) > callback);
 	void setOnRequestTranslate(std::function<void(double, double, double, double, int, int) > callback);
 	void setOnRequestResizeWindow(std::function<void(double, double)> callback);
-	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds, QMatrix4x4 transformation);
-	void renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 transformation);
-	void renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation);
+	void render(std::vector<std::shared_ptr<RenderableObjects>>& pointClouds, QMatrix4x4 modelViewProjectionMatrix);
+	void renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::shared_ptr<BestFitPlane>& plane, QMatrix4x4 modelViewProjectionMatrix);
+	void renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 modelViewProjectionMatrix, QMatrix4x4 modelViewMatrix);
 
 private:
 	void _triggerOnRequestPaintGL();

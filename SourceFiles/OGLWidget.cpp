@@ -78,7 +78,7 @@ void OGLWidget::renderColouring(std::shared_ptr<PointCloud3d>& pointCloud, std::
 
 }
 
-void OGLWidget::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 transformation)
+void OGLWidget::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix4x4 modelViewProjectionMatrix, QMatrix4x4 modelViewMatrix)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear buffers
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //clear background color
@@ -86,7 +86,8 @@ void OGLWidget::renderShading(std::shared_ptr<PointCloud3d>& pointCloud, QMatrix
 
 	this->_pointCloud3dRendererPtr->renderShading(
 		pointCloud,
-		transformation,
+		modelViewProjectionMatrix,
+		modelViewMatrix,
 		rasterizedSizeOfPoints
 	);
 }

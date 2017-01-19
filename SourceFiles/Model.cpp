@@ -27,7 +27,7 @@ void Model::add(std::shared_ptr<BestFitPlane> bfPlanePtr) {
 	this->_renderableObjects.push_back(bfPlanePtr);
 }
 
-void Model::addNormals(std::shared_ptr<PointCloud3d> pointCloudPtr, double radius)
+void Model::addNormals(std::shared_ptr<PointCloud3d>& pointCloudPtr, double radius)
 {
 	std::shared_ptr<std::vector<Point3d>> normals = computeNormalVectors(pointCloudPtr, radius);
 	this->_normalVectorSets.push_back(normals);

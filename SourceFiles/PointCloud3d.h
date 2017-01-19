@@ -26,7 +26,7 @@ public:
 	void toEachPointApply(std::function<void(Point3d*)> functor) const;
 
 	QColor getColor() const;
-	std::shared_ptr<std::vector<Point3d>> getNormals();
+	std::shared_ptr<std::vector<Point3d>> getNormals() const;
 	std::shared_ptr<std::vector<Point3d*>> query(Point3d const & referencePoint, double maximumDistance) const;
 	std::shared_ptr<PointCloud3d> computeSmoothedVersionWith(double radius);
 	std::shared_ptr<PointCloud3d> computeThinnedVersionWith(double thinningRadius);
