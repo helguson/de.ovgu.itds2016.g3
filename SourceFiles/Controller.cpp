@@ -95,7 +95,7 @@ Controller::Controller(int numberOfArguments, char** arguments)
 		for each (int index in view.getVisibleElementsIndicies()) {
 			std::shared_ptr<PointCloud3d> pcPtr = std::dynamic_pointer_cast<PointCloud3d>(model.getRenderableObjectAt(index));
 			if (pcPtr)
-				model.addNormals(pcPtr, view.getSettings().thinRadius);
+				model.addNormals(pcPtr, view.getSettings().normalFactor);
 		}
 	}
 	);

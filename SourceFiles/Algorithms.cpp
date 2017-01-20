@@ -181,11 +181,15 @@ std::shared_ptr<std::vector<Point3d>> computeNormalVectors(const std::shared_ptr
 	
 	#pragma omp parallel for
 	for (int index = 0; index < pointCloudPoints->size(); index++) {
-		std::shared_ptr<std::vector<Point3d*>> nearestNeighborPtr = pointCloud->query(pointCloudPoints->at(index), radius);
-		std::vector<Point3d> nearestNeighbor = std::vector<Point3d>();
+		std::shared_ptr<std::vector<Point3d*>> nearestNeighborsPtr = pointCloud->query(pointCloudPoints->at(index), radius);
+		std::vector<Point3d> nearestNeighbors = std::vector<Point3d>();
+		for (Point3d* pointPtr : *nearestNeighborsPtr) {
+			nearestNeighbors.push_back(*pointPtr);
+		}
+
 
 		Matrix M = Matrix();
-		computeCovarianceMatrix3x3(nearestNeighbor, M);
+		computeCovarianceMatrix3x3(nearestNeighbors, M);
 		SVD::computeSymmetricEigenvectors(M);
 		Point3d normal = Point3d(M(0, 2), M(1, 2), M(2, 2));
 		normalizeVector(normal);
