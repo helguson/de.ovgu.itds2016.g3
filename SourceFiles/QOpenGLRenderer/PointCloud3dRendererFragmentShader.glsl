@@ -7,8 +7,9 @@ void main()
 	if(shouldApplyShading){
 		lowp vec3 lightPositionInViewSpace = vec3(1.0, 1.0, 1.0);
 		lowp vec4 ambientColor = vec4(0.1, 0.1, 0.1, 1.0);
-		lowp vec4 diffuseColor = vec4(fragmentRGB, 1.0);
-		lowp vec4 specularColor = vec4(0.7, 0.7, 0.7, 1.0);
+		//lowp vec4 diffuseColor = vec4(fragmentRGB, 1.0);
+		lowp vec4 diffuseColor = vec4(0.5, 0.5, 0.0, 1.0);
+		lowp vec4 specularColor = vec4(0.8, 0.8, 0.8, 1.0);
 		lowp float shininess = 100.0;
 		highp vec3 N = normalize(viewSpaceNormal);
 		highp vec3 L = normalize(lightPositionInViewSpace-fragmentXYZInViewSpace);	//direction to light
@@ -22,6 +23,7 @@ void main()
 		iSpec = clamp(iSpec, 0.0, 1.0);
 
 		gl_FragColor = iAmbi + iDiff + iSpec;
+		//gl_FragColor = vec4(N, 1.0);
 	}
 	else{
 		gl_FragColor = vec4(fragmentRGB, 1.0);
